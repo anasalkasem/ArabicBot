@@ -17,10 +17,17 @@ class TradingStrategy:
         if not self.multi_tf_enabled or not self.require_trend_alignment:
             return True, "Multi-timeframe disabled"
         
+        if medium_trend is None or long_trend is None:
+            return True, "Multi-timeframe data unavailable, proceeding"
+        
         if medium_trend == 'bullish' and long_trend == 'bullish':
             return True, f"✅ Trend aligned: 1h={medium_trend}, 4h={long_trend}"
         elif medium_trend == 'bullish' and long_trend == 'neutral':
             return True, f"⚠️ Partial alignment: 1h={medium_trend}, 4h={long_trend}"
+        elif medium_trend == 'neutral' and long_trend in ['bullish', 'neutral']:
+            return True, f"⚠️ Neutral trend acceptable: 1h={medium_trend}, 4h={long_trend}"
+        elif medium_trend == 'bearish' or long_trend == 'bearish':
+            return False, f"❌ Bearish trend detected: 1h={medium_trend}, 4h={long_trend}"
         else:
             return False, f"❌ Trend not aligned: 1h={medium_trend}, 4h={long_trend}"
     
