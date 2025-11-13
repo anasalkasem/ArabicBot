@@ -76,6 +76,30 @@ class TechnicalIndicators:
             logger.error(f"Error calculating MACD: {e}")
             return df
     
+    def calculate_ema(self, df):
+        try:
+            ema_short = self.config['indicators']['ema_short']
+            ema_long = self.config['indicators']['ema_long']
+            
+            df['ema_short'] = ta.ema(df['close'], length=ema_short)
+            df['ema_long'] = ta.ema(df['close'], length=ema_long)
+            return df
+        except Exception as e:
+            logger.error(f"Error calculating EMA: {e}")
+            return df
+    
+    def calculate_adx(self, df):
+        try:
+            adx_period = self.config['indicators']['adx_period']
+            adx_data = ta.adx(df['high'], df['low'], df['close'], length=adx_period)
+            df['adx'] = adx_data[f'ADX_{adx_period}']
+            df['dmp'] = adx_data[f'DMP_{adx_period}']
+            df['dmn'] = adx_data[f'DMN_{adx_period}']
+            return df
+        except Exception as e:
+            logger.error(f"Error calculating ADX: {e}")
+            return df
+    
     def calculate_all_indicators(self, klines):
         df = self.prepare_dataframe(klines)
         if df is None or df.empty:
@@ -85,6 +109,8 @@ class TechnicalIndicators:
         df = self.calculate_stochastic(df)
         df = self.calculate_bollinger_bands(df)
         df = self.calculate_macd(df)
+        df = self.calculate_ema(df)
+        df = self.calculate_adx(df)
         
         return df
     
@@ -104,5 +130,27 @@ class TechnicalIndicators:
             'bb_lower': latest['bb_lower'],
             'macd': latest['macd'],
             'macd_signal': latest['macd_signal'],
-            'macd_hist': latest['macd_hist']
+            'macd_hist': latest['macd_hist'],
+            'ema_short': latest['ema_short'],
+            'ema_long': latest['ema_long'],
+            'adx': latest['adx'],
+            'dmp': latest['dmp'],
+            'dmn': latest['dmn']
         }
+    
+    def analyze_trend(self, df):
+        if df is None or df.empty:
+            return 'neutral'
+        
+        latest = df.iloc[-1]
+        
+        ema_bullish = latest['ema_short'] > latest['ema_long']
+        price_above_ema = latest['close'] > latest['ema_long']
+        adx_strong = latest['adx'] > self.config['indicators']['adx_threshold']
+        
+        if ema_bullish and price_above_ema and adx_strong:
+            return 'bullish'
+        elif not ema_bullish and not price_above_ema and adx_strong:
+            return 'bearish'
+        else:
+            return 'neutral'

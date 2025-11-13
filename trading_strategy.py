@@ -10,13 +10,33 @@ class TradingStrategy:
         self.rsi_overbought = config['indicators']['rsi_overbought']
         self.stoch_oversold = config['indicators']['stochastic_oversold']
         self.stoch_overbought = config['indicators']['stochastic_overbought']
+        self.multi_tf_enabled = config.get('multi_timeframe', {}).get('enabled', False)
+        self.require_trend_alignment = config.get('multi_timeframe', {}).get('require_trend_alignment', True)
     
-    def check_buy_signal(self, indicators, prev_indicators=None):
+    def check_trend_alignment(self, medium_trend, long_trend):
+        if not self.multi_tf_enabled or not self.require_trend_alignment:
+            return True, "Multi-timeframe disabled"
+        
+        if medium_trend == 'bullish' and long_trend == 'bullish':
+            return True, f"✅ Trend aligned: 1h={medium_trend}, 4h={long_trend}"
+        elif medium_trend == 'bullish' and long_trend == 'neutral':
+            return True, f"⚠️ Partial alignment: 1h={medium_trend}, 4h={long_trend}"
+        else:
+            return False, f"❌ Trend not aligned: 1h={medium_trend}, 4h={long_trend}"
+    
+    def check_buy_signal(self, indicators, prev_indicators=None, medium_trend=None, long_trend=None):
         try:
             if not indicators or np.isnan(indicators['rsi']):
                 return False, []
             
             signals = []
+            
+            if self.multi_tf_enabled:
+                trend_ok, trend_msg = self.check_trend_alignment(medium_trend, long_trend)
+                if not trend_ok:
+                    logger.debug(f"Buy signal rejected: {trend_msg}")
+                    return False, []
+                signals.append(trend_msg)
             
             rsi_condition = indicators['rsi'] < self.rsi_oversold
             if rsi_condition:
@@ -30,7 +50,14 @@ class TradingStrategy:
             if bb_condition:
                 signals.append(f"Price={indicators['close']:.2f} touching lower BB={indicators['bb_lower']:.2f}")
             
+            ema_bullish = indicators['ema_short'] > indicators['ema_long']
+            if ema_bullish:
+                signals.append(f"EMA bullish: {indicators['ema_short']:.2f} > {indicators['ema_long']:.2f}")
+            
             buy_signal = rsi_condition and stoch_condition and bb_condition
+            
+            if self.multi_tf_enabled:
+                buy_signal = buy_signal and self.check_trend_alignment(medium_trend, long_trend)[0]
             
             if buy_signal:
                 logger.info(f"✅ BUY SIGNAL DETECTED: {', '.join(signals)}")

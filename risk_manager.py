@@ -74,12 +74,22 @@ class RiskManager:
         return True
     
     def open_position(self, symbol, entry_price, quantity, signals):
+        trailing_config = self.config['risk_management'].get('trailing_stop_loss', {})
+        initial_stop = -trailing_config.get('initial_stop_percent', 2.0)
+        
         self.positions[symbol] = {
             'status': 'open',
             'entry_price': entry_price,
             'quantity': quantity,
             'signals': signals,
-            'entry_time': str(pd.Timestamp.now())
+            'entry_time': str(pd.Timestamp.now()),
+            'trailing_stop': {
+                'enabled': trailing_config.get('enabled', False),
+                'current_stop_percent': initial_stop,
+                'highest_price': entry_price,
+                'activation_profit': trailing_config.get('activation_profit_percent', 3.0),
+                'trail_percent': trailing_config.get('trail_percent', 2.0)
+            }
         }
         self.save_positions()
         logger.info(f"📈 Position opened: {symbol} @ ${entry_price:.2f}, Quantity: {quantity:.8f}")
@@ -110,6 +120,65 @@ class RiskManager:
                    f"Profit: {profit_percent:.2f}% (${profit_usd:.2f}), Reason: {reason}")
         
         return position
+    
+    def update_trailing_stop(self, symbol, current_price):
+        if symbol not in self.positions:
+            return None
+        
+        position = self.positions[symbol]
+        if position.get('status') != 'open':
+            return None
+        
+        trailing = position.get('trailing_stop', {})
+        if not trailing.get('enabled', False):
+            return None
+        
+        entry_price = position['entry_price']
+        current_profit_percent = ((current_price - entry_price) / entry_price) * 100
+        
+        activation_profit = trailing['activation_profit']
+        if current_profit_percent < activation_profit:
+            return None
+        
+        highest_price = trailing.get('highest_price', entry_price)
+        if current_price > highest_price:
+            trailing['highest_price'] = current_price
+            
+            profit_from_entry = ((current_price - entry_price) / entry_price) * 100
+            new_stop = profit_from_entry - trailing['trail_percent']
+            
+            if new_stop > trailing['current_stop_percent']:
+                old_stop = trailing['current_stop_percent']
+                trailing['current_stop_percent'] = new_stop
+                position['trailing_stop'] = trailing
+                self.save_positions()
+                
+                logger.info(f"🔄 Trailing stop updated for {symbol}: "
+                          f"{old_stop:.2f}% → {new_stop:.2f}% (Price: ${current_price:.2f})")
+                return new_stop
+        
+        return trailing['current_stop_percent']
+    
+    def check_trailing_stop(self, symbol, current_price):
+        if symbol not in self.positions:
+            return False
+        
+        position = self.positions[symbol]
+        trailing = position.get('trailing_stop', {})
+        
+        if not trailing.get('enabled', False):
+            return False
+        
+        entry_price = position['entry_price']
+        current_profit_percent = ((current_price - entry_price) / entry_price) * 100
+        stop_percent = trailing.get('current_stop_percent', -2.0)
+        
+        if current_profit_percent <= stop_percent:
+            logger.warning(f"🛑 TRAILING STOP triggered for {symbol}: "
+                         f"Profit {current_profit_percent:.2f}% <= Stop {stop_percent:.2f}%")
+            return True
+        
+        return False
     
     def get_open_positions(self):
         return {k: v for k, v in self.positions.items() if v.get('status') == 'open'}

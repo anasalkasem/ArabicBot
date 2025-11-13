@@ -32,6 +32,14 @@ class BinanceTradingBot:
         self.risk_manager = RiskManager(self.config, self.binance_client)
         
         self.prev_indicators = {}
+        self.multi_tf_enabled = self.config.get('multi_timeframe', {}).get('enabled', False)
+        
+        if self.multi_tf_enabled:
+            logger.info("✨ Multi-Timeframe Analysis: ENABLED")
+        
+        trailing_enabled = self.config.get('risk_management', {}).get('trailing_stop_loss', {}).get('enabled', False)
+        if trailing_enabled:
+            logger.info("✨ Trailing Stop-Loss: ENABLED")
         
         logger.info("✅ Bot initialized successfully")
         logger.info("=" * 80)
@@ -47,13 +55,14 @@ class BinanceTradingBot:
             logger.warning("  Running in DEMO mode - no real balance available")
         logger.info("")
     
-    def analyze_symbol(self, symbol):
+    def analyze_symbol(self, symbol, timeframe=None):
         try:
-            interval = self.config['trading']['candle_interval']
-            klines = self.binance_client.get_historical_klines(symbol, interval, limit=100)
+            if timeframe is None:
+                timeframe = self.config['trading']['candle_interval']
+            
+            klines = self.binance_client.get_historical_klines(symbol, timeframe, limit=100)
             
             if not klines:
-                logger.warning(f"No klines data for {symbol}")
                 return None
             
             df = self.technical_indicators.calculate_all_indicators(klines)
@@ -61,29 +70,75 @@ class BinanceTradingBot:
                 return None
             
             indicators = self.technical_indicators.get_latest_values(df)
-            prev_indicators = self.prev_indicators.get(symbol)
+            trend = self.technical_indicators.analyze_trend(df)
             
-            self.prev_indicators[symbol] = indicators
-            
-            return indicators, prev_indicators
+            return indicators, trend
             
         except Exception as e:
-            logger.error(f"Error analyzing {symbol}: {e}")
+            logger.error(f"Error analyzing {symbol} on {timeframe}: {e}")
+            return None
+    
+    def analyze_multi_timeframe(self, symbol):
+        try:
+            short_tf = self.config['multi_timeframe']['short_timeframe']
+            medium_tf = self.config['multi_timeframe']['medium_timeframe']
+            long_tf = self.config['multi_timeframe']['long_timeframe']
+            
+            short_result = self.analyze_symbol(symbol, short_tf)
+            medium_result = self.analyze_symbol(symbol, medium_tf)
+            long_result = self.analyze_symbol(symbol, long_tf)
+            
+            if not short_result:
+                return None
+            
+            short_indicators, short_trend = short_result
+            medium_trend = medium_result[1] if medium_result else 'neutral'
+            long_trend = long_result[1] if long_result else 'neutral'
+            
+            prev_indicators = self.prev_indicators.get(symbol)
+            self.prev_indicators[symbol] = short_indicators
+            
+            return short_indicators, prev_indicators, medium_trend, long_trend
+            
+        except Exception as e:
+            logger.error(f"Error in multi-timeframe analysis for {symbol}: {e}")
             return None
     
     def process_symbol(self, symbol):
         try:
-            result = self.analyze_symbol(symbol)
-            if not result:
-                return
+            if self.multi_tf_enabled:
+                result = self.analyze_multi_timeframe(symbol)
+                if not result:
+                    return
+                indicators, prev_indicators, medium_trend, long_trend = result
+            else:
+                result = self.analyze_symbol(symbol)
+                if not result:
+                    return
+                indicators, _ = result
+                prev_indicators = self.prev_indicators.get(symbol)
+                self.prev_indicators[symbol] = indicators
+                medium_trend = None
+                long_trend = None
             
-            indicators, prev_indicators = result
             current_price = indicators['close']
-            
             position = self.risk_manager.get_position(symbol)
             
             if position and position.get('status') == 'open':
                 entry_price = position['entry_price']
+                
+                self.risk_manager.update_trailing_stop(symbol, current_price)
+                
+                if self.risk_manager.check_trailing_stop(symbol, current_price):
+                    logger.warning(f"🛑 TRAILING STOP triggered for {symbol}")
+                    order = self.binance_client.create_test_order(
+                        symbol=symbol,
+                        side='SELL',
+                        quantity=position['quantity']
+                    )
+                    if order:
+                        self.risk_manager.close_position(symbol, current_price, "TRAILING_STOP")
+                    return
                 
                 if self.trading_strategy.should_stop_loss(current_price, entry_price):
                     logger.warning(f"🛑 STOP LOSS triggered for {symbol}")
@@ -111,7 +166,9 @@ class BinanceTradingBot:
                         self.risk_manager.close_position(symbol, current_price, reason)
             
             else:
-                buy_signal, signals = self.trading_strategy.check_buy_signal(indicators, prev_indicators)
+                buy_signal, signals = self.trading_strategy.check_buy_signal(
+                    indicators, prev_indicators, medium_trend, long_trend
+                )
                 
                 if buy_signal and self.risk_manager.can_open_position(symbol):
                     quantity = self.risk_manager.calculate_position_size(symbol, current_price)
