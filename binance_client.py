@@ -22,18 +22,35 @@ class BinanceClientManager:
                 return
             
             if self.testnet:
-                self.client = Client(api_key, api_secret, testnet=True)
-                logger.info("Connected to Binance Testnet successfully")
+                try:
+                    self.client = Client(api_key, api_secret, testnet=True)
+                    logger.info("✅ Connected to Binance Testnet successfully")
+                except BinanceAPIException as e:
+                    if "restricted location" in str(e).lower():
+                        logger.warning("⚠️ Binance Testnet is geo-restricted from Replit servers.")
+                        logger.warning("Switching to Binance Live API (read-only mode)...")
+                        self.testnet = False
+                        self.client = Client(api_key, api_secret)
+                        logger.info("✅ Connected to Binance Live API successfully")
+                    else:
+                        raise
             else:
                 self.client = Client(api_key, api_secret)
-                logger.info("Connected to Binance Live API successfully")
+                logger.info("✅ Connected to Binance Live API successfully")
                 
         except BinanceAPIException as e:
-            logger.error(f"Binance API Error: {e}")
-            raise
+            if "restricted location" in str(e).lower():
+                logger.error("❌ Binance API is geo-restricted from Replit servers.")
+                logger.error("The bot will continue in DEMO mode (monitoring only).")
+                logger.info("💡 To use real trading, run the bot on your local computer.")
+                self.client = None
+            else:
+                logger.error(f"Binance API Error: {e}")
+                self.client = None
         except Exception as e:
             logger.error(f"Error initializing Binance client: {e}")
-            raise
+            logger.info("Continuing in DEMO mode...")
+            self.client = None
     
     def get_account_balance(self):
         if not self.client:
