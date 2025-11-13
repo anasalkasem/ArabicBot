@@ -5,7 +5,21 @@
     "stop_loss_percent": 2.0,
     "take_profit_percent": 5.0,
     "position_size_percent": 5.0,
-    "max_positions": 3
+    "max_positions": 3,
+    "trailing_stop_loss": {
+      "enabled": true,
+      "initial_stop_percent": 2.0,
+      "activation_profit_percent": 3.0,
+      "trail_percent": 2.0,
+      "step_size": 2.0
+    }
+  },
+  "multi_timeframe": {
+    "enabled": true,
+    "short_timeframe": "5m",
+    "medium_timeframe": "1h",
+    "long_timeframe": "4h",
+    "require_trend_alignment": true
   },
   "indicators": {
     "rsi_period": 14,
@@ -18,7 +32,11 @@
     "bb_std": 2,
     "macd_fast": 12,
     "macd_slow": 26,
-    "macd_signal": 9
+    "macd_signal": 9,
+    "ema_short": 20,
+    "ema_long": 50,
+    "adx_period": 14,
+    "adx_threshold": 25
   },
   "trading": {
     "candle_interval": "15m",
