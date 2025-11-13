@@ -1,7 +1,9 @@
 import json
 import time
 import os
+import threading
 from datetime import datetime
+from flask import Flask, jsonify
 from binance_client import BinanceClientManager
 from technical_indicators import TechnicalIndicators
 from trading_strategy import TradingStrategy
@@ -9,6 +11,15 @@ from risk_manager import RiskManager
 from logger_setup import setup_logger
 
 logger = setup_logger('main_bot')
+app = Flask(__name__)
+
+bot_instance = None
+bot_stats = {
+    'status': 'initializing',
+    'iterations': 0,
+    'start_time': None,
+    'last_check': None
+}
 
 class BinanceTradingBot:
     def __init__(self, config_file='config.json'):
@@ -201,8 +212,12 @@ class BinanceTradingBot:
             logger.info("\n📊 No open positions")
     
     def run(self):
+        global bot_stats
         logger.info("\n🚀 Bot is now running...")
         logger.info(f"Checking markets every {self.check_interval} seconds\n")
+        
+        bot_stats['status'] = 'running'
+        bot_stats['start_time'] = datetime.now().isoformat()
         
         self.display_account_info()
         
@@ -210,6 +225,9 @@ class BinanceTradingBot:
         try:
             while True:
                 iteration += 1
+                bot_stats['iterations'] = iteration
+                bot_stats['last_check'] = datetime.now().isoformat()
+                
                 logger.info(f"\n{'='*80}")
                 logger.info(f"🔄 Iteration #{iteration} - {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
                 logger.info(f"{'='*80}")
@@ -225,12 +243,52 @@ class BinanceTradingBot:
                 
         except KeyboardInterrupt:
             logger.info("\n\n🛑 Bot stopped by user")
+            bot_stats['status'] = 'stopped'
             self.display_status()
             logger.info("\n👋 Goodbye!")
         except Exception as e:
             logger.error(f"\n❌ Fatal error: {e}")
+            bot_stats['status'] = 'error'
             raise
 
+@app.route('/')
+def health_check():
+    return jsonify({
+        'status': 'healthy',
+        'bot_status': bot_stats['status'],
+        'iterations': bot_stats['iterations'],
+        'uptime': f"Started at {bot_stats['start_time']}" if bot_stats['start_time'] else 'Not started',
+        'last_check': bot_stats['last_check']
+    })
+
+@app.route('/status')
+def get_status():
+    if bot_instance:
+        positions = bot_instance.risk_manager.get_open_positions()
+        return jsonify({
+            'bot_status': bot_stats['status'],
+            'iterations': bot_stats['iterations'],
+            'start_time': bot_stats['start_time'],
+            'last_check': bot_stats['last_check'],
+            'open_positions': len(positions),
+            'positions': positions
+        })
+    return jsonify({'status': 'initializing'})
+
+def run_bot():
+    global bot_instance
+    try:
+        bot_instance = BinanceTradingBot()
+        bot_instance.run()
+    except Exception as e:
+        logger.error(f"Bot error: {e}")
+        bot_stats['status'] = 'error'
+
 if __name__ == "__main__":
-    bot = BinanceTradingBot()
-    bot.run()
+    logger.info("🌐 Starting web server on port 5000...")
+    logger.info("🤖 Starting trading bot in background...")
+    
+    bot_thread = threading.Thread(target=run_bot, daemon=True)
+    bot_thread.start()
+    
+    app.run(host='0.0.0.0', port=5000, debug=False)

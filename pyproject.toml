@@ -4,6 +4,9 @@ version = "0.1.0"
 description = "Binance Trading Bot with Technical Analysis"
 requires-python = ">=3.12"
 dependencies = [
+    "binance>=0.3.84",
+    "cryptography>=46.0.3",
+    "flask>=3.1.2",
     "numpy>=2.2.6",
     "pandas>=2.3.3",
     "pandas-ta>=0.4.71b0",
