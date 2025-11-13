@@ -3,7 +3,7 @@ import time
 import os
 import threading
 from datetime import datetime
-from flask import Flask, jsonify
+from flask import Flask, jsonify, render_template
 from binance_client import BinanceClientManager
 from technical_indicators import TechnicalIndicators
 from trading_strategy import TradingStrategy
@@ -12,6 +12,10 @@ from logger_setup import setup_logger
 
 logger = setup_logger('main_bot')
 app = Flask(__name__)
+
+# قائمة السجلات للعرض في الواجهة
+recent_logs = []
+MAX_LOGS = 50
 
 bot_instance = None
 bot_stats = {
@@ -131,6 +135,9 @@ class BinanceTradingBot:
                 self.prev_indicators[symbol] = indicators
                 medium_trend = None
                 long_trend = None
+            
+            if not indicators:
+                return
             
             current_price = indicators['close']
             position = self.risk_manager.get_position(symbol)
@@ -252,7 +259,13 @@ class BinanceTradingBot:
             raise
 
 @app.route('/')
+def index():
+    """عرض الصفحة الرئيسية"""
+    return render_template('index.html')
+
+@app.route('/health')
 def health_check():
+    """Health check للـ deployment"""
     return jsonify({
         'status': 'healthy',
         'bot_status': bot_stats['status'],
@@ -263,6 +276,7 @@ def health_check():
 
 @app.route('/status')
 def get_status():
+    """إرجاع حالة البوت والصفقات"""
     if bot_instance:
         positions = bot_instance.risk_manager.get_open_positions()
         return jsonify({
@@ -274,6 +288,20 @@ def get_status():
             'positions': positions
         })
     return jsonify({'status': 'initializing'})
+
+@app.route('/logs')
+def get_logs():
+    """إرجاع آخر السجلات"""
+    try:
+        logs = []
+        if os.path.exists('bot.log'):
+            with open('bot.log', 'r', encoding='utf-8') as f:
+                # قراءة آخر 50 سطر
+                all_lines = f.readlines()
+                logs = [line.strip() for line in all_lines[-50:] if line.strip()]
+        return jsonify({'logs': logs})
+    except Exception as e:
+        return jsonify({'logs': [], 'error': str(e)})
 
 def run_bot():
     global bot_instance
