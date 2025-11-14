@@ -2,16 +2,16 @@
   "trading_pairs": ["BTCUSDT", "ETHUSDT", "SOLUSDT"],
   "testnet": true,
   "risk_management": {
-    "stop_loss_percent": 2.0,
-    "take_profit_percent": 5.0,
-    "position_size_percent": 5.0,
+    "stop_loss_percent": 3.0,
+    "take_profit_percent": 4.0,
+    "position_size_percent": 10.0,
     "max_positions": 3,
     "trailing_stop_loss": {
       "enabled": true,
-      "initial_stop_percent": 2.0,
-      "activation_profit_percent": 3.0,
+      "initial_stop_percent": 3.0,
+      "activation_profit_percent": 2.5,
       "trail_percent": 2.0,
-      "step_size": 2.0
+      "step_size": 1.5
     }
   },
   "multi_timeframe": {
@@ -23,11 +23,11 @@
   },
   "indicators": {
     "rsi_period": 14,
-    "rsi_oversold": 30,
-    "rsi_overbought": 70,
+    "rsi_oversold": 40,
+    "rsi_overbought": 65,
     "stochastic_period": 14,
-    "stochastic_oversold": 20,
-    "stochastic_overbought": 80,
+    "stochastic_oversold": 30,
+    "stochastic_overbought": 70,
     "bb_period": 20,
     "bb_std": 2,
     "macd_fast": 12,
