@@ -126,13 +126,15 @@ class BinanceTradingBot:
                 if not result:
                     return
                 indicators, prev_indicators, medium_trend, long_trend = result
+                short_trend = 'neutral'
             else:
                 result = self.analyze_symbol(symbol)
                 if not result:
                     return
-                indicators, _ = result
+                indicators, trend = result
                 prev_indicators = self.prev_indicators.get(symbol)
                 self.prev_indicators[symbol] = indicators
+                short_trend = trend if trend else 'neutral'
                 medium_trend = None
                 long_trend = None
             
@@ -206,10 +208,12 @@ class BinanceTradingBot:
                             self.risk_manager.open_position(symbol, current_price, quantity, signals)
                 elif not buy_signal:
                     reasons = []
-                    if indicators['rsi'] >= 30:
-                        reasons.append(f"RSI={indicators['rsi']:.1f} (need <30)")
-                    if indicators['stoch_k'] >= 20:
-                        reasons.append(f"Stoch={indicators['stoch_k']:.1f} (need <20)")
+                    rsi_threshold = self.config['indicators']['rsi_oversold']
+                    stoch_threshold = self.config['indicators']['stochastic_oversold']
+                    if indicators['rsi'] >= rsi_threshold:
+                        reasons.append(f"RSI={indicators['rsi']:.1f} (need <{rsi_threshold})")
+                    if indicators['stoch_k'] >= stoch_threshold:
+                        reasons.append(f"Stoch={indicators['stoch_k']:.1f} (need <{stoch_threshold})")
                     if current_price > indicators['bb_lower']:
                         reasons.append(f"Price above BB lower")
                     if medium_trend == 'bearish' or long_trend == 'bearish':
