@@ -26,8 +26,12 @@ class TradingStrategy:
             return True, f"⚠️ Partial alignment: 1h={medium_trend}, 4h={long_trend}"
         elif medium_trend == 'neutral' and long_trend in ['bullish', 'neutral']:
             return True, f"⚠️ Neutral trend acceptable: 1h={medium_trend}, 4h={long_trend}"
-        elif medium_trend == 'bearish' or long_trend == 'bearish':
-            return False, f"❌ Bearish trend detected: 1h={medium_trend}, 4h={long_trend}"
+        elif medium_trend == 'bearish' and long_trend == 'neutral':
+            return True, f"⚠️ Acceptable: 1h={medium_trend}, 4h={long_trend} (only one bearish)"
+        elif medium_trend == 'neutral' and long_trend == 'bearish':
+            return True, f"⚠️ Acceptable: 1h={medium_trend}, 4h={long_trend} (only one bearish)"
+        elif medium_trend == 'bearish' and long_trend == 'bearish':
+            return False, f"❌ Both bearish: 1h={medium_trend}, 4h={long_trend}"
         else:
             return False, f"❌ Trend not aligned: 1h={medium_trend}, 4h={long_trend}"
     
@@ -53,9 +57,11 @@ class TradingStrategy:
             if stoch_condition:
                 signals.append(f"Stochastic K={indicators['stoch_k']:.2f} < {self.stoch_oversold}")
             
-            bb_condition = indicators['close'] <= indicators['bb_lower']
+            bb_tolerance = 1.005
+            bb_condition = indicators['close'] <= (indicators['bb_lower'] * bb_tolerance)
             if bb_condition:
-                signals.append(f"Price={indicators['close']:.2f} touching lower BB={indicators['bb_lower']:.2f}")
+                price_diff_pct = ((indicators['close'] - indicators['bb_lower']) / indicators['bb_lower']) * 100
+                signals.append(f"Price={indicators['close']:.2f} near BB lower={indicators['bb_lower']:.2f} ({price_diff_pct:+.2f}%)")
             
             ema_bullish = indicators['ema_short'] > indicators['ema_long']
             if ema_bullish:
