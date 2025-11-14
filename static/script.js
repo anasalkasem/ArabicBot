@@ -45,10 +45,11 @@ async function updateStatistics() {
         profitElement.textContent = '$' + profit.toFixed(2);
         profitElement.className = 'stat-value profit ' + (profit >= 0 ? 'positive' : 'negative');
         
-        document.getElementById('today-trades').textContent = stats.today?.trades || 0;
+        const todayTrades = (stats.today && stats.today.trades) ? stats.today.trades : 0;
+        document.getElementById('today-trades').textContent = todayTrades;
         
     } catch (error) {
-        console.error('خطأ في جلب الإحصائيات:', error);
+        console.error('خطأ في جلب الإحصائيات:', error.message || error);
     }
 }
 
