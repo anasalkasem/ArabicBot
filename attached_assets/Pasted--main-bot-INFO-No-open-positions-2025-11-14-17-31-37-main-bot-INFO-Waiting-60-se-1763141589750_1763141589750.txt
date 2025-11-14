@@ -1,0 +1,49 @@
+- main_bot - INFO - 
+📊 No open positions
+2025-11-14 17:31:37 - main_bot - INFO - 
+⏸️  Waiting 60 seconds until next check...
+100.64.0.2 - - [14/Nov/2025 17:31:39] "GET /logs HTTP/1.1" 200 -
+100.64.0.2 - - [14/Nov/2025 17:31:39] "GET /status HTTP/1.1" 200 -
+100.64.0.2 - - [14/Nov/2025 17:31:44] "GET /status HTTP/1.1" 200 -
+100.64.0.2 - - [14/Nov/2025 17:31:49] "GET /logs HTTP/1.1" 200 -
+100.64.0.2 - - [14/Nov/2025 17:31:49] "GET /status HTTP/1.1" 200 -
+100.64.0.2 - - [14/Nov/2025 17:31:53] "GET /status HTTP/1.1" 200 -
+100.64.0.2 - - [14/Nov/2025 17:31:53] "GET /logs HTTP/1.1" 200 -
+100.64.0.2 - - [14/Nov/2025 17:31:54] "GET /status HTTP/1.1" 200 -
+100.64.0.2 - - [14/Nov/2025 17:31:59] "GET /logs HTTP/1.1" 200 -
+100.64.0.2 - - [14/Nov/2025 17:31:59] "GET /status HTTP/1.1" 200 -
+100.64.0.2 - - [14/Nov/2025 17:32:04] "GET /status HTTP/1.1" 200 -
+100.64.0.2 - - [14/Nov/2025 17:32:09] "GET /logs HTTP/1.1" 200 -
+100.64.0.2 - - [14/Nov/2025 17:32:09] "GET /status HTTP/1.1" 200 -
+2025-11-14 17:32:37 - technical_indicators - ERROR - Error calculating Bollinger Bands: 'BBU_20_2.0'
+2025-11-14 17:32:37 - main_bot - INFO - 
+2025-11-14 17:32:37 - main_bot - ERROR - Error analyzing ETHUSDT on 5m: 'bb_upper'
+================================================================================
+2025-11-14 17:32:37 - main_bot - INFO - 🔄 Iteration #6 - 2025-11-14 17:32:37
+2025-11-14 17:32:37 - technical_indicators - ERROR - Error calculating Bollinger Bands: 'BBU_20_2.0'
+2025-11-14 17:32:37 - main_bot - INFO - ================================================================================
+2025-11-14 17:32:37 - main_bot - ERROR - Error analyzing ETHUSDT on 1h: 'bb_upper'
+2025-11-14 17:32:37 - main_bot - INFO - 
+🔍 Analyzing BTCUSDT...
+2025-11-14 17:32:37 - technical_indicators - ERROR - Error calculating Bollinger Bands: 'BBU_20_2.0'
+2025-11-14 17:32:37 - main_bot - ERROR - Error analyzing BTCUSDT on 5m: 'bb_upper'
+2025-11-14 17:32:37 - technical_indicators - ERROR - Error calculating Bollinger Bands: 'BBU_20_2.0'
+2025-11-14 17:32:37 - main_bot - ERROR - Error analyzing BTCUSDT on 1h: 'bb_upper'
+2025-11-14 17:32:37 - technical_indicators - ERROR - Error calculating Bollinger Bands: 'BBU_20_2.0'
+2025-11-14 17:32:37 - main_bot - ERROR - Error analyzing BTCUSDT on 4h: 'bb_upper'
+2025-11-14 17:32:37 - main_bot - INFO - 
+🔍 Analyzing ETHUSDT...
+2025-11-14 17:32:37 - technical_indicators - ERROR - Error calculating Bollinger Bands: 'BBU_20_2.0'
+2025-11-14 17:32:37 - main_bot - ERROR - Error analyzing ETHUSDT on 4h: 'bb_upper'
+2025-11-14 17:32:37 - main_bot - INFO - 
+🔍 Analyzing SOLUSDT...
+2025-11-14 17:32:38 - technical_indicators - ERROR - Error calculating Bollinger Bands: 'BBU_20_2.0'
+2025-11-14 17:32:38 - main_bot - ERROR - Error analyzing SOLUSDT on 5m: 'bb_upper'
+2025-11-14 17:32:38 - technical_indicators - ERROR - Error calculating Bollinger Bands: 'BBU_20_2.0'
+2025-11-14 17:32:38 - main_bot - ERROR - Error analyzing SOLUSDT on 1h: 'bb_upper'
+2025-11-14 17:32:38 - technical_indicators - ERROR - Error calculating Bollinger Bands: 'BBU_20_2.0'
+2025-11-14 17:32:38 - main_bot - ERROR - Error analyzing SOLUSDT on 4h: 'bb_upper'
+2025-11-14 17:32:38 - main_bot - INFO - 
+📊 No open positions
+2025-11-14 17:32:38 - main_bot - INFO - 
+⏸️  Waiting 60 seconds until next check...

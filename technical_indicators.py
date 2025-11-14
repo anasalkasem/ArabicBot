@@ -53,9 +53,23 @@ class TechnicalIndicators:
             bb_period = self.config['indicators']['bb_period']
             bb_std = self.config['indicators']['bb_std']
             bbands = ta.bbands(df['close'], length=bb_period, std=bb_std)
-            df['bb_upper'] = bbands[f'BBU_{bb_period}_{bb_std}.0']
-            df['bb_middle'] = bbands[f'BBM_{bb_period}_{bb_std}.0']
-            df['bb_lower'] = bbands[f'BBL_{bb_period}_{bb_std}.0']
+            
+            if bbands is None or bbands.empty:
+                logger.warning("Bollinger Bands calculation returned empty result")
+                return df
+            
+            cols = bbands.columns.tolist()
+            bb_upper_col = next((col for col in cols if 'BBU' in col), None)
+            bb_middle_col = next((col for col in cols if 'BBM' in col), None)
+            bb_lower_col = next((col for col in cols if 'BBL' in col), None)
+            
+            if bb_upper_col and bb_middle_col and bb_lower_col:
+                df['bb_upper'] = bbands[bb_upper_col]
+                df['bb_middle'] = bbands[bb_middle_col]
+                df['bb_lower'] = bbands[bb_lower_col]
+            else:
+                logger.error(f"BB columns not found. Available: {cols}")
+            
             return df
         except Exception as e:
             logger.error(f"Error calculating Bollinger Bands: {e}")
