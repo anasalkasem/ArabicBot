@@ -43,3 +43,16 @@ Thumbs.db
 # Binance Bot specific
 trades_history.json
 positions.json
+
+# Replit specific (not needed on Railway)
+.replit
+.upm/
+.pythonlibs/
+.cache/
+.config/
+.local/
+uv.lock
+pyproject.toml
+
+# Logs (keep for debugging, but don't commit large ones)
+bot.log

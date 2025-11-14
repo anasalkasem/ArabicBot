@@ -313,10 +313,11 @@ def run_bot():
         bot_stats['status'] = 'error'
 
 if __name__ == "__main__":
-    logger.info("🌐 Starting web server on port 5000...")
+    port = int(os.environ.get('PORT', 5000))
+    logger.info(f"🌐 Starting web server on port {port}...")
     logger.info("🤖 Starting trading bot in background...")
     
     bot_thread = threading.Thread(target=run_bot, daemon=True)
     bot_thread.start()
     
-    app.run(host='0.0.0.0', port=5000, debug=False)
+    app.run(host='0.0.0.0', port=port, debug=False)

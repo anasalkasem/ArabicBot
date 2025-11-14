@@ -1,0 +1,7 @@
+Flask>=3.1.2
+python-binance>=1.0.32
+pandas>=2.3.3
+pandas-ta>=0.4.71b0
+numpy>=2.2.6
+cryptography>=46.0.3
+binance>=0.3.84
