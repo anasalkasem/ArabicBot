@@ -211,6 +211,47 @@ header h1 {
     font-weight: bold;
 }
 
+/* Statistics */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+}
+
+.stat-item {
+    text-align: center;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 10px;
+}
+
+.stat-value {
+    display: block;
+    font-size: clamp(1.3rem, 4vw, 1.8rem);
+    font-weight: bold;
+    color: #667eea;
+    margin-bottom: 8px;
+}
+
+.stat-value.profit.positive {
+    color: #10b981;
+}
+
+.stat-value.profit.negative {
+    color: #ef4444;
+}
+
+.stat-value.win-rate {
+    color: #3b82f6;
+}
+
+.stat-label {
+    display: block;
+    font-size: clamp(0.75rem, 2vw, 0.9rem);
+    color: #666;
+    font-weight: 500;
+}
+
 /* Trading Pairs */
 .trading-pairs {
     display: flex;

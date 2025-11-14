@@ -25,6 +25,31 @@ async function updateDashboard() {
         console.error('خطأ في جلب البيانات:', error);
         showToast('خطأ في الاتصال بالخادم', 'error');
     }
+    
+    // تحديث الإحصائيات
+    updateStatistics();
+}
+
+async function updateStatistics() {
+    try {
+        const response = await fetch('/statistics');
+        const stats = await response.json();
+        
+        if (stats.error) return;
+        
+        document.getElementById('total-trades').textContent = stats.total_trades || 0;
+        document.getElementById('win-rate').textContent = (stats.win_rate || 0).toFixed(1) + '%';
+        
+        const profitElement = document.getElementById('total-profit');
+        const profit = stats.total_profit_usd || 0;
+        profitElement.textContent = '$' + profit.toFixed(2);
+        profitElement.className = 'stat-value profit ' + (profit >= 0 ? 'positive' : 'negative');
+        
+        document.getElementById('today-trades').textContent = stats.today?.trades || 0;
+        
+    } catch (error) {
+        console.error('خطأ في جلب الإحصائيات:', error);
+    }
 }
 
 function getStatusText(status) {
