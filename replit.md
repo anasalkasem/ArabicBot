@@ -66,16 +66,19 @@
 
 ## Setup Instructions
 
-### 1. إضافة مفاتيح Binance API
+### 1. إضافة المفاتيح السرية (Secrets)
 في Replit Secrets (قائمة Tools → Secrets):
 ```
 BINANCE_API_KEY = your_api_key_here
 BINANCE_API_SECRET = your_api_secret_here
+TELEGRAM_BOT_TOKEN = your_telegram_bot_token (اختياري)
+TELEGRAM_CHAT_ID = your_telegram_chat_id (اختياري)
 ```
 
 **مهم**: 
 - للتجربة: استخدم [Binance Testnet](https://testnet.binance.vision/)
 - للتداول الحقيقي: احصل على المفاتيح من [Binance API Management](https://www.binance.com/en/my/settings/api-management)
+- للإشعارات: أنشئ بوت Telegram عبر [@BotFather](https://t.me/BotFather)
 
 ### 2. تشغيل البوت
 اضغط على زر "Run" أو نفذ:
@@ -85,7 +88,7 @@ python main.py
 
 ## Current Status
 - ✅ Python 3.12 environment setup
-- ✅ All dependencies installed (numpy, pandas, pandas-ta, python-binance)
+- ✅ All dependencies installed (numpy, pandas, pandas-ta, python-binance, requests)
 - ✅ Binance API integration
 - ✅ Technical indicators (RSI, Stochastic, Bollinger Bands, MACD, EMA, ADX)
 - ✅ Multi-Timeframe Analysis (5m, 1h, 4h)
@@ -93,6 +96,9 @@ python main.py
 - ✅ Trading strategy implementation
 - ✅ Risk management system
 - ✅ Logging system
+- ✅ Telegram notifications system
+- ✅ Performance statistics tracking
+- ✅ Real-time dashboard with analytics
 - ✅ Testnet mode for safe testing
 - ⏳ Demo mode active (waiting for API keys)
 
@@ -103,25 +109,29 @@ python main.py
 - اختبر الاستراتيجية جيداً على Testnet قبل استخدام أموال حقيقية
 
 ## Recent Changes
-### 2025-11-14 (Latest Update - Optimized for Small Accounts)
+### 2025-11-14 (Latest Update - Telegram Notifications + Statistics Dashboard)
+- 📲 **Telegram Integration**: إشعارات فورية عند البيع/الشراء/الأخطاء
+  - استخدام TELEGRAM_BOT_TOKEN و TELEGRAM_CHAT_ID من environment variables
+  - telegram_notifier.py module جديد لإدارة الإشعارات
+- 📊 **Performance Statistics**: نظام تتبع شامل للإحصائيات
+  - statistics_tracker.py يحفظ جميع الصفقات في trading_stats.json
+  - حساب Win Rate, Average Profit, Best/Worst Trade
+  - إحصائيات يومية وإحصائيات لكل زوج تداول
+  - /statistics API endpoint للحصول على البيانات
+- 🎨 **Enhanced Dashboard**: واجهة محسّنة مع عرض الإحصائيات
+  - قسم إحصائيات جديد يعرض 4 مقاييس رئيسية
+  - تحديث تلقائي للبيانات كل 5 ثوانٍ
+  - عرض 5 أزواج تداول (BTC, ETH, SOL, XRP, BNB)
+- 📦 **Dependencies**: إضافة requests>=2.31.0 لـ Telegram HTTP API
+- ✅ **Testing**: اختبار شامل - البوت يعمل بدون أخطاء
+
+### 2025-11-14 (Previous Update - Optimized for Small Accounts)
 - 🎨 **واجهة محسّنة**: إضافة أزرار تفاعلية (تحديث، إظهار/إخفاء السجلات، تصدير)
 - 📱 **Responsive Design**: تصميم متجاوب كامل للهواتف والأجهزة اللوحية
 - 🚀 **جاهز للنشر على Railway**: إضافة ملفات requirements.txt, Procfile, railway.json
-- 🔧 **Fix Bollinger Bands**: حل مشكلة توافق أسماء الأعمدة
-- 📊 **Detailed Logging**: عرض تفصيلي لأسباب عدم الدخول في صفقات
 - 💱 **More Trading Pairs**: إضافة XRP و BNB (إجمالي 5 عملات)
 - ⚡ **Faster Checks**: تحليل السوق كل 5 ثواني (بدل 60 ثانية)
-- 🎯 **BB Price Tolerance**: قبول السعر ضمن 0.5% من BB lower (فرص أكثر)
-- 📉 **Relaxed Trend Rules**: قبول bearish على إطار زمني واحد فقط (ليس الاثنين)
-- ⚙️ **Optimized Settings**: إعدادات محسّنة للحسابات الصغيرة ($50-$100):
-  - RSI oversold: 40 (بدل 30) - دخول أسهل
-  - Stochastic oversold: 30 (بدل 20) - فرص أكثر
-  - Position size: 10% (بدل 5%) - استخدام أفضل للرصيد
-  - Stop-loss: 3% (بدل 2%) - مجال أوسع
-  - Take-profit: 4% (بدل 5%) - أهداف أقرب
-  - Check interval: 5 seconds (بدل 60) - مراقبة أسرع
-  - BB tolerance: 0.5% - قبول السعر قريب من القاع
-  - Trend relaxation: bearish مقبول على إطار واحد
+- ⚙️ **Optimized Settings**: إعدادات محسّنة للحسابات الصغيرة ($50-$100)
 
 ### 2025-11-13 (Multi-Timeframe & Trailing Stop)
 - ✨ إضافة Multi-Timeframe Analysis (5m, 1h, 4h)
@@ -137,7 +147,7 @@ python main.py
 
 ## Next Steps
 1. **إضافة مفاتيح API**: للانتقال من Demo Mode إلى التداول الفعلي
-2. **اختبار على Testnet**: تجربة البوت بأموال تجريبية قبل الأموال الحقيقية
-3. **Backtesting System**: اختبار الاستراتيجية على بيانات تاريخية
-4. **نظام الإشعارات**: إضافة Telegram أو Email للتنبيهات
-5. **لوحة تحكم متقدمة**: واجهة رسومية مع مخططات بيانية
+2. **تفعيل Telegram**: إضافة TELEGRAM_BOT_TOKEN و TELEGRAM_CHAT_ID للحصول على إشعارات فورية
+3. **النشر على Railway**: لتشغيل البوت 24/7 بدون قيود جغرافية
+4. **Backtesting System**: اختبار الاستراتيجية على بيانات تاريخية
+5. **رسوم بيانية متقدمة**: إضافة Chart.js لعرض الأداء بصرياً
