@@ -1,5 +1,5 @@
 {
-  "trading_pairs": ["BTCUSDT", "ETHUSDT", "SOLUSDT"],
+  "trading_pairs": ["BTCUSDT", "ETHUSDT", "SOLUSDT", "XRPUSDT", "BNBUSDT"],
   "testnet": true,
   "risk_management": {
     "stop_loss_percent": 3.0,
@@ -40,7 +40,7 @@
   },
   "trading": {
     "candle_interval": "15m",
-    "check_interval_seconds": 60,
+    "check_interval_seconds": 5,
     "min_volume_usdt": 1000000
   }
 }

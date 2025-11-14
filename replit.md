@@ -29,7 +29,7 @@
 
 ## Configuration
 جميع الإعدادات في ملف `config.json`:
-- `trading_pairs`: أزواج العملات للتداول (مثل BTCUSDT, ETHUSDT, SOLUSDT)
+- `trading_pairs`: أزواج العملات للتداول (مثل BTCUSDT, ETHUSDT, SOLUSDT, XRPUSDT, BNBUSDT)
 - `testnet`: true للوضع التجريبي، false للتداول الحقيقي
 - `risk_management`: إعدادات Stop-Loss, Take-Profit, Trailing Stop-Loss
 - `multi_timeframe`: إعدادات التحليل متعدد الأطر الزمنية (5m, 1h, 4h)
@@ -109,12 +109,15 @@ python main.py
 - 🚀 **جاهز للنشر على Railway**: إضافة ملفات requirements.txt, Procfile, railway.json
 - 🔧 **Fix Bollinger Bands**: حل مشكلة توافق أسماء الأعمدة
 - 📊 **Detailed Logging**: عرض تفصيلي لأسباب عدم الدخول في صفقات
+- 💱 **More Trading Pairs**: إضافة XRP و BNB (إجمالي 5 عملات)
+- ⚡ **Faster Checks**: تحليل السوق كل 5 ثواني (بدل 60 ثانية)
 - ⚙️ **Optimized Settings**: إعدادات محسّنة للحسابات الصغيرة ($50-$100):
   - RSI oversold: 40 (بدل 30) - دخول أسهل
   - Stochastic oversold: 30 (بدل 20) - فرص أكثر
   - Position size: 10% (بدل 5%) - استخدام أفضل للرصيد
   - Stop-loss: 3% (بدل 2%) - مجال أوسع
   - Take-profit: 4% (بدل 5%) - أهداف أقرب
+  - Check interval: 5 seconds (بدل 60) - مراقبة أسرع
 
 ### 2025-11-13 (Multi-Timeframe & Trailing Stop)
 - ✨ إضافة Multi-Timeframe Analysis (5m, 1h, 4h)
