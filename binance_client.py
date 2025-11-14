@@ -1,4 +1,5 @@
 import os
+import requests
 from binance.client import Client
 from binance.exceptions import BinanceAPIException
 from logger_setup import setup_logger
@@ -74,27 +75,40 @@ class BinanceClientManager:
             return {}
     
     def get_symbol_price(self, symbol):
-        if not self.client:
-            return None
-        
         try:
-            ticker = self.client.get_symbol_ticker(symbol=symbol)
-            return float(ticker['price'])
+            if self.client:
+                ticker = self.client.get_symbol_ticker(symbol=symbol)
+                return float(ticker['price'])
+            else:
+                url = f"https://api.binance.com/api/v3/ticker/price?symbol={symbol}"
+                response = requests.get(url, timeout=10)
+                if response.status_code == 200:
+                    data = response.json()
+                    return float(data['price'])
+                else:
+                    logger.error(f"Error getting price for {symbol}: HTTP {response.status_code}")
+                    return None
         except Exception as e:
             logger.error(f"Error getting price for {symbol}: {e}")
             return None
     
     def get_historical_klines(self, symbol, interval, limit=100):
-        if not self.client:
-            return []
-        
         try:
-            klines = self.client.get_klines(
-                symbol=symbol,
-                interval=interval,
-                limit=limit
-            )
-            return klines
+            if self.client:
+                klines = self.client.get_klines(
+                    symbol=symbol,
+                    interval=interval,
+                    limit=limit
+                )
+                return klines
+            else:
+                url = f"https://api.binance.com/api/v3/klines?symbol={symbol}&interval={interval}&limit={limit}"
+                response = requests.get(url, timeout=10)
+                if response.status_code == 200:
+                    return response.json()
+                else:
+                    logger.error(f"Error getting klines for {symbol}: HTTP {response.status_code}")
+                    return []
         except Exception as e:
             logger.error(f"Error getting klines for {symbol}: {e}")
             return []
