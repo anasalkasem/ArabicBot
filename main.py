@@ -184,6 +184,10 @@ class BinanceTradingBot:
                         self.risk_manager.close_position(symbol, current_price, reason)
             
             else:
+                logger.info(f"   📊 RSI: {indicators['rsi']:.1f} | Stoch: {indicators['stoch_k']:.1f} | "
+                          f"Price: ${current_price:.2f} | BB Lower: ${indicators['bb_lower']:.2f}")
+                logger.info(f"   📈 Trends: 5m={short_trend}, 1h={medium_trend}, 4h={long_trend}")
+                
                 buy_signal, signals = self.trading_strategy.check_buy_signal(
                     indicators, prev_indicators, medium_trend, long_trend
                 )
@@ -200,6 +204,18 @@ class BinanceTradingBot:
                         )
                         if order:
                             self.risk_manager.open_position(symbol, current_price, quantity, signals)
+                elif not buy_signal:
+                    reasons = []
+                    if indicators['rsi'] >= 30:
+                        reasons.append(f"RSI={indicators['rsi']:.1f} (need <30)")
+                    if indicators['stoch_k'] >= 20:
+                        reasons.append(f"Stoch={indicators['stoch_k']:.1f} (need <20)")
+                    if current_price > indicators['bb_lower']:
+                        reasons.append(f"Price above BB lower")
+                    if medium_trend == 'bearish' or long_trend == 'bearish':
+                        reasons.append(f"Bearish trend")
+                    if reasons:
+                        logger.info(f"   ⏭️ No buy: {', '.join(reasons)}")
         
         except Exception as e:
             logger.error(f"Error processing {symbol}: {e}")
