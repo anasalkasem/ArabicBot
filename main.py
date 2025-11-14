@@ -8,6 +8,8 @@ from binance_client import BinanceClientManager
 from technical_indicators import TechnicalIndicators
 from trading_strategy import TradingStrategy
 from risk_manager import RiskManager
+from telegram_notifier import TelegramNotifier
+from statistics_tracker import StatisticsTracker
 from logger_setup import setup_logger
 
 logger = setup_logger('main_bot')
@@ -45,6 +47,8 @@ class BinanceTradingBot:
         self.technical_indicators = TechnicalIndicators(self.config)
         self.trading_strategy = TradingStrategy(self.config)
         self.risk_manager = RiskManager(self.config, self.binance_client)
+        self.telegram = TelegramNotifier(self.config)
+        self.stats = StatisticsTracker()
         
         self.prev_indicators = {}
         self.multi_tf_enabled = self.config.get('multi_timeframe', {}).get('enabled', False)
@@ -158,6 +162,8 @@ class BinanceTradingBot:
                     )
                     if order:
                         self.risk_manager.close_position(symbol, current_price, "TRAILING_STOP")
+                        self.stats.record_trade(symbol, entry_price, current_price, position['quantity'], "TRAILING_STOP")
+                        self.telegram.notify_sell(symbol, current_price, position['quantity'], entry_price, "TRAILING_STOP")
                     return
                 
                 if self.trading_strategy.should_stop_loss(current_price, entry_price):
@@ -169,6 +175,8 @@ class BinanceTradingBot:
                     )
                     if order:
                         self.risk_manager.close_position(symbol, current_price, "STOP_LOSS")
+                        self.stats.record_trade(symbol, entry_price, current_price, position['quantity'], "STOP_LOSS")
+                        self.telegram.notify_sell(symbol, current_price, position['quantity'], entry_price, "STOP_LOSS")
                     return
                 
                 sell_signal, signals, reason = self.trading_strategy.check_sell_signal(
@@ -184,6 +192,8 @@ class BinanceTradingBot:
                     )
                     if order:
                         self.risk_manager.close_position(symbol, current_price, reason)
+                        self.stats.record_trade(symbol, entry_price, current_price, position['quantity'], reason)
+                        self.telegram.notify_sell(symbol, current_price, position['quantity'], entry_price, reason)
             
             else:
                 logger.info(f"   📊 RSI: {indicators['rsi']:.1f} | Stoch: {indicators['stoch_k']:.1f} | "
@@ -206,6 +216,7 @@ class BinanceTradingBot:
                         )
                         if order:
                             self.risk_manager.open_position(symbol, current_price, quantity, signals)
+                            self.telegram.notify_buy(symbol, current_price, quantity, signals)
                 elif not buy_signal:
                     reasons = []
                     rsi_threshold = self.config['indicators']['rsi_oversold']
@@ -247,6 +258,8 @@ class BinanceTradingBot:
         
         bot_stats['status'] = 'running'
         bot_stats['start_time'] = datetime.now().isoformat()
+        
+        self.telegram.notify_startup(self.trading_pairs, self.testnet)
         
         self.display_account_info()
         
@@ -324,6 +337,31 @@ def get_logs():
         return jsonify({'logs': logs})
     except Exception as e:
         return jsonify({'logs': [], 'error': str(e)})
+
+@app.route('/statistics')
+def get_statistics():
+    """إرجاع الإحصائيات الكاملة"""
+    if bot_instance:
+        stats = bot_instance.stats.get_stats()
+        win_rate = bot_instance.stats.get_win_rate()
+        avg_profit = bot_instance.stats.get_average_profit()
+        today_stats = bot_instance.stats.get_today_stats()
+        recent_trades = bot_instance.stats.get_recent_trades(10)
+        
+        return jsonify({
+            'total_trades': stats['total_trades'],
+            'winning_trades': stats['winning_trades'],
+            'losing_trades': stats['losing_trades'],
+            'win_rate': win_rate,
+            'total_profit_usd': stats['total_profit_usd'],
+            'average_profit': avg_profit,
+            'best_trade': stats['best_trade'],
+            'worst_trade': stats['worst_trade'],
+            'today': today_stats,
+            'recent_trades': recent_trades,
+            'symbol_stats': stats['symbol_stats']
+        })
+    return jsonify({'error': 'Bot not initialized'})
 
 def run_bot():
     global bot_instance

@@ -42,5 +42,8 @@
     "candle_interval": "15m",
     "check_interval_seconds": 5,
     "min_volume_usdt": 1000000
+  },
+  "telegram": {
+    "enabled": false
   }
 }
