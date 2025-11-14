@@ -103,19 +103,27 @@ python main.py
 - اختبر الاستراتيجية جيداً على Testnet قبل استخدام أموال حقيقية
 
 ## Recent Changes
-### 2025-11-13 (Latest Update)
-- ✨ إضافة Multi-Timeframe Analysis لتحليل الاتجاهات على أطر زمنية متعددة
-- ✨ إضافة Trailing Stop-Loss الديناميكي لحماية الأرباح
+### 2025-11-14 (Latest Update - Railway Deployment Ready)
+- 🎨 **واجهة محسّنة**: إضافة أزرار تفاعلية (تحديث، إظهار/إخفاء السجلات، تصدير)
+- 📱 **Responsive Design**: تصميم متجاوب كامل للهواتف والأجهزة اللوحية
+- 🚀 **جاهز للنشر على Railway**: إضافة ملفات requirements.txt, Procfile, railway.json
+- ✅ **PORT variable**: دعم المنافذ الديناميكية للـ deployment
+- 📝 **دليل النشر**: إضافة RAILWAY_DEPLOYMENT.md مع خطوات كاملة
+- 🎯 **Toast Notifications**: رسائل توضيحية للمستخدم
+- 💾 **تصدير السجلات**: إمكانية تحميل سجلات البوت كملف نصي
+- 🌙 **Dark Mode Support**: دعم الوضع الليلي تلقائياً
+
+### 2025-11-13 (Multi-Timeframe & Trailing Stop)
+- ✨ إضافة Multi-Timeframe Analysis (5m, 1h, 4h)
+- ✨ إضافة Trailing Stop-Loss الديناميكي
 - ✨ إضافة مؤشرات فنية جديدة: EMA (50, 200) و ADX (14)
-- ✨ تحسين منطق إشارات الشراء والبيع
-- ✅ اختبار شامل للبوت مع جميع الميزات الجديدة
-- ✅ مراجعة معمارية ناجحة (PASS rating)
+- ✅ اختبار شامل للبوت مع جميع الميزات
+- ✅ مراجعة معمارية ناجحة
 
 ### 2025-11-13 (Initial Setup)
-- Initial project setup with complete trading bot implementation
+- Initial project setup with complete trading bot
 - Python 3.12 environment configured
-- All core modules implemented (API client, indicators, strategy, risk manager)
-- Configuration system with JSON file
+- Core modules: API client, indicators, strategy, risk manager
 
 ## Next Steps
 1. **إضافة مفاتيح API**: للانتقال من Demo Mode إلى التداول الفعلي

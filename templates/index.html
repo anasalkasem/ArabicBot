@@ -2,16 +2,32 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>🤖 بوت التداول Binance</title>
     <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>🤖 بوت التداول الآلي - Binance</h1>
-            <p class="subtitle">مراقبة وتحليل الأسواق على مدار الساعة</p>
+            <h1>🤖 بوت التداول الآلي</h1>
+            <p class="subtitle">مراقبة وتحليل الأسواق 24/7</p>
         </header>
+
+        <!-- أزرار التحكم -->
+        <div class="controls">
+            <button class="btn btn-primary" onclick="refreshData()">
+                <span class="btn-icon">🔄</span>
+                <span class="btn-text">تحديث الآن</span>
+            </button>
+            <button class="btn btn-secondary" onclick="toggleLogs()">
+                <span class="btn-icon">📝</span>
+                <span class="btn-text">إظهار/إخفاء السجلات</span>
+            </button>
+            <button class="btn btn-info" onclick="exportLogs()">
+                <span class="btn-icon">💾</span>
+                <span class="btn-text">تصدير السجلات</span>
+            </button>
+        </div>
 
         <div class="dashboard">
             <!-- حالة البوت -->
@@ -23,7 +39,7 @@
                         <span class="value status-badge" id="bot-status">جاري التحميل...</span>
                     </div>
                     <div class="status-item">
-                        <span class="label">عدد التحليلات:</span>
+                        <span class="label">التحليلات:</span>
                         <span class="value" id="iterations">-</span>
                     </div>
                     <div class="status-item">
@@ -39,14 +55,14 @@
 
             <!-- معلومات الحساب -->
             <div class="card account-card">
-                <h2>💼 معلومات الحساب</h2>
+                <h2>💼 الحساب</h2>
                 <div class="account-info">
                     <div class="info-item">
                         <span class="label">الوضع:</span>
                         <span class="value mode-badge" id="mode">TESTNET</span>
                     </div>
                     <div class="info-item">
-                        <span class="label">عدد الصفقات المفتوحة:</span>
+                        <span class="label">الصفقات:</span>
                         <span class="value" id="open-positions">0</span>
                     </div>
                 </div>
@@ -54,7 +70,7 @@
 
             <!-- أزواج التداول -->
             <div class="card pairs-card">
-                <h2>📈 أزواج التداول</h2>
+                <h2>📈 التداول</h2>
                 <div class="trading-pairs">
                     <span class="pair-badge">BTC/USDT</span>
                     <span class="pair-badge">ETH/USDT</span>
@@ -62,30 +78,36 @@
                 </div>
             </div>
 
-            <!-- الميزات المفعلة -->
+            <!-- الميزات -->
             <div class="card features-card">
-                <h2>✨ الميزات المفعلة</h2>
+                <h2>✨ الميزات</h2>
                 <ul class="features-list">
-                    <li>✅ Multi-Timeframe Analysis (5m, 1h, 4h)</li>
-                    <li>✅ Trailing Stop-Loss الديناميكي</li>
-                    <li>✅ إدارة المخاطر الذكية</li>
-                    <li>✅ Stop-Loss تلقائي (2%)</li>
-                    <li>✅ Take-Profit (5%)</li>
-                    <li>✅ المؤشرات الفنية (RSI, MACD, Bollinger Bands)</li>
+                    <li>Multi-Timeframe Analysis</li>
+                    <li>Trailing Stop-Loss</li>
+                    <li>إدارة المخاطر</li>
+                    <li>Stop-Loss (2%)</li>
+                    <li>Take-Profit (5%)</li>
+                    <li>المؤشرات الفنية</li>
                 </ul>
             </div>
 
             <!-- الصفقات المفتوحة -->
-            <div class="card positions-card">
-                <h2>💰 الصفقات المفتوحة</h2>
+            <div class="card positions-card full-width">
+                <div class="card-header">
+                    <h2>💰 الصفقات المفتوحة</h2>
+                    <button class="btn-small" onclick="refreshData()">تحديث</button>
+                </div>
                 <div id="positions-container">
-                    <p class="no-positions">لا توجد صفقات مفتوحة حالياً</p>
+                    <p class="no-positions">لا توجد صفقات مفتوحة</p>
                 </div>
             </div>
 
-            <!-- السجلات الأخيرة -->
-            <div class="card logs-card">
-                <h2>📝 السجلات الأخيرة</h2>
+            <!-- السجلات -->
+            <div class="card logs-card full-width" id="logs-section">
+                <div class="card-header">
+                    <h2>📝 السجلات الأخيرة</h2>
+                    <button class="btn-small" onclick="clearLogsDisplay()">مسح العرض</button>
+                </div>
                 <div class="logs-container" id="logs">
                     <p class="loading">جاري تحميل السجلات...</p>
                 </div>
@@ -93,10 +115,13 @@
         </div>
 
         <footer>
-            <p>⚠️ تحذير: التداول في العملات الرقمية يحمل مخاطر عالية</p>
+            <p class="warning">⚠️ التداول في العملات الرقمية يحمل مخاطر عالية</p>
             <p class="update-time">آخر تحديث: <span id="update-time">-</span></p>
         </footer>
     </div>
+
+    <!-- رسالة التحديث -->
+    <div id="toast" class="toast"></div>
 
     <script src="/static/script.js"></script>
 </body>

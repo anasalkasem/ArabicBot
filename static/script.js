@@ -1,7 +1,6 @@
 // تحديث البيانات تلقائياً
 async function updateDashboard() {
     try {
-        // جلب حالة البوت
         const response = await fetch('/status');
         const data = await response.json();
         
@@ -23,7 +22,8 @@ async function updateDashboard() {
         document.getElementById('update-time').textContent = new Date().toLocaleString('ar-EG');
         
     } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error('خطأ في جلب البيانات:', error);
+        showToast('خطأ في الاتصال بالخادم', 'error');
     }
 }
 
@@ -57,24 +57,27 @@ function formatTime(timestamp) {
 function updatePositions(positions) {
     const container = document.getElementById('positions-container');
     
-    if (!positions || positions.length === 0) {
+    if (!positions || Object.keys(positions).length === 0) {
         container.innerHTML = '<p class="no-positions">لا توجد صفقات مفتوحة حالياً</p>';
         return;
     }
     
-    container.innerHTML = positions.map(pos => `
+    // تحويل الـ object إلى array
+    const positionsArray = Object.values(positions);
+    
+    container.innerHTML = positionsArray.map(pos => `
         <div class="position-item">
             <div class="position-header">
                 <span class="position-symbol">${pos.symbol}</span>
                 <span class="profit ${pos.current_profit >= 0 ? 'profit-positive' : 'profit-negative'}">
-                    ${pos.current_profit >= 0 ? '+' : ''}${pos.current_profit.toFixed(2)}%
+                    ${pos.current_profit >= 0 ? '+' : ''}${pos.current_profit ? pos.current_profit.toFixed(2) : '0.00'}%
                 </span>
             </div>
             <div class="position-details">
-                <div><strong>سعر الدخول:</strong> $${pos.entry_price.toFixed(2)}</div>
-                <div><strong>الكمية:</strong> ${pos.quantity.toFixed(6)}</div>
-                <div><strong>Stop-Loss:</strong> $${pos.stop_loss.toFixed(2)}</div>
-                <div><strong>Take-Profit:</strong> $${pos.take_profit.toFixed(2)}</div>
+                <div><strong>سعر الدخول:</strong> $${pos.entry_price ? pos.entry_price.toFixed(2) : '0.00'}</div>
+                <div><strong>الكمية:</strong> ${pos.quantity ? pos.quantity.toFixed(6) : '0.000000'}</div>
+                <div><strong>Stop-Loss:</strong> $${pos.stop_loss ? pos.stop_loss.toFixed(2) : '0.00'}</div>
+                <div><strong>Take-Profit:</strong> $${pos.take_profit ? pos.take_profit.toFixed(2) : '0.00'}</div>
             </div>
         </div>
     `).join('');
@@ -88,19 +91,122 @@ async function updateLogs() {
         
         const logsContainer = document.getElementById('logs');
         if (data.logs && data.logs.length > 0) {
-            logsContainer.innerHTML = data.logs.map(log => `<p>${log}</p>`).join('');
+            logsContainer.innerHTML = data.logs.map(log => 
+                `<p>${escapeHtml(log)}</p>`
+            ).join('');
             // التمرير للأسفل
             logsContainer.scrollTop = logsContainer.scrollHeight;
+        } else {
+            logsContainer.innerHTML = '<p class="loading">لا توجد سجلات متاحة</p>';
         }
     } catch (error) {
-        console.error('Error fetching logs:', error);
+        console.error('خطأ في جلب السجلات:', error);
     }
 }
 
+// دوال الأزرار
+function refreshData() {
+    showToast('جاري تحديث البيانات...', 'info');
+    updateDashboard();
+    updateLogs();
+    setTimeout(() => {
+        showToast('تم التحديث بنجاح! ✅', 'success');
+    }, 500);
+}
+
+function toggleLogs() {
+    const logsSection = document.getElementById('logs-section');
+    if (logsSection.style.display === 'none') {
+        logsSection.style.display = 'block';
+        showToast('تم إظهار السجلات', 'info');
+    } else {
+        logsSection.style.display = 'none';
+        showToast('تم إخفاء السجلات', 'info');
+    }
+}
+
+function clearLogsDisplay() {
+    const logsContainer = document.getElementById('logs');
+    logsContainer.innerHTML = '<p class="loading">تم مسح العرض - سيتم التحديث تلقائياً</p>';
+    showToast('تم مسح السجلات المعروضة', 'info');
+    setTimeout(updateLogs, 2000);
+}
+
+function exportLogs() {
+    fetch('/logs')
+        .then(response => response.json())
+        .then(data => {
+            if (data.logs && data.logs.length > 0) {
+                const logsText = data.logs.join('\n');
+                const blob = new Blob([logsText], { type: 'text/plain' });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `bot-logs-${new Date().toISOString().slice(0,10)}.txt`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
+                showToast('تم تصدير السجلات! 💾', 'success');
+            } else {
+                showToast('لا توجد سجلات للتصدير', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('خطأ في تصدير السجلات:', error);
+            showToast('فشل تصدير السجلات', 'error');
+        });
+}
+
+// Toast notification
+function showToast(message, type = 'info') {
+    const toast = document.getElementById('toast');
+    toast.textContent = message;
+    
+    // تغيير اللون حسب النوع
+    if (type === 'success') {
+        toast.style.background = '#10b981';
+    } else if (type === 'error') {
+        toast.style.background = '#ef4444';
+    } else if (type === 'info') {
+        toast.style.background = '#3b82f6';
+    }
+    
+    toast.classList.add('show');
+    
+    setTimeout(() => {
+        toast.classList.remove('show');
+    }, 3000);
+}
+
+// Escape HTML to prevent XSS
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
 // تحديث البيانات كل 5 ثواني
-setInterval(updateDashboard, 5000);
-setInterval(updateLogs, 10000);
+let updateInterval = setInterval(updateDashboard, 5000);
+let logsInterval = setInterval(updateLogs, 10000);
 
 // تحديث أولي
 updateDashboard();
 updateLogs();
+
+// إيقاف التحديث عند إخفاء الصفحة (توفير الموارد)
+document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+        clearInterval(updateInterval);
+        clearInterval(logsInterval);
+    } else {
+        updateInterval = setInterval(updateDashboard, 5000);
+        logsInterval = setInterval(updateLogs, 10000);
+        refreshData();
+    }
+});
+
+// رسالة ترحيب
+setTimeout(() => {
+    showToast('مرحباً! يتم تحديث البيانات تلقائياً كل 5 ثواني 👋', 'success');
+}, 1000);
