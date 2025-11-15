@@ -83,7 +83,7 @@
       "volume": 20,
       "relative_strength": 10
     },
-    "buy_threshold": 20,
+    "buy_threshold": 40,
     "sell_threshold": 80,
     "sentiment": {
       "cache_ttl_minutes": 15,

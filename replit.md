@@ -128,7 +128,14 @@ python main.py
 - اختبر الاستراتيجية جيداً على Testnet قبل استخدام أموال حقيقية
 
 ## Recent Changes
-### 2025-11-15 (Latest Update - Custom Momentum Index System)
+### 2025-11-15 (Latest Update - Custom Momentum Threshold Adjustment)
+- ⚙️ **Config Optimization**: تعديل Custom Momentum Index buy threshold
+  - تغيير buy_threshold من 20 إلى 40 لقبول المزيد من الفرص
+  - يوازن بين الحماية والفرص التجارية
+  - مناسب للحسابات المتوسطة ($200+)
+  - البوت الآن يقبل إشارات شراء عند momentum < 40 بدلاً من < 20
+
+### 2025-11-15 (Previous Update - Custom Momentum Index System)
 - 🚀 **Major Feature**: Custom Momentum Index - مؤشر زخم متقدم بـ 4 مكونات!
   - **Technical Analysis (40%)**: RSI + Stochastic + MACD
   - **Sentiment Analysis (30%)**: CoinGecko community data + VADER NLP
