@@ -18,6 +18,7 @@ from indicator_performance_tracker import IndicatorPerformanceTracker
 from logger_setup import setup_logger
 from db_manager import DatabaseManager
 from telegram_bot import TelegramBotController
+from ai_market_analyzer import AIMarketAnalyzer
 
 logger = setup_logger('main_bot')
 app = Flask(__name__)
@@ -68,6 +69,7 @@ class BinanceTradingBot:
         self.sentiment_analyzer = SentimentAnalyzer(self.config)
         self.custom_momentum = CustomMomentumIndex(self.config, self.sentiment_analyzer)
         self.performance_tracker = IndicatorPerformanceTracker(db_manager=self.db)
+        self.ai_analyzer = AIMarketAnalyzer()
         
         self.prev_indicators = {}
         self.prev_indicator_signals = {}
@@ -97,6 +99,10 @@ class BinanceTradingBot:
         trailing_enabled = self.config.get('risk_management', {}).get('trailing_stop_loss', {}).get('enabled', False)
         if trailing_enabled:
             logger.info("✨ Trailing Stop-Loss: ENABLED")
+        
+        if self.ai_analyzer.enabled:
+            logger.info("🤖 AI Market Analyzer: ENABLED (GPT-4)")
+            logger.info("   Features: Market Analysis, Strategy Audit, Telegram Chat")
         
         logger.info("✅ Bot initialized successfully")
         logger.info("=" * 80)
@@ -661,7 +667,7 @@ def run_telegram_bot():
     
     try:
         logger.info("🤖 Starting Telegram bot controller...")
-        telegram_bot_instance = TelegramBotController(bot_instance, bot_instance.db)
+        telegram_bot_instance = TelegramBotController(bot_instance, bot_instance.db, bot_instance.ai_analyzer)
         telegram_bot_instance.run()
     except Exception as e:
         logger.error(f"❌ Telegram bot error: {e}")

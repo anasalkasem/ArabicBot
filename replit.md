@@ -68,6 +68,7 @@ The bot is structured into several modular Python files, each responsible for a 
 - **Python Libraries**: `numpy`, `pandas`, `pandas-ta`, `python-binance`, `python-telegram-bot`, `requests`.
 
 ## Recent Updates (November 2025)
+- **AI Integration - OpenAI GPT-4 (Nov 15, 2025)**: Added 3 powerful AI features: (1) AI Market Analyzer - intelligent market analysis with recommendations and risk assessment, (2) Telegram AI Commands - `/analyze` and `/audit` commands for instant AI insights, (3) AI Chat Assistant - 24/7 intelligent chatbot via Telegram. Uses GPT-4o-mini for fast, accurate analysis. See `AI_FEATURES.md` for complete documentation.
 - **Telegram Control Panel**: Added comprehensive Telegram bot controller with 8 commands (`/start`, `/status`, `/stats`, `/balance`, `/positions`, `/regime`, `/logs`, `/help`) and interactive keyboard buttons for full bot management via mobile.
 - **PostgreSQL Integration**: Migrated from JSON to PostgreSQL database for better performance, scalability, and complex analytics.
 - **Dynamic Strategy Weaver - FULL ACTIVATION (Nov 15, 2025)**: The system now **actively uses** calculated indicator weights to make buy decisions! When confidence ≥50%, the bot buys immediately (bypassing static strategy). When confidence <50%, falls back to proven RSI+Stoch+BB strategy. This allows the bot to learn which indicators work best per symbol and adapt over time. See `DYNAMIC_STRATEGY_WEAVER.md` for full details.

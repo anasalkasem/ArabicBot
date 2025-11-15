@@ -12,9 +12,10 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 class TelegramBotController:
-    def __init__(self, bot_instance, db_manager):
+    def __init__(self, bot_instance, db_manager, ai_analyzer=None):
         self.bot = bot_instance
         self.db = db_manager
+        self.ai_analyzer = ai_analyzer
         self.token = os.getenv('TELEGRAM_BOT_TOKEN')
         self.admin_chat_id = os.getenv('TELEGRAM_CHAT_ID')
         
@@ -33,6 +34,9 @@ class TelegramBotController:
         self.application.add_handler(CommandHandler("regime", self.regime_command))
         self.application.add_handler(CommandHandler("logs", self.logs_command))
         self.application.add_handler(CommandHandler("help", self.help_command))
+        self.application.add_handler(CommandHandler("analyze", self.ai_analyze_command))
+        self.application.add_handler(CommandHandler("audit", self.ai_audit_command))
+        self.application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, self.ai_chat_handler))
         self.application.add_handler(CallbackQueryHandler(self.button_handler))
         
         logger.info("✅ Telegram bot handlers configured")
@@ -492,6 +496,189 @@ class TelegramBotController:
             )
         except Exception as e:
             logger.error(f"Error sending notification: {e}")
+    
+    async def ai_analyze_command(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        """تحليل السوق باستخدام AI"""
+        if not self.is_authorized(update):
+            await update.message.reply_text("⛔ عذراً، غير مصرح لك باستخدام هذا البوت")
+            return
+        
+        if not self.ai_analyzer or not self.ai_analyzer.enabled:
+            await update.message.reply_text("⚠️ ميزة AI غير مفعّلة. تحتاج إلى OPENAI_API_KEY")
+            return
+        
+        try:
+            await update.message.reply_text("🤖 جاري تحليل السوق باستخدام الذكاء الاصطناعي...")
+            
+            symbol = context.args[0] if context.args else 'BTCUSDT'
+            
+            result = self.bot.analyze_symbol(symbol)
+            if not result:
+                await update.message.reply_text(f"❌ لا يمكن الحصول على بيانات {symbol}")
+                return
+            
+            indicators, _trend = result
+            
+            market_regime = self.bot.trading_strategy.current_regime if self.bot.regime_enabled else 'sideways'
+            momentum_index = self.bot.symbol_momentum_cache.get(symbol)
+            recent_trades = self.bot.stats.get_recent_trades(5)
+            
+            analysis = self.ai_analyzer.analyze_market_conditions(
+                symbol, indicators, market_regime, momentum_index, recent_trades
+            )
+            
+            if not analysis:
+                await update.message.reply_text("❌ فشل تحليل AI")
+                return
+            
+            recommendation_emoji = {
+                'BUY': '🟢',
+                'SELL': '🔴',
+                'HOLD': '🟡'
+            }
+            
+            risk_emoji = {
+                'LOW': '🟢',
+                'MEDIUM': '🟡',
+                'HIGH': '🔴'
+            }
+            
+            message = f"""
+🤖 تحليل AI لـ {symbol}
+━━━━━━━━━━━━━━━━━━━━
+
+📊 التحليل:
+{analysis['analysis']}
+
+{recommendation_emoji.get(analysis['recommendation'], '⚪')} التوصية: {analysis['recommendation']}
+🎯 مستوى الثقة: {analysis['confidence']:.0%}
+{risk_emoji.get(analysis['risk_level'], '⚪')} المخاطرة: {analysis['risk_level']}
+
+💡 نقاط رئيسية:
+{chr(10).join(f"• {insight}" for insight in analysis['key_insights'])}
+
+⏰ {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
+            """
+            
+            await update.message.reply_text(message)
+            
+        except Exception as e:
+            logger.error(f"Error in AI analyze command: {e}")
+            await update.message.reply_text(f"❌ خطأ: {str(e)}")
+    
+    async def ai_audit_command(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        """تدقيق الاستراتيجية باستخدام AI"""
+        if not self.is_authorized(update):
+            await update.message.reply_text("⛔ عذراً، غير مصرح لك باستخدام هذا البوت")
+            return
+        
+        if not self.ai_analyzer or not self.ai_analyzer.enabled:
+            await update.message.reply_text("⚠️ ميزة AI غير مفعّلة. تحتاج إلى OPENAI_API_KEY")
+            return
+        
+        try:
+            await update.message.reply_text("🔍 جاري تدقيق الاستراتيجية...")
+            
+            stats = self.bot.stats.get_stats()
+            win_rate = self.bot.stats.get_win_rate()
+            avg_profit = self.bot.stats.get_average_profit()
+            recent_trades = self.bot.stats.get_recent_trades(10)
+            
+            full_stats = {
+                'total_trades': stats['total_trades'],
+                'winning_trades': stats['winning_trades'],
+                'losing_trades': stats['losing_trades'],
+                'win_rate': win_rate,
+                'total_profit_usd': stats['total_profit_usd'],
+                'average_profit': avg_profit,
+                'best_trade': stats['best_trade'],
+                'worst_trade': stats['worst_trade']
+            }
+            
+            audit = self.ai_analyzer.audit_strategy_performance(full_stats, recent_trades)
+            
+            if not audit:
+                await update.message.reply_text("❌ فشل التدقيق")
+                return
+            
+            message = f"""
+🔍 تدقيق الاستراتيجية - AI
+━━━━━━━━━━━━━━━━━━━━
+
+⭐ التقييم العام: {audit['overall_rating']}
+📊 الدرجة: {audit['performance_score']}/10
+
+💪 نقاط القوة:
+{chr(10).join(f"• {s}" for s in audit['strengths'])}
+
+⚠️ نقاط الضعف:
+{chr(10).join(f"• {w}" for w in audit['weaknesses'])}
+
+🎯 التوصيات:
+{chr(10).join(f"{i+1}. {r}" for i, r in enumerate(audit['recommendations']))}
+
+🛡️ تقييم المخاطر:
+{audit['risk_assessment']}
+
+📌 الخطوات التالية:
+{audit['next_steps']}
+            """
+            
+            await update.message.reply_text(message)
+            
+        except Exception as e:
+            logger.error(f"Error in AI audit command: {e}")
+            await update.message.reply_text(f"❌ خطأ: {str(e)}")
+    
+    async def ai_chat_handler(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        """الدردشة مع AI Assistant"""
+        if not self.is_authorized(update):
+            return
+        
+        if not self.ai_analyzer or not self.ai_analyzer.enabled:
+            return
+        
+        try:
+            user_message = update.message.text
+            
+            if len(user_message) < 5 or len(user_message) > 500:
+                return
+            
+            await update.message.reply_text("🤖 جاري التفكير...")
+            
+            from openai import OpenAI
+            client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
+            
+            stats = self.bot.stats.get_stats()
+            positions = self.bot.risk_manager.get_open_positions()
+            regime = self.bot.trading_strategy.current_regime if self.bot.regime_enabled else 'sideways'
+            
+            context_info = f"""
+أنت مساعد تداول ذكي لبوت Binance. المعلومات الحالية:
+- إجمالي الصفقات: {stats['total_trades']}
+- نسبة النجاح: {self.bot.stats.get_win_rate():.1f}%
+- المراكز المفتوحة: {len(positions)}
+- حالة السوق: {regime}
+- الأزواج: {', '.join(self.bot.trading_pairs)}
+
+أجب بإيجاز ووضوح بالعربية.
+            """
+            
+            response = client.chat.completions.create(
+                model="gpt-4o-mini",
+                messages=[
+                    {"role": "system", "content": context_info},
+                    {"role": "user", "content": user_message}
+                ],
+                temperature=0.7,
+                max_tokens=300
+            )
+            
+            ai_response = response.choices[0].message.content.strip()
+            await update.message.reply_text(f"🤖 {ai_response}")
+            
+        except Exception as e:
+            logger.error(f"Error in AI chat handler: {e}")
     
     def run(self):
         logger.info("🤖 Starting Telegram bot...")
