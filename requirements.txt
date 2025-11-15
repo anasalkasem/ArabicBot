@@ -10,3 +10,4 @@ nltk
 vaderSentiment
 psycopg2-binary
 python-telegram-bot
+openai>=2.0.0
