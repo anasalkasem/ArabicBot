@@ -74,5 +74,20 @@
   },
   "telegram": {
     "enabled": true
+  },
+  "custom_momentum": {
+    "enabled": true,
+    "weights": {
+      "technical": 40,
+      "sentiment": 30,
+      "volume": 20,
+      "relative_strength": 10
+    },
+    "buy_threshold": 20,
+    "sell_threshold": 80,
+    "sentiment": {
+      "cache_ttl_minutes": 15,
+      "enabled": true
+    }
   }
 }

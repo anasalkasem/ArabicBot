@@ -11,6 +11,8 @@ from risk_manager import RiskManager
 from telegram_notifier import TelegramNotifier
 from statistics_tracker import StatisticsTracker
 from market_regime import MarketRegime
+from sentiment_analyzer import SentimentAnalyzer
+from custom_momentum import CustomMomentumIndex
 from logger_setup import setup_logger
 
 logger = setup_logger('main_bot')
@@ -51,16 +53,22 @@ class BinanceTradingBot:
         self.telegram = TelegramNotifier(self.config)
         self.stats = StatisticsTracker()
         self.market_regime = MarketRegime(self.config)
+        self.sentiment_analyzer = SentimentAnalyzer(self.config)
+        self.custom_momentum = CustomMomentumIndex(self.config, self.sentiment_analyzer)
         
         self.prev_indicators = {}
         self.multi_tf_enabled = self.config.get('multi_timeframe', {}).get('enabled', False)
         self.regime_enabled = self.config.get('market_regime', {}).get('enabled', False)
+        self.momentum_enabled = self.config.get('custom_momentum', {}).get('enabled', False)
         
         if self.multi_tf_enabled:
             logger.info("✨ Multi-Timeframe Analysis: ENABLED")
         
         if self.regime_enabled:
             logger.info("✨ Market Regime Adaptation: ENABLED")
+        
+        if self.momentum_enabled:
+            logger.info("✨ Custom Momentum Index: ENABLED")
         
         trailing_enabled = self.config.get('risk_management', {}).get('trailing_stop_loss', {}).get('enabled', False)
         if trailing_enabled:
@@ -101,6 +109,42 @@ class BinanceTradingBot:
             
         except Exception as e:
             logger.error(f"Error analyzing {symbol} on {timeframe}: {e}")
+            return None
+    
+    def get_24h_data(self, symbol):
+        """
+        الحصول على بيانات 24 ساعة (volume avg, open price)
+        Returns: (volume_avg, open_24h)
+        """
+        try:
+            klines = self.binance_client.get_historical_klines(symbol, '1h', limit=24)
+            if not klines or len(klines) < 2:
+                return None, None
+            
+            volumes = [float(candle[5]) for candle in klines]
+            volume_avg = sum(volumes) / len(volumes)
+            
+            open_24h = float(klines[0][1])
+            
+            return volume_avg, open_24h
+        except Exception as e:
+            logger.error(f"Error getting 24h data for {symbol}: {e}")
+            return None, None
+    
+    def calculate_btc_change_24h(self):
+        """حساب تغير سعر BTC خلال 24 ساعة"""
+        try:
+            klines = self.binance_client.get_historical_klines('BTCUSDT', '1h', limit=24)
+            if not klines or len(klines) < 2:
+                return None
+            
+            open_price = float(klines[0][1])
+            close_price = float(klines[-1][4])
+            
+            change_percent = ((close_price - open_price) / open_price) * 100
+            return change_percent
+        except Exception as e:
+            logger.error(f"Error calculating BTC 24h change: {e}")
             return None
     
     def analyze_multi_timeframe(self, symbol):
@@ -218,9 +262,28 @@ class BinanceTradingBot:
                     regime_emoji = {'bull': '🐂', 'bear': '🐻', 'sideways': '↔️'}
                     logger.info(f"   {regime_emoji.get(market_regime, '📊')} Market Regime: {market_regime.upper()}")
                 
+                momentum_index = None
+                momentum_components = None
+                if self.momentum_enabled:
+                    volume_24h_avg, symbol_open_24h = self.get_24h_data(symbol)
+                    btc_change_24h = self.calculate_btc_change_24h()
+                    
+                    momentum_index, momentum_components = self.custom_momentum.compute(
+                        symbol, indicators, volume_24h_avg=volume_24h_avg, btc_change_24h=btc_change_24h, symbol_open_24h=symbol_open_24h
+                    )
+                    if momentum_index is not None:
+                        logger.info(f"   🎯 Custom Momentum Index: {momentum_index:.1f}/100")
+                
                 buy_signal, signals = self.trading_strategy.check_buy_signal(
                     indicators, prev_indicators, medium_trend, long_trend, market_regime
                 )
+                
+                if self.momentum_enabled and momentum_index is not None:
+                    if not self.custom_momentum.should_buy(momentum_index):
+                        buy_signal = False
+                        logger.info(f"   ⏭️ Custom Momentum: No buy (index={momentum_index:.1f}, need <{self.custom_momentum.buy_threshold})")
+                    else:
+                        logger.info(f"   ✅ Custom Momentum: BUY signal (index={momentum_index:.1f} < {self.custom_momentum.buy_threshold})")
                 
                 if buy_signal and self.risk_manager.can_open_position(symbol):
                     quantity = self.risk_manager.calculate_position_size(symbol, current_price)
@@ -335,6 +398,24 @@ def get_status():
         market_regime = bot_instance.trading_strategy.current_regime if bot_instance.regime_enabled else 'sideways'
         regime_reason = bot_instance.trading_strategy.current_regime_reason if bot_instance.regime_enabled else 'N/A'
         
+        momentum_data = {}
+        if bot_instance.momentum_enabled:
+            try:
+                for symbol in bot_instance.trading_pairs:
+                    result = bot_instance.analyze_symbol(symbol)
+                    if result:
+                        indicators, _ = result
+                        momentum_index, components = bot_instance.custom_momentum.compute(
+                            symbol, indicators, volume_24h_avg=None, btc_change_24h=None
+                        )
+                        if momentum_index is not None:
+                            momentum_data[symbol] = {
+                                'index': round(momentum_index, 1),
+                                'components': components
+                            }
+            except Exception as e:
+                logger.error(f"Error calculating momentum for status: {e}")
+        
         return jsonify({
             'bot_status': bot_stats['status'],
             'iterations': bot_stats['iterations'],
@@ -345,9 +426,11 @@ def get_status():
             'testnet': bot_instance.testnet,
             'market_regime': market_regime,
             'regime_reason': regime_reason,
-            'regime_enabled': bot_instance.regime_enabled
+            'regime_enabled': bot_instance.regime_enabled,
+            'momentum_enabled': bot_instance.momentum_enabled,
+            'momentum_data': momentum_data
         })
-    return jsonify({'status': 'initializing', 'testnet': True, 'market_regime': 'unknown', 'regime_enabled': False})
+    return jsonify({'status': 'initializing', 'testnet': True, 'market_regime': 'unknown', 'regime_enabled': False, 'momentum_enabled': False})
 
 @app.route('/logs')
 def get_logs():

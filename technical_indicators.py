@@ -136,6 +136,7 @@ class TechnicalIndicators:
         return {
             'timestamp': latest['close_time'],
             'close': latest['close'],
+            'volume': latest['volume'],
             'rsi': latest['rsi'],
             'stoch_k': latest['stoch_k'],
             'stoch_d': latest['stoch_d'],

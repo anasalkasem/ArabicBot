@@ -28,6 +28,9 @@ async function updateDashboard() {
         // تحديث حالة السوق (Market Regime)
         updateMarketRegime(data);
         
+        // تحديث مؤشر الزخم المخصص
+        updateCustomMomentum(data);
+        
         // تحديث وقت التحديث
         document.getElementById('update-time').textContent = new Date().toLocaleString('ar-EG');
         
@@ -82,6 +85,57 @@ function updateMarketRegime(data) {
     
     const badge = document.getElementById('regime-badge');
     badge.className = 'regime-badge ' + current.className;
+}
+
+function updateCustomMomentum(data) {
+    if (!data.momentum_enabled || !data.momentum_data) {
+        document.getElementById('momentum-card-container').style.display = 'none';
+        return;
+    }
+    
+    document.getElementById('momentum-card-container').style.display = 'block';
+    
+    const firstSymbol = Object.keys(data.momentum_data)[0];
+    if (!firstSymbol) return;
+    
+    const momentumData = data.momentum_data[firstSymbol];
+    const index = momentumData.index || 50;
+    const components = momentumData.components || {};
+    
+    document.getElementById('momentum-value').textContent = index.toFixed(1);
+    
+    let signalText = 'محايد';
+    let signalClass = 'neutral';
+    if (index < 20) {
+        signalText = '🟢 شراء قوي!';
+        signalClass = 'buy-strong';
+    } else if (index < 40) {
+        signalText = '🟢 شراء';
+        signalClass = 'buy';
+    } else if (index > 80) {
+        signalText = '🔴 بيع قوي!';
+        signalClass = 'sell-strong';
+    } else if (index > 60) {
+        signalText = '🟡 بيع';
+        signalClass = 'sell';
+    }
+    
+    const signalElement = document.getElementById('momentum-signal');
+    signalElement.textContent = signalText;
+    signalElement.className = 'momentum-signal ' + signalClass;
+    
+    if (components.technical) {
+        document.getElementById('tech-score').textContent = components.technical.score.toFixed(1);
+    }
+    if (components.sentiment) {
+        document.getElementById('sentiment-score').textContent = components.sentiment.score.toFixed(1);
+    }
+    if (components.volume) {
+        document.getElementById('volume-score').textContent = components.volume.score.toFixed(1);
+    }
+    if (components.relative_strength) {
+        document.getElementById('strength-score').textContent = components.relative_strength.score.toFixed(1);
+    }
 }
 
 async function updateStatistics() {
