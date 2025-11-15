@@ -25,6 +25,9 @@ async function updateDashboard() {
         // تحديث الصفقات المفتوحة
         updatePositions(data.positions);
         
+        // تحديث حالة السوق (Market Regime)
+        updateMarketRegime(data);
+        
         // تحديث وقت التحديث
         document.getElementById('update-time').textContent = new Date().toLocaleString('ar-EG');
         
@@ -35,6 +38,50 @@ async function updateDashboard() {
     
     // تحديث الإحصائيات
     updateStatistics();
+}
+
+function updateMarketRegime(data) {
+    if (!data.regime_enabled) {
+        document.getElementById('regime-card-container').style.display = 'none';
+        return;
+    }
+    
+    document.getElementById('regime-card-container').style.display = 'block';
+    
+    const regime = data.market_regime || 'sideways';
+    const regimeData = {
+        'bull': {
+            icon: '🐂',
+            name: 'BULL',
+            description: 'السوق في اتجاه صاعد',
+            strategy: 'استراتيجية جريئة - Buy the Dip',
+            className: 'bull'
+        },
+        'bear': {
+            icon: '🐻',
+            name: 'BEAR',
+            description: 'السوق في اتجاه هابط',
+            strategy: 'استراتيجية حذرة - حماية رأس المال',
+            className: 'bear'
+        },
+        'sideways': {
+            icon: '↔️',
+            name: 'SIDEWAYS',
+            description: 'السوق في حالة تذبذب جانبي',
+            strategy: 'استراتيجية متوازنة - BB Bands',
+            className: 'sideways'
+        }
+    };
+    
+    const current = regimeData[regime] || regimeData['sideways'];
+    
+    document.getElementById('regime-icon').textContent = current.icon;
+    document.getElementById('regime-name').textContent = current.name;
+    document.getElementById('regime-description').textContent = current.description;
+    document.getElementById('regime-strategy').textContent = current.strategy;
+    
+    const badge = document.getElementById('regime-badge');
+    badge.className = 'regime-badge ' + current.className;
 }
 
 async function updateStatistics() {

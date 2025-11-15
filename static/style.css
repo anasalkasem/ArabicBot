@@ -584,3 +584,97 @@ footer {
         background: linear-gradient(135deg, #000000 0%, #1a1a2e 50%, #16213e 100%);
     }
 }
+
+
+/* Market Regime Card Styles */
+.regime-card {
+    background: linear-gradient(135deg, rgba(44, 44, 46, 0.9), rgba(58, 58, 60, 0.85));
+}
+
+.regime-info {
+    text-align: center;
+}
+
+.regime-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 28px;
+    border-radius: 25px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 15px;
+    transition: all 0.3s ease;
+}
+
+.regime-badge.bull {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+    animation: bull-pulse 2s ease-in-out infinite;
+}
+
+.regime-badge.bear {
+    background: linear-gradient(135deg, var(--ios-red), #dc3545);
+    color: white;
+    box-shadow: 0 6px 20px rgba(255, 59, 48, 0.4);
+    animation: bear-pulse 2s ease-in-out infinite;
+}
+
+.regime-badge.sideways {
+    background: linear-gradient(135deg, var(--ios-blue), var(--ios-purple));
+    color: white;
+    box-shadow: 0 6px 20px rgba(0, 122, 255, 0.4);
+}
+
+@keyframes bull-pulse {
+    0%, 100% { box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4); transform: scale(1); }
+    50% { box-shadow: 0 8px 30px rgba(16, 185, 129, 0.6); transform: scale(1.02); }
+}
+
+@keyframes bear-pulse {
+    0%, 100% { box-shadow: 0 6px 20px rgba(255, 59, 48, 0.4); transform: scale(1); }
+    50% { box-shadow: 0 8px 30px rgba(255, 59, 48, 0.6); transform: scale(1.02); }
+}
+
+.regime-icon {
+    font-size: 1.5rem;
+}
+
+.regime-name {
+    font-size: 1.1rem;
+    letter-spacing: 1.5px;
+}
+
+.regime-description {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    margin-bottom: 12px;
+    font-weight: 500;
+}
+
+.regime-strategy {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 16px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: var(--border-radius-small);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.strategy-label {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.strategy-value {
+    color: var(--text-primary);
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+

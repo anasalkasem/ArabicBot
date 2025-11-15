@@ -5,9 +5,10 @@ import os
 logger = setup_logger('risk_manager')
 
 class RiskManager:
-    def __init__(self, config, binance_client):
+    def __init__(self, config, binance_client, trading_strategy=None):
         self.config = config
         self.binance_client = binance_client
+        self.trading_strategy = trading_strategy
         self.positions_file = 'positions.json'
         self.positions = self.load_positions()
     
@@ -74,8 +75,25 @@ class RiskManager:
         return True
     
     def open_position(self, symbol, entry_price, quantity, signals):
+        market_regime = 'sideways'
+        stop_loss_multiplier = 1.0
+        take_profit_multiplier = 1.0
+        
+        if self.trading_strategy and hasattr(self.trading_strategy, 'current_regime'):
+            market_regime = self.trading_strategy.current_regime
+            regime_config = self.config.get('market_regime', {})
+            regime_strategy = regime_config.get(f'{market_regime}_strategy', {})
+            stop_loss_multiplier = regime_strategy.get('stop_loss_multiplier', 1.0)
+            take_profit_multiplier = regime_strategy.get('take_profit_multiplier', 1.0)
+        
+        base_stop_loss = self.config['risk_management']['stop_loss_percent']
+        base_take_profit = self.config['risk_management']['take_profit_percent']
+        
+        adjusted_stop_loss = base_stop_loss * stop_loss_multiplier
+        adjusted_take_profit = base_take_profit * take_profit_multiplier
+        
         trailing_config = self.config['risk_management'].get('trailing_stop_loss', {})
-        initial_stop = -trailing_config.get('initial_stop_percent', 2.0)
+        initial_stop = -adjusted_stop_loss
         
         self.positions[symbol] = {
             'status': 'open',
@@ -83,6 +101,9 @@ class RiskManager:
             'quantity': quantity,
             'signals': signals,
             'entry_time': str(pd.Timestamp.now()),
+            'market_regime': market_regime,
+            'stop_loss_percent': adjusted_stop_loss,
+            'take_profit_percent': adjusted_take_profit,
             'trailing_stop': {
                 'enabled': trailing_config.get('enabled', False),
                 'current_stop_percent': initial_stop,
@@ -93,6 +114,7 @@ class RiskManager:
         }
         self.save_positions()
         logger.info(f"📈 Position opened: {symbol} @ ${entry_price:.2f}, Quantity: {quantity:.8f}")
+        logger.info(f"   Regime: {market_regime.upper()} | SL: {adjusted_stop_loss:.1f}% | TP: {adjusted_take_profit:.1f}%")
     
     def close_position(self, symbol, exit_price, reason):
         if symbol not in self.positions:

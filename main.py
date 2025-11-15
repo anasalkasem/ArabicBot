@@ -10,6 +10,7 @@ from trading_strategy import TradingStrategy
 from risk_manager import RiskManager
 from telegram_notifier import TelegramNotifier
 from statistics_tracker import StatisticsTracker
+from market_regime import MarketRegime
 from logger_setup import setup_logger
 
 logger = setup_logger('main_bot')
@@ -46,15 +47,20 @@ class BinanceTradingBot:
         self.binance_client = BinanceClientManager(testnet=self.testnet)
         self.technical_indicators = TechnicalIndicators(self.config)
         self.trading_strategy = TradingStrategy(self.config)
-        self.risk_manager = RiskManager(self.config, self.binance_client)
+        self.risk_manager = RiskManager(self.config, self.binance_client, self.trading_strategy)
         self.telegram = TelegramNotifier(self.config)
         self.stats = StatisticsTracker()
+        self.market_regime = MarketRegime(self.config)
         
         self.prev_indicators = {}
         self.multi_tf_enabled = self.config.get('multi_timeframe', {}).get('enabled', False)
+        self.regime_enabled = self.config.get('market_regime', {}).get('enabled', False)
         
         if self.multi_tf_enabled:
             logger.info("✨ Multi-Timeframe Analysis: ENABLED")
+        
+        if self.regime_enabled:
+            logger.info("✨ Market Regime Adaptation: ENABLED")
         
         trailing_enabled = self.config.get('risk_management', {}).get('trailing_stop_loss', {}).get('enabled', False)
         if trailing_enabled:
@@ -146,6 +152,15 @@ class BinanceTradingBot:
                 return
             
             current_price = indicators['close']
+            
+            market_regime = 'sideways'
+            regime_reason = 'Not detected'
+            if self.regime_enabled:
+                timeframe = self.config['trading']['candle_interval']
+                klines = self.binance_client.get_historical_klines(symbol, timeframe, limit=100)
+                market_regime, regime_reason = self.market_regime.detect_regime(indicators, klines)
+                self.trading_strategy.adapt_to_regime(market_regime, regime_reason)
+            
             position = self.risk_manager.get_position(symbol)
             
             if position and position.get('status') == 'open':
@@ -166,7 +181,7 @@ class BinanceTradingBot:
                         self.telegram.notify_sell(symbol, current_price, position['quantity'], entry_price, "TRAILING_STOP")
                     return
                 
-                if self.trading_strategy.should_stop_loss(current_price, entry_price):
+                if self.trading_strategy.should_stop_loss(current_price, entry_price, position):
                     logger.warning(f"🛑 STOP LOSS triggered for {symbol}")
                     order = self.binance_client.create_test_order(
                         symbol=symbol,
@@ -180,7 +195,7 @@ class BinanceTradingBot:
                     return
                 
                 sell_signal, signals, reason = self.trading_strategy.check_sell_signal(
-                    indicators, entry_price, prev_indicators
+                    indicators, entry_price, prev_indicators, market_regime, position
                 )
                 
                 if sell_signal:
@@ -199,9 +214,12 @@ class BinanceTradingBot:
                 logger.info(f"   📊 RSI: {indicators['rsi']:.1f} | Stoch: {indicators['stoch_k']:.1f} | "
                           f"Price: ${current_price:.2f} | BB Lower: ${indicators['bb_lower']:.2f}")
                 logger.info(f"   📈 Trends: 5m={short_trend}, 1h={medium_trend}, 4h={long_trend}")
+                if self.regime_enabled:
+                    regime_emoji = {'bull': '🐂', 'bear': '🐻', 'sideways': '↔️'}
+                    logger.info(f"   {regime_emoji.get(market_regime, '📊')} Market Regime: {market_regime.upper()}")
                 
                 buy_signal, signals = self.trading_strategy.check_buy_signal(
-                    indicators, prev_indicators, medium_trend, long_trend
+                    indicators, prev_indicators, medium_trend, long_trend, market_regime
                 )
                 
                 if buy_signal and self.risk_manager.can_open_position(symbol):
@@ -314,6 +332,9 @@ def get_status():
     """إرجاع حالة البوت والصفقات"""
     if bot_instance:
         positions = bot_instance.risk_manager.get_open_positions()
+        market_regime = bot_instance.trading_strategy.current_regime if bot_instance.regime_enabled else 'sideways'
+        regime_reason = bot_instance.trading_strategy.current_regime_reason if bot_instance.regime_enabled else 'N/A'
+        
         return jsonify({
             'bot_status': bot_stats['status'],
             'iterations': bot_stats['iterations'],
@@ -321,9 +342,12 @@ def get_status():
             'last_check': bot_stats['last_check'],
             'open_positions': len(positions),
             'positions': positions,
-            'testnet': bot_instance.testnet
+            'testnet': bot_instance.testnet,
+            'market_regime': market_regime,
+            'regime_reason': regime_reason,
+            'regime_enabled': bot_instance.regime_enabled
         })
-    return jsonify({'status': 'initializing', 'testnet': True})
+    return jsonify({'status': 'initializing', 'testnet': True, 'market_regime': 'unknown', 'regime_enabled': False})
 
 @app.route('/logs')
 def get_logs():

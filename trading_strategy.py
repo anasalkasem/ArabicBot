@@ -6,13 +6,21 @@ logger = setup_logger('trading_strategy')
 class TradingStrategy:
     def __init__(self, config):
         self.config = config
-        self.rsi_oversold = config['indicators']['rsi_oversold']
+        self.base_rsi_oversold = config['indicators']['rsi_oversold']
+        self.rsi_oversold = self.base_rsi_oversold
         self.rsi_overbought = config['indicators']['rsi_overbought']
-        self.stoch_oversold = config['indicators']['stochastic_oversold']
+        self.base_stoch_oversold = config['indicators']['stochastic_oversold']
+        self.stoch_oversold = self.base_stoch_oversold
         self.stoch_overbought = config['indicators']['stochastic_overbought']
-        self.bb_tolerance = 1 + (config['indicators']['bb_tolerance'] / 100)
+        self.base_bb_tolerance = 1 + (config['indicators']['bb_tolerance'] / 100)
+        self.bb_tolerance = self.base_bb_tolerance
         self.multi_tf_enabled = config.get('multi_timeframe', {}).get('enabled', False)
         self.require_trend_alignment = config.get('multi_timeframe', {}).get('require_trend_alignment', True)
+        
+        self.regime_enabled = config.get('market_regime', {}).get('enabled', False)
+        self.regime_config = config.get('market_regime', {})
+        self.current_regime = 'sideways'
+        self.current_regime_reason = 'Not yet detected'
     
     def check_trend_alignment(self, medium_trend, long_trend):
         if not self.multi_tf_enabled or not self.require_trend_alignment:
@@ -36,12 +44,50 @@ class TradingStrategy:
         else:
             return False, f"❌ Trend not aligned: 1h={medium_trend}, 4h={long_trend}"
     
-    def check_buy_signal(self, indicators, prev_indicators=None, medium_trend=None, long_trend=None):
+    def adapt_to_regime(self, regime, reason):
+        """
+        تكييف الاستراتيجية بناءً على حالة السوق
+        """
+        self.current_regime = regime
+        self.current_regime_reason = reason
+        
+        if not self.regime_enabled:
+            return
+        
+        if regime == 'bull':
+            bull_config = self.regime_config.get('bull_strategy', {})
+            self.rsi_oversold = self.base_rsi_oversold + bull_config.get('rsi_oversold_adjustment', 5)
+            self.stoch_oversold = self.base_stoch_oversold + bull_config.get('stoch_oversold_adjustment', 5)
+            bb_adjustment = bull_config.get('bb_tolerance_adjustment', 0.5)
+            self.bb_tolerance = self.base_bb_tolerance + (bb_adjustment / 100)
+            logger.info(f"🐂 Adapted to BULL market: RSI<{self.rsi_oversold}, Stoch<{self.stoch_oversold}, BB tolerance={((self.bb_tolerance-1)*100):.1f}%")
+        
+        elif regime == 'bear':
+            bear_config = self.regime_config.get('bear_strategy', {})
+            self.rsi_oversold = self.base_rsi_oversold + bear_config.get('rsi_oversold_adjustment', -15)
+            self.stoch_oversold = self.base_stoch_oversold + bear_config.get('stoch_oversold_adjustment', -20)
+            bb_adjustment = bear_config.get('bb_tolerance_adjustment', -0.5)
+            self.bb_tolerance = self.base_bb_tolerance + (bb_adjustment / 100)
+            logger.warning(f"🐻 BEAR market detected - Very conservative: RSI<{self.rsi_oversold}, Stoch<{self.stoch_oversold}, BB tolerance={((self.bb_tolerance-1)*100):.1f}%")
+        
+        else:
+            self.rsi_oversold = self.base_rsi_oversold
+            self.stoch_oversold = self.base_stoch_oversold
+            self.bb_tolerance = self.base_bb_tolerance
+            logger.info(f"↔️ Adapted to SIDEWAYS market: Using standard strategy")
+    
+    def check_buy_signal(self, indicators, prev_indicators=None, medium_trend=None, long_trend=None, market_regime=None):
         try:
             if not indicators or np.isnan(indicators['rsi']):
                 return False, []
             
             signals = []
+            
+            if market_regime and self.regime_enabled and market_regime == 'bear':
+                bear_config = self.regime_config.get('bear_strategy', {})
+                if not bear_config.get('allow_new_trades', True):
+                    logger.debug(f"🐻 Buy rejected: Bear market - trading disabled")
+                    return False, [f"Bear market: {self.current_regime_reason}"]
             
             if self.multi_tf_enabled:
                 trend_ok, trend_msg = self.check_trend_alignment(medium_trend, long_trend)
@@ -81,7 +127,7 @@ class TradingStrategy:
             logger.error(f"Error checking buy signal: {e}")
             return False, []
     
-    def check_sell_signal(self, indicators, entry_price=None, prev_indicators=None):
+    def check_sell_signal(self, indicators, entry_price=None, prev_indicators=None, market_regime=None, position=None):
         try:
             if not indicators or np.isnan(indicators['rsi']):
                 return False, [], None
@@ -96,10 +142,13 @@ class TradingStrategy:
             
             if entry_price:
                 profit_percent = ((indicators['close'] - entry_price) / entry_price) * 100
-                take_profit_target = self.config['risk_management']['take_profit_percent']
                 
-                if profit_percent >= take_profit_target:
-                    signals.append(f"Profit={profit_percent:.2f}% >= Target={take_profit_target}%")
+                take_profit_percent = self.config['risk_management']['take_profit_percent']
+                if position and 'take_profit_percent' in position:
+                    take_profit_percent = position['take_profit_percent']
+                
+                if profit_percent >= take_profit_percent:
+                    signals.append(f"Profit={profit_percent:.2f}% >= Target={take_profit_percent:.1f}%")
                     sell_reason = "TAKE_PROFIT"
             
             if prev_indicators and not np.isnan(prev_indicators.get('macd_hist', np.nan)):
@@ -123,13 +172,18 @@ class TradingStrategy:
             logger.error(f"Error checking sell signal: {e}")
             return False, [], None
     
-    def should_stop_loss(self, current_price, entry_price):
+    def should_stop_loss(self, current_price, entry_price, position=None):
         try:
             if not entry_price or entry_price == 0:
                 return False
             
             loss_percent = ((current_price - entry_price) / entry_price) * 100
-            stop_loss_threshold = -self.config['risk_management']['stop_loss_percent']
+            
+            stop_loss_percent = self.config['risk_management']['stop_loss_percent']
+            if position and 'stop_loss_percent' in position:
+                stop_loss_percent = position['stop_loss_percent']
+            
+            stop_loss_threshold = -stop_loss_percent
             
             if loss_percent <= stop_loss_threshold:
                 logger.warning(f"⛔ STOP LOSS TRIGGERED: Loss={loss_percent:.2f}% <= {stop_loss_threshold}%")
