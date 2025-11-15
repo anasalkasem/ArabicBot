@@ -10,6 +10,7 @@ class TradingStrategy:
         self.rsi_overbought = config['indicators']['rsi_overbought']
         self.stoch_oversold = config['indicators']['stochastic_oversold']
         self.stoch_overbought = config['indicators']['stochastic_overbought']
+        self.bb_tolerance = 1 + (config['indicators']['bb_tolerance'] / 100)
         self.multi_tf_enabled = config.get('multi_timeframe', {}).get('enabled', False)
         self.require_trend_alignment = config.get('multi_timeframe', {}).get('require_trend_alignment', True)
     
@@ -57,8 +58,7 @@ class TradingStrategy:
             if stoch_condition:
                 signals.append(f"Stochastic K={indicators['stoch_k']:.2f} < {self.stoch_oversold}")
             
-            bb_tolerance = 1.005
-            bb_condition = indicators['close'] <= (indicators['bb_lower'] * bb_tolerance)
+            bb_condition = indicators['close'] <= (indicators['bb_lower'] * self.bb_tolerance)
             if bb_condition:
                 price_diff_pct = ((indicators['close'] - indicators['bb_lower']) / indicators['bb_lower']) * 100
                 signals.append(f"Price={indicators['close']:.2f} near BB lower={indicators['bb_lower']:.2f} ({price_diff_pct:+.2f}%)")

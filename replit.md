@@ -109,7 +109,14 @@ python main.py
 - اختبر الاستراتيجية جيداً على Testnet قبل استخدام أموال حقيقية
 
 ## Recent Changes
-### 2025-11-14 (Latest Update - Telegram Notifications + Statistics Dashboard)
+### 2025-11-15 (Latest Update - Critical Bug Fix)
+- 🐛 **Bug Fix**: Fixed BB tolerance not reading from config.json
+  - BB tolerance was hard-coded to 0.5% in trading_strategy.py
+  - Now correctly reads from config.json (currently set to 1.5%)
+  - Also fixed mode display to show LIVE vs TESTNET dynamically
+- 🎨 **UI Enhancement**: Mode badge now shows green for LIVE, orange for TESTNET
+
+### 2025-11-14 (Previous Update - Telegram Notifications + Statistics Dashboard)
 - 📲 **Telegram Integration**: إشعارات فورية عند البيع/الشراء/الأخطاء
   - استخدام TELEGRAM_BOT_TOKEN و TELEGRAM_CHAT_ID من environment variables
   - telegram_notifier.py module جديد لإدارة الإشعارات
