@@ -559,7 +559,34 @@ def health_check():
 def get_status():
     """إرجاع حالة البوت والصفقات"""
     if bot_instance:
-        positions = bot_instance.risk_manager.get_open_positions()
+        positions_raw = bot_instance.risk_manager.get_open_positions()
+        
+        positions_enriched = {}
+        for symbol, pos in positions_raw.items():
+            current_price = bot_instance.binance_client.get_symbol_price(symbol)
+            entry_price = pos.get('entry_price', 0)
+            
+            current_profit = 0
+            if current_price and entry_price:
+                current_profit = ((current_price - entry_price) / entry_price) * 100
+            
+            stop_loss_price = None
+            take_profit_price = None
+            if entry_price:
+                if pos.get('stop_loss_percent'):
+                    stop_loss_price = entry_price * (1 - pos['stop_loss_percent'] / 100)
+                if pos.get('take_profit_percent'):
+                    take_profit_price = entry_price * (1 + pos['take_profit_percent'] / 100)
+            
+            positions_enriched[symbol] = {
+                **pos,
+                'symbol': symbol,
+                'current_price': current_price,
+                'current_profit': round(current_profit, 2),
+                'stop_loss': stop_loss_price,
+                'take_profit': take_profit_price
+            }
+        
         market_regime = bot_instance.trading_strategy.current_regime if bot_instance.regime_enabled else 'sideways'
         regime_reason = bot_instance.trading_strategy.current_regime_reason if bot_instance.regime_enabled else 'N/A'
         
@@ -586,8 +613,8 @@ def get_status():
             'iterations': bot_stats['iterations'],
             'start_time': bot_stats['start_time'],
             'last_check': bot_stats['last_check'],
-            'open_positions': len(positions),
-            'positions': positions,
+            'open_positions': len(positions_enriched),
+            'positions': positions_enriched,
             'testnet': bot_instance.testnet,
             'market_regime': market_regime,
             'regime_reason': regime_reason,
