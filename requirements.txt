@@ -6,3 +6,5 @@ numpy>=2.2.6
 cryptography>=46.0.3
 binance>=0.3.84
 requests>=2.31.0
+nltk
+vaderSentiment
