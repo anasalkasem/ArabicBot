@@ -96,7 +96,17 @@ class RiskManager:
                     for filter in symbol_info['filters']:
                         if filter['filterType'] == 'LOT_SIZE':
                             step_size = float(filter['stepSize'])
+                            
+                            # Calculate precision from step_size
+                            step_size_str = f"{step_size:.10f}".rstrip('0')
+                            if '.' in step_size_str:
+                                precision = len(step_size_str.split('.')[1])
+                            else:
+                                precision = 0
+                            
+                            # Round to step_size and apply precision
                             quantity = round(quantity / step_size) * step_size
+                            quantity = round(quantity, precision)
                             break
                 
                 logger.info(f"Position size for {symbol}: {quantity:.8f} (${position_value:.2f})")
