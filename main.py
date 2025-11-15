@@ -15,6 +15,7 @@ from sentiment_analyzer import SentimentAnalyzer
 from custom_momentum import CustomMomentumIndex
 from indicator_performance_tracker import IndicatorPerformanceTracker
 from logger_setup import setup_logger
+from db_manager import DatabaseManager
 
 logger = setup_logger('main_bot')
 app = Flask(__name__)
@@ -47,16 +48,23 @@ class BinanceTradingBot:
         logger.info(f"Mode: {'TESTNET' if self.testnet else 'LIVE TRADING'}")
         logger.info(f"Trading Pairs: {', '.join(self.trading_pairs)}")
         
+        try:
+            self.db = DatabaseManager()
+            logger.info("✅ Database connected successfully")
+        except Exception as e:
+            logger.error(f"❌ Database connection failed: {e}")
+            self.db = None
+        
         self.binance_client = BinanceClientManager(testnet=self.testnet)
         self.technical_indicators = TechnicalIndicators(self.config)
         self.trading_strategy = TradingStrategy(self.config)
-        self.risk_manager = RiskManager(self.config, self.binance_client, self.trading_strategy)
+        self.risk_manager = RiskManager(self.config, self.binance_client, self.trading_strategy, db_manager=self.db)
         self.telegram = TelegramNotifier(self.config)
-        self.stats = StatisticsTracker()
+        self.stats = StatisticsTracker(db_manager=self.db)
         self.market_regime = MarketRegime(self.config)
         self.sentiment_analyzer = SentimentAnalyzer(self.config)
         self.custom_momentum = CustomMomentumIndex(self.config, self.sentiment_analyzer)
-        self.performance_tracker = IndicatorPerformanceTracker()
+        self.performance_tracker = IndicatorPerformanceTracker(db_manager=self.db)
         
         self.prev_indicators = {}
         self.prev_indicator_signals = {}

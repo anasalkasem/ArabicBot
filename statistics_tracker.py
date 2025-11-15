@@ -6,18 +6,38 @@ from logger_setup import setup_logger
 logger = setup_logger('statistics_tracker')
 
 class StatisticsTracker:
-    def __init__(self, stats_file='trading_stats.json'):
+    def __init__(self, stats_file='trading_stats.json', db_manager=None):
         self.stats_file = stats_file
+        self.db = db_manager
         self.stats = self.load_stats()
     
     def load_stats(self):
-        """تحميل الإحصائيات من الملف"""
+        """تحميل الإحصائيات من قاعدة البيانات أو الملف"""
+        if self.db:
+            try:
+                db_stats = self.db.get_trading_statistics()
+                if db_stats:
+                    return {
+                        'total_trades': db_stats.get('total_trades', 0),
+                        'winning_trades': db_stats.get('winning_trades', 0),
+                        'losing_trades': db_stats.get('losing_trades', 0),
+                        'total_profit_usd': float(db_stats.get('total_profit_loss', 0)),
+                        'total_profit_percent': float(db_stats.get('avg_profit_percent', 0)),
+                        'best_trade': {'symbol': '', 'profit_pct': float(db_stats.get('best_trade', 0)), 'profit_usd': 0.0},
+                        'worst_trade': {'symbol': '', 'profit_pct': float(db_stats.get('worst_trade', 0)), 'profit_usd': 0.0},
+                        'trades_history': [],
+                        'daily_stats': {},
+                        'symbol_stats': {}
+                    }
+            except Exception as e:
+                logger.error(f"Error loading stats from DB: {e}")
+        
         if os.path.exists(self.stats_file):
             try:
                 with open(self.stats_file, 'r', encoding='utf-8') as f:
                     return json.load(f)
             except Exception as e:
-                logger.error(f"Error loading stats: {e}")
+                logger.error(f"Error loading stats from file: {e}")
         
         return {
             'total_trades': 0,

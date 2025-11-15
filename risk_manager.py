@@ -5,29 +5,56 @@ import os
 logger = setup_logger('risk_manager')
 
 class RiskManager:
-    def __init__(self, config, binance_client, trading_strategy=None):
+    def __init__(self, config, binance_client, trading_strategy=None, db_manager=None):
         self.config = config
         self.binance_client = binance_client
         self.trading_strategy = trading_strategy
+        self.db = db_manager
         self.positions_file = 'positions.json'
         self.positions = self.load_positions()
     
     def load_positions(self):
+        if self.db:
+            try:
+                return self.db.get_positions()
+            except Exception as e:
+                logger.error(f"Error loading positions from DB: {e}")
+        
         if os.path.exists(self.positions_file):
             try:
                 with open(self.positions_file, 'r') as f:
                     return json.load(f)
             except Exception as e:
-                logger.error(f"Error loading positions: {e}")
+                logger.error(f"Error loading positions from file: {e}")
                 return {}
         return {}
     
     def save_positions(self):
+        if self.db:
+            for symbol, pos in self.positions.items():
+                if pos.get('status') == 'open':
+                    try:
+                        from datetime import datetime
+                        self.db.save_position(
+                            symbol=symbol,
+                            entry_price=pos['entry_price'],
+                            quantity=pos['quantity'],
+                            entry_time=datetime.fromisoformat(pos['entry_time']) if isinstance(pos['entry_time'], str) else pos['entry_time'],
+                            stop_loss=pos.get('stop_loss_percent'),
+                            take_profit=pos.get('take_profit_percent'),
+                            trailing_stop_price=pos.get('trailing_stop', {}).get('current_stop_percent'),
+                            highest_price=pos.get('trailing_stop', {}).get('highest_price'),
+                            market_regime=pos.get('market_regime'),
+                            buy_signals=pos.get('signals')
+                        )
+                    except Exception as e:
+                        logger.error(f"Error saving position {symbol} to DB: {e}")
+        
         try:
             with open(self.positions_file, 'w') as f:
                 json.dump(self.positions, f, indent=2)
         except Exception as e:
-            logger.error(f"Error saving positions: {e}")
+            logger.error(f"Error saving positions to file: {e}")
     
     def calculate_position_size(self, symbol, current_price):
         try:
