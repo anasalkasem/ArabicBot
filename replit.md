@@ -71,3 +71,4 @@ The bot is structured into several modular Python files, each responsible for a 
 - **Telegram Control Panel**: Added comprehensive Telegram bot controller with 8 commands (`/start`, `/status`, `/stats`, `/balance`, `/positions`, `/regime`, `/logs`, `/help`) and interactive keyboard buttons for full bot management via mobile.
 - **PostgreSQL Integration**: Migrated from JSON to PostgreSQL database for better performance, scalability, and complex analytics.
 - **Dynamic Strategy Weaver**: State-change gating system that learns from indicator performance to optimize trading signals.
+- **CRITICAL FIX (Nov 15, 2025)**: Fixed severe logic error in Custom Momentum Index where the bot was mixing data between different trading pairs. Added `symbol_momentum_cache` for complete data isolation, triple-level validation, and enhanced logging with symbol names. See `LOGIC_ERROR_FIX.md` for details.
