@@ -83,6 +83,11 @@ class RiskManager:
             position_size_percent = self.config['risk_management']['position_size_percent']
             position_value = usdt_balance * (position_size_percent / 100)
             
+            min_order_value = self.config['risk_management'].get('min_order_value_usdt', 11.0)
+            if position_value < min_order_value:
+                logger.warning(f"⚠️ Position value ${position_value:.2f} is below minimum ${min_order_value:.2f} - skipping trade")
+                return 0
+            
             if current_price and current_price > 0:
                 quantity = position_value / current_price
                 
