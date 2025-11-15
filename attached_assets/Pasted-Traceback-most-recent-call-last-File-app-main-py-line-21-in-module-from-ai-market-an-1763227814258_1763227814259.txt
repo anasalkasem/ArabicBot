@@ -1,0 +1,120 @@
+Traceback (most recent call last):
+  File "/app/main.py", line 21, in <module>
+    from ai_market_analyzer import AIMarketAnalyzer
+  File "/app/ai_market_analyzer.py", line 3, in <module>
+    from openai import OpenAI
+ModuleNotFoundError: No module named 'openai'
+Traceback (most recent call last):
+  File "/app/main.py", line 21, in <module>
+    from ai_market_analyzer import AIMarketAnalyzer
+  File "/app/ai_market_analyzer.py", line 3, in <module>
+    from openai import OpenAI
+ModuleNotFoundError: No module named 'openai'
+Traceback (most recent call last):
+  File "/app/main.py", line 21, in <module>
+    from ai_market_analyzer import AIMarketAnalyzer
+  File "/app/ai_market_analyzer.py", line 3, in <module>
+    from openai import OpenAI
+ModuleNotFoundError: No module named 'openai'
+Traceback (most recent call last):
+  File "/app/main.py", line 21, in <module>
+    from ai_market_analyzer import AIMarketAnalyzer
+  File "/app/ai_market_analyzer.py", line 3, in <module>
+    from openai import OpenAI
+ModuleNotFoundError: No module named 'openai'
+Traceback (most recent call last):
+  File "/app/main.py", line 21, in <module>
+    from ai_market_analyzer import AIMarketAnalyzer
+  File "/app/ai_market_analyzer.py", line 3, in <module>
+    from openai import OpenAI
+ModuleNotFoundError: No module named 'openai'
+Traceback (most recent call last):
+  File "/app/main.py", line 21, in <module>
+    from ai_market_analyzer import AIMarketAnalyzer
+  File "/app/ai_market_analyzer.py", line 3, in <module>
+    from openai import OpenAI
+ModuleNotFoundError: No module named 'openai'
+Traceback (most recent call last):
+  File "/app/main.py", line 21, in <module>
+    from ai_market_analyzer import AIMarketAnalyzer
+  File "/app/ai_market_analyzer.py", line 3, in <module>
+    from openai import OpenAI
+ModuleNotFoundError: No module named 'openai'
+Traceback (most recent call last):
+  File "/app/main.py", line 21, in <module>
+    from ai_market_analyzer import AIMarketAnalyzer
+  File "/app/ai_market_analyzer.py", line 3, in <module>
+    from openai import OpenAI
+ModuleNotFoundError: No module named 'openai'
+Traceback (most recent call last):
+  File "/app/main.py", line 21, in <module>
+    from ai_market_analyzer import AIMarketAnalyzer
+  File "/app/ai_market_analyzer.py", line 3, in <module>
+    from openai import OpenAI
+ModuleNotFoundError: No module named 'openai'
+Traceback (most recent call last):
+  File "/app/main.py", line 21, in <module>
+    from ai_market_analyzer import AIMarketAnalyzer
+  File "/app/ai_market_analyzer.py", line 3, in <module>
+    from openai import OpenAI
+ModuleNotFoundError: No module named 'openai'
+Traceback (most recent call last):
+  File "/app/main.py", line 21, in <module>
+    from ai_market_analyzer import AIMarketAnalyzer
+  File "/app/ai_market_analyzer.py", line 3, in <module>
+    from openai import OpenAI
+ModuleNotFoundError: No module named 'openai'
+Traceback (most recent call last):
+  File "/app/main.py", line 21, in <module>
+    from ai_market_analyzer import AIMarketAnalyzer
+  File "/app/ai_market_analyzer.py", line 3, in <module>
+    from openai import OpenAI
+ModuleNotFoundError: No module named 'openai'
+Traceback (most recent call last):
+  File "/app/main.py", line 21, in <module>
+    from ai_market_analyzer import AIMarketAnalyzer
+  File "/app/ai_market_analyzer.py", line 3, in <module>
+    from openai import OpenAI
+ModuleNotFoundError: No module named 'openai'
+Traceback (most recent call last):
+  File "/app/main.py", line 21, in <module>
+    from ai_market_analyzer import AIMarketAnalyzer
+  File "/app/ai_market_analyzer.py", line 3, in <module>
+    from openai import OpenAI
+ModuleNotFoundError: No module named 'openai'
+    from ai_market_analyzer import AIMarketAnalyzer
+  File "/app/ai_market_analyzer.py", line 3, in <module>
+    from openai import OpenAI
+ModuleNotFoundError: No module named 'openai'
+Traceback (most recent call last):
+  File "/app/main.py", line 21, in <module>
+Traceback (most recent call last):
+  File "/app/main.py", line 21, in <module>
+    from ai_market_analyzer import AIMarketAnalyzer
+  File "/app/ai_market_analyzer.py", line 3, in <module>
+    from openai import OpenAI
+ModuleNotFoundError: No module named 'openai'
+  File "/app/ai_market_analyzer.py", line 3, in <module>
+    from openai import OpenAI
+ModuleNotFoundError: No module named 'openai'
+Traceback (most recent call last):
+  File "/app/main.py", line 21, in <module>
+    from ai_market_analyzer import AIMarketAnalyzer
+Traceback (most recent call last):
+  File "/app/main.py", line 21, in <module>
+    from ai_market_analyzer import AIMarketAnalyzer
+  File "/app/ai_market_analyzer.py", line 3, in <module>
+    from openai import OpenAI
+ModuleNotFoundError: No module named 'openai'
+Traceback (most recent call last):
+  File "/app/main.py", line 21, in <module>
+    from ai_market_analyzer import AIMarketAnalyzer
+  File "/app/ai_market_analyzer.py", line 3, in <module>
+    from openai import OpenAI
+ModuleNotFoundError: No module named 'openai'
+Traceback (most recent call last):
+  File "/app/main.py", line 21, in <module>
+    from ai_market_analyzer import AIMarketAnalyzer
+  File "/app/ai_market_analyzer.py", line 3, in <module>
+    from openai import OpenAI
+ModuleNotFoundError: No 

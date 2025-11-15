@@ -18,9 +18,16 @@ from indicator_performance_tracker import IndicatorPerformanceTracker
 from logger_setup import setup_logger
 from db_manager import DatabaseManager
 from telegram_bot import TelegramBotController
-from ai_market_analyzer import AIMarketAnalyzer
 
 logger = setup_logger('main_bot')
+
+try:
+    from ai_market_analyzer import AIMarketAnalyzer
+    AI_AVAILABLE = True
+except ImportError:
+    logger.warning("⚠️ AI features disabled - openai package not installed")
+    AIMarketAnalyzer = None
+    AI_AVAILABLE = False
 app = Flask(__name__)
 
 # قائمة السجلات للعرض في الواجهة
@@ -69,7 +76,11 @@ class BinanceTradingBot:
         self.sentiment_analyzer = SentimentAnalyzer(self.config)
         self.custom_momentum = CustomMomentumIndex(self.config, self.sentiment_analyzer)
         self.performance_tracker = IndicatorPerformanceTracker(db_manager=self.db)
-        self.ai_analyzer = AIMarketAnalyzer()
+        
+        if AI_AVAILABLE:
+            self.ai_analyzer = AIMarketAnalyzer()
+        else:
+            self.ai_analyzer = None
         
         self.prev_indicators = {}
         self.prev_indicator_signals = {}
@@ -100,9 +111,13 @@ class BinanceTradingBot:
         if trailing_enabled:
             logger.info("✨ Trailing Stop-Loss: ENABLED")
         
-        if self.ai_analyzer.enabled:
+        if self.ai_analyzer and self.ai_analyzer.enabled:
             logger.info("🤖 AI Market Analyzer: ENABLED (GPT-4)")
             logger.info("   Features: Market Analysis, Strategy Audit, Telegram Chat")
+        elif AI_AVAILABLE and self.ai_analyzer:
+            logger.info("⚠️ AI Market Analyzer: DISABLED (No OpenAI API key)")
+        else:
+            logger.info("⚠️ AI Market Analyzer: UNAVAILABLE (Install openai package)")
         
         logger.info("✅ Bot initialized successfully")
         logger.info("=" * 80)
