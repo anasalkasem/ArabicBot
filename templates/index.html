@@ -153,7 +153,13 @@
             <div class="card positions-card full-width">
                 <div class="card-header">
                     <h2>💰 الصفقات المفتوحة</h2>
-                    <button class="btn-small" onclick="refreshData()">تحديث</button>
+                    <div class="header-buttons">
+                        <button class="btn-small btn-danger" onclick="sellAllPositions()" id="sell-all-btn">
+                            <span class="btn-icon">🔴</span>
+                            <span>بيع الكل</span>
+                        </button>
+                        <button class="btn-small" onclick="refreshData()">تحديث</button>
+                    </div>
                 </div>
                 <div id="positions-container">
                     <p class="no-positions">لا توجد صفقات مفتوحة</p>

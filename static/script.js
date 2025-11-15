@@ -340,6 +340,67 @@ document.addEventListener('visibilitychange', () => {
     }
 });
 
+// بيع جميع الصفقات
+async function sellAllPositions() {
+    if (!confirm('⚠️ هل أنت متأكد من بيع جميع الصفقات المفتوحة؟\n\nسيتم بيع كل الصفقات بالسعر الحالي.')) {
+        return;
+    }
+    
+    const sellBtn = document.getElementById('sell-all-btn');
+    const originalText = sellBtn.innerHTML;
+    
+    try {
+        sellBtn.disabled = true;
+        sellBtn.innerHTML = '<span class="btn-icon">⏳</span><span>جاري البيع...</span>';
+        
+        const response = await fetch('/sell-all', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            if (data.sold > 0) {
+                showToast(`✅ تم بيع ${data.sold} من ${data.total} صفقات بنجاح!`, 'success');
+                
+                if (data.results && data.results.length > 0) {
+                    let details = '\n\nالتفاصيل:\n';
+                    data.results.forEach(result => {
+                        if (result.success) {
+                            details += `✅ ${result.symbol}: ${result.profit_pct > 0 ? '+' : ''}${result.profit_pct}% ($${result.profit_usd > 0 ? '+' : ''}${result.profit_usd})\n`;
+                        } else {
+                            details += `❌ ${result.symbol}: فشل البيع (${result.error})\n`;
+                        }
+                    });
+                    console.log(details);
+                }
+                
+                if (data.failed > 0) {
+                    showToast(`⚠️ فشل بيع ${data.failed} صفقة. تحقق من السجلات.`, 'error');
+                }
+            } else {
+                showToast('📭 لا توجد صفقات مفتوحة للبيع', 'info');
+            }
+            
+            setTimeout(() => {
+                refreshData();
+            }, 2000);
+        } else {
+            showToast(`❌ خطأ: ${data.error || 'فشل البيع'}`, 'error');
+        }
+        
+    } catch (error) {
+        console.error('Error selling all positions:', error);
+        showToast('❌ خطأ في الاتصال بالخادم', 'error');
+    } finally {
+        sellBtn.disabled = false;
+        sellBtn.innerHTML = originalText;
+    }
+}
+
 // رسالة ترحيب
 setTimeout(() => {
     showToast('مرحباً! يتم تحديث البيانات تلقائياً كل 5 ثواني 👋', 'success');

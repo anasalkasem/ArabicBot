@@ -697,6 +697,108 @@ def get_strategy_weights():
             return jsonify({'error': str(e), 'enabled': False})
     return jsonify({'enabled': False, 'message': 'Dynamic Strategy Weaver not enabled'})
 
+@app.route('/sell-all', methods=['POST'])
+def sell_all_positions():
+    """بيع جميع الصفقات المفتوحة"""
+    if not bot_instance:
+        return jsonify({'success': False, 'error': 'Bot not initialized'}), 400
+    
+    try:
+        positions = bot_instance.risk_manager.get_open_positions()
+        
+        if not positions:
+            return jsonify({'success': True, 'message': 'No open positions to sell', 'sold': 0})
+        
+        results = []
+        sold_count = 0
+        failed_count = 0
+        
+        for symbol, position in positions.items():
+            try:
+                current_price = bot_instance.binance_client.get_symbol_price(symbol)
+                quantity = position.get('quantity', 0)
+                entry_price = position.get('entry_price', 0)
+                
+                if current_price and quantity > 0:
+                    profit_pct = ((current_price - entry_price) / entry_price) * 100 if entry_price else 0
+                    
+                    logger.info(f"🔴 MANUAL SELL ALL: Selling {symbol} at {profit_pct:.2f}% profit")
+                    
+                    order = bot_instance.binance_client.create_market_order(symbol, 'SELL', quantity)
+                    
+                    if order is None:
+                        results.append({
+                            'symbol': symbol,
+                            'success': False,
+                            'error': 'Order creation failed or rejected by exchange'
+                        })
+                        failed_count += 1
+                        logger.warning(f"⚠️ {symbol} sell order creation failed")
+                    elif order.get('status') == 'FILLED':
+                        bot_instance.risk_manager.close_position(
+                            symbol, 
+                            current_price, 
+                            "MANUAL_SELL_ALL"
+                        )
+                        
+                        profit_usd = (current_price - entry_price) * quantity if entry_price else 0
+                        
+                        bot_instance.stats.record_trade(
+                            symbol, 
+                            entry_price, 
+                            current_price, 
+                            quantity, 
+                            "MANUAL_SELL_ALL"
+                        )
+                        
+                        results.append({
+                            'symbol': symbol,
+                            'success': True,
+                            'profit_pct': round(profit_pct, 2),
+                            'profit_usd': round(profit_usd, 2),
+                            'price': current_price
+                        })
+                        sold_count += 1
+                        logger.info(f"✅ {symbol} sold successfully at ${current_price:.2f} ({profit_pct:+.2f}%)")
+                    elif order.get('status') in ['PARTIALLY_FILLED', 'PENDING']:
+                        results.append({
+                            'symbol': symbol,
+                            'success': False,
+                            'error': f"Order partially filled or pending - Status: {order.get('status')}"
+                        })
+                        failed_count += 1
+                        logger.warning(f"⚠️ {symbol} order status: {order.get('status')} - Check manually")
+                    else:
+                        results.append({
+                            'symbol': symbol,
+                            'success': False,
+                            'error': f"Order status: {order.get('status', 'UNKNOWN')}"
+                        })
+                        failed_count += 1
+                        logger.warning(f"⚠️ {symbol} sell order failed - Status: {order.get('status')}")
+                        
+            except Exception as e:
+                results.append({
+                    'symbol': symbol,
+                    'success': False,
+                    'error': str(e)
+                })
+                failed_count += 1
+                logger.error(f"❌ Error selling {symbol}: {e}")
+        
+        return jsonify({
+            'success': True,
+            'sold': sold_count,
+            'failed': failed_count,
+            'total': len(positions),
+            'results': results,
+            'message': f'Successfully sold {sold_count} out of {len(positions)} positions'
+        })
+        
+    except Exception as e:
+        logger.error(f"❌ Error in sell-all endpoint: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
 def run_bot():
     global bot_instance
     try:
