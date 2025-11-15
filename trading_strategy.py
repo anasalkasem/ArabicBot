@@ -22,6 +22,37 @@ class TradingStrategy:
         self.current_regime = 'sideways'
         self.current_regime_reason = 'Not yet detected'
     
+    def get_individual_indicator_signals(self, indicators, prev_indicators=None):
+        """
+        استخراج إشارات كل مؤشر على حدة (لتتبع الأداء)
+        Returns: dict مع boolean لكل مؤشر
+        """
+        try:
+            if not indicators or np.isnan(indicators.get('rsi', np.nan)):
+                return {}
+            
+            signals = {}
+            
+            signals['rsi'] = indicators['rsi'] < self.rsi_oversold
+            
+            signals['stochastic'] = indicators.get('stoch_k', 100) < self.stoch_oversold
+            
+            signals['bollinger_bands'] = indicators['close'] <= (indicators.get('bb_lower', 0) * self.bb_tolerance)
+            
+            if prev_indicators and not np.isnan(prev_indicators.get('macd_hist', np.nan)):
+                macd_bullish = (
+                    prev_indicators.get('macd_hist', 0) < 0 and 
+                    indicators.get('macd_hist', 0) > 0
+                )
+                signals['macd'] = macd_bullish
+            else:
+                signals['macd'] = indicators.get('macd_hist', 0) > 0
+            
+            return signals
+        except Exception as e:
+            logger.error(f"Error extracting individual signals: {e}")
+            return {}
+    
     def check_trend_alignment(self, medium_trend, long_trend):
         if not self.multi_tf_enabled or not self.require_trend_alignment:
             return True, "Multi-timeframe disabled"
@@ -79,21 +110,23 @@ class TradingStrategy:
     def check_buy_signal(self, indicators, prev_indicators=None, medium_trend=None, long_trend=None, market_regime=None):
         try:
             if not indicators or np.isnan(indicators['rsi']):
-                return False, []
+                return False, [], {}
             
             signals = []
+            
+            indicator_signals_map = self.get_individual_indicator_signals(indicators, prev_indicators)
             
             if market_regime and self.regime_enabled and market_regime == 'bear':
                 bear_config = self.regime_config.get('bear_strategy', {})
                 if not bear_config.get('allow_new_trades', True):
                     logger.debug(f"🐻 Buy rejected: Bear market - trading disabled")
-                    return False, [f"Bear market: {self.current_regime_reason}"]
+                    return False, [f"Bear market: {self.current_regime_reason}"], indicator_signals_map
             
             if self.multi_tf_enabled:
                 trend_ok, trend_msg = self.check_trend_alignment(medium_trend, long_trend)
                 if not trend_ok:
                     logger.debug(f"Buy signal rejected: {trend_msg}")
-                    return False, []
+                    return False, [], indicator_signals_map
                 signals.append(trend_msg)
             
             rsi_condition = indicators['rsi'] < self.rsi_oversold
@@ -121,11 +154,11 @@ class TradingStrategy:
             if buy_signal:
                 logger.info(f"✅ BUY SIGNAL DETECTED: {', '.join(signals)}")
             
-            return buy_signal, signals
+            return buy_signal, signals, indicator_signals_map
             
         except Exception as e:
             logger.error(f"Error checking buy signal: {e}")
-            return False, []
+            return False, [], {}
     
     def check_sell_signal(self, indicators, entry_price=None, prev_indicators=None, market_regime=None, position=None):
         try:

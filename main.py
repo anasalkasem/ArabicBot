@@ -13,6 +13,7 @@ from statistics_tracker import StatisticsTracker
 from market_regime import MarketRegime
 from sentiment_analyzer import SentimentAnalyzer
 from custom_momentum import CustomMomentumIndex
+from indicator_performance_tracker import IndicatorPerformanceTracker
 from logger_setup import setup_logger
 
 logger = setup_logger('main_bot')
@@ -55,11 +56,13 @@ class BinanceTradingBot:
         self.market_regime = MarketRegime(self.config)
         self.sentiment_analyzer = SentimentAnalyzer(self.config)
         self.custom_momentum = CustomMomentumIndex(self.config, self.sentiment_analyzer)
+        self.performance_tracker = IndicatorPerformanceTracker()
         
         self.prev_indicators = {}
         self.multi_tf_enabled = self.config.get('multi_timeframe', {}).get('enabled', False)
         self.regime_enabled = self.config.get('market_regime', {}).get('enabled', False)
         self.momentum_enabled = self.config.get('custom_momentum', {}).get('enabled', False)
+        self.weaver_enabled = True
         
         if self.multi_tf_enabled:
             logger.info("✨ Multi-Timeframe Analysis: ENABLED")
@@ -69,6 +72,9 @@ class BinanceTradingBot:
         
         if self.momentum_enabled:
             logger.info("✨ Custom Momentum Index: ENABLED")
+        
+        if self.weaver_enabled:
+            logger.info("✨ Dynamic Strategy Weaver: ENABLED (MVP mode)")
         
         trailing_enabled = self.config.get('risk_management', {}).get('trailing_stop_loss', {}).get('enabled', False)
         if trailing_enabled:
@@ -274,9 +280,24 @@ class BinanceTradingBot:
                     if momentum_index is not None:
                         logger.info(f"   🎯 Custom Momentum Index: {momentum_index:.1f}/100")
                 
-                buy_signal, signals = self.trading_strategy.check_buy_signal(
+                buy_signal, signals, indicator_signals = self.trading_strategy.check_buy_signal(
                     indicators, prev_indicators, medium_trend, long_trend, market_regime
                 )
+                
+                if self.weaver_enabled and indicator_signals:
+                    try:
+                        if self.multi_tf_enabled:
+                            timeframe = self.config['multi_timeframe']['short_timeframe']
+                        else:
+                            timeframe = self.config['trading']['candle_interval']
+                        
+                        for indicator_name, is_bullish in indicator_signals.items():
+                            self.performance_tracker.track_signal(
+                                symbol, indicator_name, timeframe,
+                                is_bullish, current_price
+                            )
+                    except Exception as e:
+                        logger.error(f"Error tracking indicators: {e}")
                 
                 if self.momentum_enabled and momentum_index is not None:
                     if not self.custom_momentum.should_buy(momentum_index):
@@ -361,12 +382,24 @@ class BinanceTradingBot:
                 
                 self.display_status()
                 
+                if self.weaver_enabled and iteration % 10 == 0:
+                    try:
+                        self.performance_tracker.save_to_file()
+                    except Exception as e:
+                        logger.error(f"Error saving tracker data: {e}")
+                
                 logger.info(f"\n⏸️  Waiting {self.check_interval} seconds until next check...")
                 time.sleep(self.check_interval)
                 
         except KeyboardInterrupt:
             logger.info("\n\n🛑 Bot stopped by user")
             bot_stats['status'] = 'stopped'
+            if self.weaver_enabled:
+                try:
+                    self.performance_tracker.save_to_file()
+                    logger.info("💾 Saved Dynamic Strategy Weaver data")
+                except:
+                    pass
             self.display_status()
             logger.info("\n👋 Goodbye!")
         except Exception as e:
@@ -470,6 +503,33 @@ def get_statistics():
             'symbol_stats': stats['symbol_stats']
         })
     return jsonify({'error': 'Bot not initialized'})
+
+@app.route('/strategy-weights')
+def get_strategy_weights():
+    """إرجاع أوزان الاستراتيجية الديناميكية لكل زوج تداول"""
+    if bot_instance and bot_instance.weaver_enabled:
+        try:
+            timeframe = bot_instance.config['trading']['candle_interval']
+            weights_data = {}
+            
+            for symbol in bot_instance.trading_pairs:
+                weights = bot_instance.performance_tracker.get_indicator_weights(symbol, timeframe)
+                stats = bot_instance.performance_tracker.get_statistics(symbol, timeframe)
+                
+                weights_data[symbol] = {
+                    'weights': {k: round(v, 3) for k, v in weights.items()},
+                    'statistics': stats
+                }
+            
+            return jsonify({
+                'enabled': True,
+                'timeframe': timeframe,
+                'symbols': weights_data
+            })
+        except Exception as e:
+            logger.error(f"Error getting strategy weights: {e}")
+            return jsonify({'error': str(e), 'enabled': False})
+    return jsonify({'enabled': False, 'message': 'Dynamic Strategy Weaver not enabled'})
 
 def run_bot():
     global bot_instance
