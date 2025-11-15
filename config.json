@@ -1,6 +1,6 @@
 {
   "trading_pairs": ["BTCUSDT", "ETHUSDT", "SOLUSDT", "XRPUSDT", "BNBUSDT"],
-  "testnet": true,
+  "testnet": false,
   "risk_management": {
     "stop_loss_percent": 3.0,
     "take_profit_percent": 4.0,

@@ -30,7 +30,7 @@
 ## Configuration
 جميع الإعدادات في ملف `config.json`:
 - `trading_pairs`: أزواج العملات للتداول (مثل BTCUSDT, ETHUSDT, SOLUSDT, XRPUSDT, BNBUSDT)
-- `testnet`: true للوضع التجريبي، false للتداول الحقيقي
+- `testnet`: **false** للتداول الحقيقي (تم التعديل!)
 - `risk_management`: إعدادات Stop-Loss, Take-Profit, Trailing Stop-Loss
 - `multi_timeframe`: إعدادات التحليل متعدد الأطر الزمنية (5m, 1h, 4h)
 - `indicators`: معلمات المؤشرات الفنية (RSI, MACD, EMA, ADX, إلخ)
@@ -39,9 +39,9 @@
 ## Trading Strategy
 
 ### إشارات الشراء (جميع الشروط يجب أن تتحقق):
-1. **RSI < 40**: السوق في منطقة التشبع البيعي (معدل للحسابات الصغيرة)
-2. **Stochastic < 30**: تأكيد إضافي على التشبع البيعي (معدل)
-3. **السعر قريب من Bollinger Band السفلي**: السعر ضمن 0.5% من القاع (tolerance مضاف)
+1. **RSI < 50**: السوق في منطقة التشبع البيعي (محسّن)
+2. **Stochastic < 65**: تأكيد إضافي على التشبع البيعي (محسّن)
+3. **السعر قريب من Bollinger Band السفلي**: السعر ضمن 1.5% من القاع (tolerance محسّن)
 4. **Multi-Timeframe Confirmation**: يقبل bearish على إطار واحد فقط (ليس الاثنين)
 
 ### إشارات البيع (أي شرط يتحقق):
