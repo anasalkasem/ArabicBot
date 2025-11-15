@@ -259,7 +259,7 @@ class BinanceTradingBot:
                 
                 if self.risk_manager.check_trailing_stop(symbol, current_price):
                     logger.warning(f"🛑 TRAILING STOP triggered for {symbol}")
-                    order = self.binance_client.create_test_order(
+                    order = self.binance_client.create_market_order(
                         symbol=symbol,
                         side='SELL',
                         quantity=position['quantity']
@@ -272,7 +272,7 @@ class BinanceTradingBot:
                 
                 if self.trading_strategy.should_stop_loss(current_price, entry_price, position):
                     logger.warning(f"🛑 STOP LOSS triggered for {symbol}")
-                    order = self.binance_client.create_test_order(
+                    order = self.binance_client.create_market_order(
                         symbol=symbol,
                         side='SELL',
                         quantity=position['quantity']
@@ -289,7 +289,7 @@ class BinanceTradingBot:
                 
                 if sell_signal:
                     logger.info(f"💵 Selling {symbol} at ${current_price:.2f}")
-                    order = self.binance_client.create_test_order(
+                    order = self.binance_client.create_market_order(
                         symbol=symbol,
                         side='SELL',
                         quantity=position['quantity']
@@ -395,7 +395,7 @@ class BinanceTradingBot:
                     
                     if quantity > 0:
                         logger.info(f"💸 Buying {symbol} at ${current_price:.2f}")
-                        order = self.binance_client.create_test_order(
+                        order = self.binance_client.create_market_order(
                             symbol=symbol,
                             side='BUY',
                             quantity=quantity
