@@ -15,15 +15,20 @@ class DatabaseManager:
     
     def connect(self):
         try:
-            self.connection = psycopg2.connect(
-                host=os.getenv('PGHOST'),
-                port=os.getenv('PGPORT'),
-                user=os.getenv('PGUSER'),
-                password=os.getenv('PGPASSWORD'),
-                database=os.getenv('PGDATABASE')
-            )
+            database_url = os.getenv('DATABASE_URL')
+            if database_url:
+                self.connection = psycopg2.connect(database_url)
+                logger.info("✅ Connected to PostgreSQL database (via DATABASE_URL)")
+            else:
+                self.connection = psycopg2.connect(
+                    host=os.getenv('PGHOST'),
+                    port=os.getenv('PGPORT'),
+                    user=os.getenv('PGUSER'),
+                    password=os.getenv('PGPASSWORD'),
+                    database=os.getenv('PGDATABASE')
+                )
+                logger.info("✅ Connected to PostgreSQL database (via separate credentials)")
             self.connection.autocommit = False
-            logger.info("✅ Connected to PostgreSQL database")
         except Exception as e:
             logger.error(f"❌ Database connection failed: {e}")
             raise
