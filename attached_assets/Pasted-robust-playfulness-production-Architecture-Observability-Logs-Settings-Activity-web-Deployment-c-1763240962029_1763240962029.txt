@@ -1,0 +1,220 @@
+robust-playfulness
+
+production
+Architecture
+Observability
+Logs
+Settings
+
+
+
+Activity
+web
+Deployment crashed
+44 seconds ago
+web
+Deployment restarted
+49 seconds ago
+web
+Deployment restarted
+49 seconds ago
+web
+Deployment restarted
+49 seconds ago
+web
+Deployment restarted
+49 seconds ago
+web
+Deployment restarted
+55 seconds ago
+web
+Deployment restarted
+55 seconds ago
+web
+Deployment restarted
+1 minute ago
+web
+Deployment crashed
+10 minutes ago
+web
+Deployment restarted
+10 minutes ago
+web
+Deployment restarted
+10 minutes ago
+web
+Deployment restarted
+10 minutes ago
+web
+Deployment restarted
+10 minutes ago
+web
+Deployment restarted
+10 minutes ago
+web
+Deployment restarted
+10 minutes ago
+web
+Deployment deploying
+10 minutes ago
+web
+Deployment building
+13 minutes ago
+web
+Deployment successful
+13 minutes ago
+web
+Deployment successful
+16 minutes ago
+web
+Deployment deploying
+20 minutes ago
+web
+Deployment building
+22 minutes ago
+web
+Redeployment successful
+22 minutes ago
+web
+Deployment created
+26 minutes ago
+web
+Deployment successful
+42 minutes ago
+Scroll to load more
+
+web
+Deployments
+Variables
+Metrics
+Settings
+web-production-3c8a.up.railway.app
+asia-southeast1-eqsg3a
+1 Replica
+
+HISTORY
+web
+/
+97550965
+Completed
+
+Nov 15, 2025 at 3:55 PM
+web-production-3c8a.up.railway.app
+Details
+Build Logs
+Deploy Logs
+HTTP Logs
+Filter and search logs
+
+2025-11-15 21:08:11,464 - main_bot - INFO - 🌐 Starting web server on port 8080...
+2025-11-15 21:08:11 - main_bot - INFO - 🤖 Starting trading bot in background...
+2025-11-15 21:08:11,465 - main_bot - INFO - 🤖 Starting trading bot in background...
+2025-11-15 21:08:11 - main_bot - INFO - ================================================================================
+[2025-11-15 21:08:09 +0000] [4] [INFO] Starting gunicorn 23.0.0
+2025-11-15 21:08:11,465 - main_bot - INFO - ================================================================================
+[2025-11-15 21:08:09 +0000] [4] [INFO] Listening at: http://0.0.0.0:8080 (4)
+[2025-11-15 21:08:09 +0000] [4] [INFO] Using worker: gthread
+2025-11-15 21:08:11 - main_bot - INFO - 📱 Starting Telegram bot in background...
+2025-11-15 21:08:11,465 - main_bot - INFO - 📱 Starting Telegram bot in background...
+2025-11-15 21:08:11 - main_bot - INFO - 🤖 Binance Trading Bot Starting...
+ * Serving Flask app 'main'
+ * Debug mode: off
+2025-11-15 21:08:11 - main_bot - INFO - Mode: LIVE TRADING
+2025-11-15 21:08:11,467 - main_bot - INFO - Mode: LIVE TRADING
+2025-11-15 21:08:11 - main_bot - INFO - Trading Pairs: BTCUSDT, ETHUSDT, SOLUSDT, XRPUSDT, BNBUSDT
+2025-11-15 21:08:11,468 - main_bot - INFO - Trading Pairs: BTCUSDT, ETHUSDT, SOLUSDT, XRPUSDT, BNBUSDT
+Address already in use
+Port 8080 is in use by another program. Either identify and stop that program, or start the server with a different port.
+[2025-11-15 21:08:13 +0000] [4] [INFO] Starting gunicorn 23.0.0
+[2025-11-15 21:08:13 +0000] [4] [INFO] Listening at: http://0.0.0.0:8080 (4)
+[2025-11-15 21:08:13 +0000] [4] [INFO] Using worker: gthread
+[2025-11-15 21:08:13 +0000] [6] [INFO] Booting worker with pid: 6
+2025-11-15 21:08:15 - main_bot - INFO - 🌐 Starting web server on port 8080...
+2025-11-15 21:08:15,790 - main_bot - INFO - 🌐 Starting web server on port 8080...
+2025-11-15 21:08:15,791 - main_bot - INFO - 🤖 Starting trading bot in background...
+2025-11-15 21:08:15 - main_bot - INFO - 🤖 Starting trading bot in background...
+2025-11-15 21:08:15 - main_bot - INFO - ================================================================================
+2025-11-15 21:08:15,791 - main_bot - INFO - ================================================================================
+2025-11-15 21:08:15 - main_bot - INFO - 📱 Starting Telegram bot in background...
+2025-11-15 21:08:15,791 - main_bot - INFO - 📱 Starting Telegram bot in background...
+2025-11-15 21:08:15 - main_bot - INFO - 🤖 Binance Trading Bot Starting...
+2025-11-15 21:08:15,791 - main_bot - INFO - 🤖 Binance Trading Bot Starting...
+2025-11-15 21:08:15 - main_bot - INFO - ================================================================================
+2025-11-15 21:08:15,792 - main_bot - INFO - ================================================================================
+2025-11-15 21:08:15 - main_bot - INFO - Mode: LIVE TRADING
+ * Serving Flask app 'main'
+ * Debug mode: off
+2025-11-15 21:08:15 - main_bot - INFO - Trading Pairs: BTCUSDT, ETHUSDT, SOLUSDT, XRPUSDT, BNBUSDT
+	Is the server running locally and accepting connections on that socket?
+Address already in use
+Port 8080 is in use by another program. Either identify and stop that program, or start the server with a different port.
+2025-11-15 21:08:15 - main_bot - ERROR - ❌ Database connection failed: connection to server on socket "/var/run/postgresql/.s.PGSQL.5432" failed: No such file or directory
+	Is the server running locally and accepting connections on that socket?
+2025-11-15 21:08:15,793 - main_bot - ERROR - ❌ Database connection failed: connection to server on socket "/var/run/postgresql/.s.PGSQL.5432" failed: No such file or directory
+	Is the server running locally and accepting connections on that socket?
+2025-11-15 21:08:15,792 - main_bot - INFO - Mode: LIVE TRADING
+2025-11-15 21:08:15,793 - main_bot - INFO - Trading Pairs: BTCUSDT, ETHUSDT, SOLUSDT, XRPUSDT, BNBUSDT
+2025-11-15 21:08:15,793 - db_manager - ERROR - ❌ Database connection failed: connection to server on socket "/var/run/postgresql/.s.PGSQL.5432" failed: No such file or directory
+[2025-11-15 21:08:17 +0000] [4] [INFO] Starting gunicorn 23.0.0
+[2025-11-15 21:08:17 +0000] [4] [INFO] Listening at: http://0.0.0.0:8080 (4)
+[2025-11-15 21:08:17 +0000] [4] [INFO] Using worker: gthread
+[2025-11-15 21:08:17 +0000] [6] [INFO] Booting worker with pid: 6
+2025-11-15 21:08:20 - main_bot - INFO - 🌐 Starting web server on port 8080...
+2025-11-15 21:08:20,103 - main_bot - INFO - 🌐 Starting web server on port 8080...
+2025-11-15 21:08:20 - main_bot - INFO - 🤖 Starting trading bot in background...
+2025-11-15 21:08:20,104 - main_bot - INFO - 🤖 Binance Trading Bot Starting...
+2025-11-15 21:08:20,103 - main_bot - INFO - 🤖 Starting trading bot in background...
+2025-11-15 21:08:20 - main_bot - INFO - ================================================================================
+2025-11-15 21:08:20,103 - main_bot - INFO - ================================================================================
+2025-11-15 21:08:20 - main_bot - INFO - 🤖 Binance Trading Bot Starting...
+2025-11-15 21:08:20 - main_bot - INFO - ================================================================================
+2025-11-15 21:08:20 - main_bot - ERROR - ❌ Database connection failed: connection to server on socket "/var/run/postgresql/.s.PGSQL.5432" failed: No such file or directory
+2025-11-15 21:08:20,104 - main_bot - INFO - ================================================================================
+2025-11-15 21:08:20 - main_bot - INFO - 📱 Starting Telegram bot in background...
+	Is the server running locally and accepting connections on that socket?
+2025-11-15 21:08:20,104 - main_bot - INFO - 📱 Starting Telegram bot in background...
+2025-11-15 21:08:20 - main_bot - INFO - Mode: LIVE TRADING
+2025-11-15 21:08:20,106 - main_bot - ERROR - ❌ Database connection failed: connection to server on socket "/var/run/postgresql/.s.PGSQL.5432" failed: No such file or directory
+2025-11-15 21:08:20,105 - main_bot - INFO - Mode: LIVE TRADING
+2025-11-15 21:08:20 - main_bot - INFO - Trading Pairs: BTCUSDT, ETHUSDT, SOLUSDT, XRPUSDT, BNBUSDT
+2025-11-15 21:08:20,105 - main_bot - INFO - Trading Pairs: BTCUSDT, ETHUSDT, SOLUSDT, XRPUSDT, BNBUSDT
+ * Serving Flask app 'main'
+ * Debug mode: off
+2025-11-15 21:08:20,106 - db_manager - ERROR - ❌ Database connection failed: connection to server on socket "/var/run/postgresql/.s.PGSQL.5432" failed: No such file or directory
+	Is the server running locally and accepting connections on that socket?
+	Is the server running locally and accepting connections on that socket?
+Address already in use
+Port 8080 is in use by another program. Either identify and stop that program, or start the server with a different port.
+[2025-11-15 21:08:22 +0000] [4] [INFO] Starting gunicorn 23.0.0
+[2025-11-15 21:08:22 +0000] [4] [INFO] Listening at: http://0.0.0.0:8080 (4)
+[2025-11-15 21:08:22 +0000] [4] [INFO] Using worker: gthread
+[2025-11-15 21:08:22 +0000] [6] [INFO] Booting worker with pid: 6
+2025-11-15 21:08:24,105 - main_bot - INFO - Mode: LIVE TRADING
+2025-11-15 21:08:24 - main_bot - INFO - Trading Pairs: BTCUSDT, ETHUSDT, SOLUSDT, XRPUSDT, BNBUSDT
+2025-11-15 21:08:24,105 - main_bot - INFO - Trading Pairs: BTCUSDT, ETHUSDT, SOLUSDT, XRPUSDT, BNBUSDT
+2025-11-15 21:08:24 - main_bot - INFO - 🌐 Starting web server on port 8080...
+2025-11-15 21:08:24,104 - main_bot - INFO - 🌐 Starting web server on port 8080...
+2025-11-15 21:08:24 - main_bot - INFO - 🤖 Starting trading bot in background...
+2025-11-15 21:08:24,104 - main_bot - INFO - 🤖 Starting trading bot in background...
+2025-11-15 21:08:24 - main_bot - INFO - ================================================================================
+2025-11-15 21:08:24,104 - main_bot - INFO - ================================================================================
+2025-11-15 21:08:24 - main_bot - INFO - 🤖 Binance Trading Bot Starting...
+2025-11-15 21:08:24,105 - main_bot - INFO - 🤖 Binance Trading Bot Starting...
+2025-11-15 21:08:24 - main_bot - INFO - ================================================================================
+2025-11-15 21:08:24,105 - main_bot - INFO - ================================================================================
+2025-11-15 21:08:24 - main_bot - INFO - 📱 Starting Telegram bot in background...
+2025-11-15 21:08:24,105 - main_bot - INFO - 📱 Starting Telegram bot in background...
+2025-11-15 21:08:24 - main_bot - INFO - Mode: LIVE TRADING
+Address already in use
+Port 8080 is in use by another program. Either identify and stop that program, or start the server with a different port.
+ * Serving Flask app 'main'
+ * Debug mode: off
+2025-11-15 21:08:24,106 - db_manager - ERROR - ❌ Database connection failed: connection to server on socket "/var/run/postgresql/.s.PGSQL.5432" failed: No such file or directory
+	Is the server running locally and accepting connections on that socket?
+2025-11-15 21:08:24 - main_bot - ERROR - ❌ Database connection failed: connection to server on socket "/var/run/postgresql/.s.PGSQL.5432" failed: No such file or directory
+	Is the server running locally and accepting connections on that socket?
+2025-11-15 21:08:24,106 - main_bot - ERROR - ❌ Database connection failed: connection to server on socket "/var/run/postgresql/.s.PGSQL.5432" failed: No such file or directory
+	Is the server running locally and accepting connections on that socket?
+
+
+web | Railway
