@@ -90,5 +90,12 @@
       "cache_ttl_minutes": 15,
       "enabled": true
     }
+  },
+  "dynamic_strategy_weaver": {
+    "enabled": true,
+    "min_confidence_threshold": 0.50,
+    "min_signals_for_learning": 10,
+    "learning_period_days": 30,
+    "weight_adjustment_speed": 0.3
   }
 }

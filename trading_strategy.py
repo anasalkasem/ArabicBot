@@ -21,6 +21,9 @@ class TradingStrategy:
         self.regime_config = config.get('market_regime', {})
         self.current_regime = 'sideways'
         self.current_regime_reason = 'Not yet detected'
+        
+        self.weaver_enabled = config.get('dynamic_strategy_weaver', {}).get('enabled', False)
+        self.min_confidence = config.get('dynamic_strategy_weaver', {}).get('min_confidence_threshold', 0.50)
     
     def get_individual_indicator_signals(self, indicators, prev_indicators=None):
         """
@@ -107,7 +110,7 @@ class TradingStrategy:
             self.bb_tolerance = self.base_bb_tolerance
             logger.info(f"↔️ Adapted to SIDEWAYS market: Using standard strategy")
     
-    def check_buy_signal(self, indicators, prev_indicators=None, medium_trend=None, long_trend=None, market_regime=None, momentum_index=None):
+    def check_buy_signal(self, indicators, prev_indicators=None, medium_trend=None, long_trend=None, market_regime=None, momentum_index=None, performance_tracker=None, symbol=None):
         try:
             if not indicators or np.isnan(indicators['rsi']):
                 return False, [], {}
@@ -115,6 +118,24 @@ class TradingStrategy:
             signals = []
             
             indicator_signals_map = self.get_individual_indicator_signals(indicators, prev_indicators)
+            
+            buy_confidence = 0.0
+            if self.weaver_enabled and performance_tracker and symbol:
+                try:
+                    buy_confidence = performance_tracker.get_buy_confidence(
+                        symbol=symbol,
+                        indicator_signals=indicator_signals_map,
+                        timeframe=self.config['trading']['candle_interval']
+                    )
+                    
+                    if buy_confidence < self.min_confidence:
+                        logger.debug(f"🧠 Dynamic Weaver: Low confidence ({buy_confidence:.2%} < {self.min_confidence:.2%}) - rejecting buy")
+                        return False, [f"Low AI confidence: {buy_confidence:.2%} < {self.min_confidence:.2%}"], indicator_signals_map
+                    
+                    signals.append(f"🧠 AI Confidence: {buy_confidence:.2%}")
+                except Exception as e:
+                    logger.warning(f"Error calculating buy confidence: {e}")
+                    buy_confidence = 0.0
             
             if market_regime and self.regime_enabled and market_regime == 'bear':
                 bear_config = self.regime_config.get('bear_strategy', {})
