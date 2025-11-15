@@ -171,8 +171,8 @@ python main.py
 - Core modules: API client, indicators, strategy, risk manager
 
 ## Next Steps
-1. **إضافة مفاتيح API**: للانتقال من Demo Mode إلى التداول الفعلي
-2. **تفعيل Telegram**: إضافة TELEGRAM_BOT_TOKEN و TELEGRAM_CHAT_ID للحصول على إشعارات فورية
-3. **النشر على Railway**: لتشغيل البوت 24/7 بدون قيود جغرافية
-4. **Backtesting System**: اختبار الاستراتيجية على بيانات تاريخية
-5. **رسوم بيانية متقدمة**: إضافة Chart.js لعرض الأداء بصرياً
+1. ✅ **Market Regime System** - تم التنفيذ بنجاح!
+2. **اختبار شامل على Testnet**: تجربة البوت في ظروف سوق مختلفة
+3. **إضافة مفاتيح API حقيقية**: للانتقال من Testnet إلى التداول الفعلي
+4. **تفعيل Telegram**: إضافة TELEGRAM_BOT_TOKEN و TELEGRAM_CHAT_ID للحصول على إشعارات فورية
+5. **النشر على Railway**: لتشغيل البوت 24/7 بدون قيود جغرافية
