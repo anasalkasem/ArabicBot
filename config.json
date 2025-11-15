@@ -4,7 +4,7 @@
   "risk_management": {
     "stop_loss_percent": 3.0,
     "take_profit_percent": 4.0,
-    "position_size_percent": 15.0,
+    "position_size_percent": 18.0,
     "max_positions": 3,
     "min_order_value_usdt": 11.0,
     "trailing_stop_loss": {
@@ -52,8 +52,8 @@
     "trend_strength_periods": 10,
     "bull_strategy": {
       "description": "جريء - Buy the Dip",
-      "rsi_oversold_adjustment": 5,
-      "stoch_oversold_adjustment": 5,
+      "rsi_oversold_adjustment": 10,
+      "stoch_oversold_adjustment": 10,
       "bb_tolerance_adjustment": 0.5,
       "stop_loss_multiplier": 1.5,
       "take_profit_multiplier": 1.3
