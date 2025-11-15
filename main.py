@@ -513,6 +513,9 @@ class BinanceTradingBot:
                 logger.info(f"🔄 Iteration #{iteration} - {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
                 logger.info(f"{'='*80}")
                 
+                # Real-Time Account Sync - تحقق من حساب Binance قبل أي شيء
+                self.risk_manager.sync_positions_with_binance()
+                
                 if self.weaver_enabled:
                     self.resolve_pending_outcomes()
                 

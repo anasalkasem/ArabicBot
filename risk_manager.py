@@ -264,5 +264,131 @@ class RiskManager:
     
     def get_position(self, symbol):
         return self.positions.get(symbol)
+    
+    def sync_positions_with_binance(self):
+        """
+        مزامنة الصفقات مع حساب Binance الحقيقي
+        - يتحقق من الأرصدة الفعلية في Binance
+        - يغلق أي "صفقات شبح" (موجودة في الذاكرة لكن غير موجودة في Binance)
+        - يحدث قاعدة البيانات تلقائياً
+        """
+        try:
+            from datetime import datetime
+            
+            # جلب الأرصدة الحقيقية من Binance
+            binance_balances = self.binance_client.get_account_balance()
+            
+            # معالجة أفضل لحالات الفشل
+            if not binance_balances:
+                # في حالة Demo Mode أو HTTP 451، لا نستطيع المزامنة
+                # نسجل تحذير واحد فقط في بداية البوت (لتجنب الضوضاء)
+                if not hasattr(self, '_sync_warning_logged'):
+                    logger.warning("⚠️ Real-Time Account Sync disabled - Cannot connect to Binance")
+                    logger.warning("   Positions will rely on database/file tracking only")
+                    logger.warning("   This is normal on Replit due to geo-restrictions")
+                    self._sync_warning_logged = True
+                return
+            
+            logger.debug("🔄 Starting Real-Time Account Sync...")
+            
+            open_positions = self.get_open_positions()
+            if not open_positions:
+                logger.debug("✅ Sync OK - No open positions to verify")
+                return
+            
+            ghost_positions = []
+            
+            for symbol, position in open_positions.items():
+                # الحصول على baseAsset الصحيح من معلومات الرمز
+                symbol_info = self.binance_client.get_symbol_info(symbol)
+                
+                if symbol_info:
+                    # استخدام baseAsset الرسمي من Binance
+                    base_asset = symbol_info.get('baseAsset')
+                else:
+                    # Fallback: محاولة استخراج يدوي (لكن مع تحذير)
+                    logger.warning(f"Cannot get symbol info for {symbol}, using fallback parsing")
+                    # إزالة العملات المقتبسة المعروفة
+                    for quote in ['USDT', 'BUSD', 'USDC', 'BTC', 'ETH', 'BNB']:
+                        if symbol.endswith(quote):
+                            base_asset = symbol[:-len(quote)]
+                            break
+                    else:
+                        logger.error(f"Cannot parse base asset from {symbol} - skipping sync check")
+                        continue
+                
+                # التحقق من وجود العملة في حساب Binance
+                if base_asset in binance_balances:
+                    balance_qty = binance_balances[base_asset]['total']
+                    position_qty = position['quantity']
+                    
+                    # التسامح مع فروق صغيرة (0.5%)
+                    tolerance = position_qty * 0.005
+                    
+                    if balance_qty < (position_qty - tolerance):
+                        # الرصيد في Binance أقل بكثير من المتوقع = صفقة شبح
+                        logger.warning(f"👻 Ghost Position Detected: {symbol}")
+                        logger.warning(f"   Expected: {position_qty:.8f} {base_asset}")
+                        logger.warning(f"   Actual in Binance: {balance_qty:.8f} {base_asset}")
+                        logger.warning(f"   → Position was likely sold manually")
+                        ghost_positions.append(symbol)
+                else:
+                    # العملة غير موجودة في الحساب على الإطلاق = صفقة شبح
+                    logger.warning(f"👻 Ghost Position Detected: {symbol}")
+                    logger.warning(f"   Asset {base_asset} not found in Binance account")
+                    logger.warning(f"   → Position was likely sold manually")
+                    ghost_positions.append(symbol)
+            
+            # إغلاق الصفقات الشبح
+            if ghost_positions:
+                logger.info(f"🧹 Cleaning {len(ghost_positions)} ghost position(s)...")
+                
+                for symbol in ghost_positions:
+                    position = self.positions[symbol]
+                    
+                    # حساب P/L تقريبي (نفترض سعر الخروج = آخر سعر معروف)
+                    current_price = self.binance_client.get_symbol_price(symbol)
+                    if not current_price:
+                        current_price = position['entry_price']  # fallback
+                    
+                    profit_loss_percent = ((current_price - position['entry_price']) / position['entry_price']) * 100
+                    profit_loss_usd = (current_price - position['entry_price']) * position['quantity']
+                    
+                    # إغلاق الصفقة في قاعدة البيانات أولاً (الأهم)
+                    if self.db:
+                        try:
+                            self.db.close_trade(
+                                symbol=symbol,
+                                exit_price=current_price,
+                                exit_time=datetime.now(),
+                                profit_loss=profit_loss_usd,
+                                profit_loss_percent=profit_loss_percent,
+                                sell_reason='MANUAL_SELL_DETECTED'
+                            )
+                            self.db.delete_position(symbol)
+                            logger.info(f"✅ Ghost position {symbol} closed in database")
+                        except Exception as e:
+                            logger.error(f"Error closing ghost position {symbol} in DB: {e}")
+                    
+                    # ثم تحديث الذاكرة المحلية
+                    self.positions[symbol]['status'] = 'closed'
+                    self.positions[symbol]['exit_price'] = current_price
+                    self.positions[symbol]['exit_time'] = datetime.now().isoformat()
+                    self.positions[symbol]['sell_reason'] = 'MANUAL_SELL_DETECTED'
+                    self.positions[symbol]['profit_loss_percent'] = profit_loss_percent
+                    self.positions[symbol]['profit_loss_usd'] = profit_loss_usd
+                    
+                    logger.info(f"✅ Closed ghost position: {symbol} | P/L: {profit_loss_percent:+.2f}% (${profit_loss_usd:+.2f})")
+                
+                # حفظ التغييرات في الملف (backup)
+                self.save_positions()
+                logger.info("✅ Real-Time Sync Complete - All positions now match Binance account")
+            else:
+                logger.debug("✅ Sync OK - All positions match Binance account")
+                
+        except Exception as e:
+            logger.error(f"❌ Error during position sync: {e}")
+            import traceback
+            logger.debug(traceback.format_exc())
 
 import pandas as pd
