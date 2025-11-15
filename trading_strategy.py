@@ -119,24 +119,6 @@ class TradingStrategy:
             
             indicator_signals_map = self.get_individual_indicator_signals(indicators, prev_indicators)
             
-            buy_confidence = 0.0
-            if self.weaver_enabled and performance_tracker and symbol:
-                try:
-                    buy_confidence = performance_tracker.get_buy_confidence(
-                        symbol=symbol,
-                        indicator_signals=indicator_signals_map,
-                        timeframe=self.config['trading']['candle_interval']
-                    )
-                    
-                    if buy_confidence < self.min_confidence:
-                        logger.debug(f"🧠 Dynamic Weaver: Low confidence ({buy_confidence:.2%} < {self.min_confidence:.2%}) - rejecting buy")
-                        return False, [f"Low AI confidence: {buy_confidence:.2%} < {self.min_confidence:.2%}"], indicator_signals_map
-                    
-                    signals.append(f"🧠 AI Confidence: {buy_confidence:.2%}")
-                except Exception as e:
-                    logger.warning(f"Error calculating buy confidence: {e}")
-                    buy_confidence = 0.0
-            
             if market_regime and self.regime_enabled and market_regime == 'bear':
                 bear_config = self.regime_config.get('bear_strategy', {})
                 if not bear_config.get('allow_new_trades', True):
@@ -145,6 +127,7 @@ class TradingStrategy:
             
             strong_momentum_threshold = self.config.get('custom_momentum', {}).get('strong_momentum_threshold', 35)
             has_strong_momentum = momentum_index is not None and momentum_index < strong_momentum_threshold
+            trend_override_active = False
             
             if self.multi_tf_enabled:
                 trend_ok, trend_msg = self.check_trend_alignment(medium_trend, long_trend)
@@ -152,11 +135,31 @@ class TradingStrategy:
                     if has_strong_momentum:
                         logger.info(f"🚀 STRONG MOMENTUM OVERRIDE: Ignoring bearish trends (momentum={momentum_index:.1f} < {strong_momentum_threshold})")
                         signals.append(f"⚡ Strong Momentum Override: {momentum_index:.1f} < {strong_momentum_threshold}")
+                        trend_override_active = True
                     else:
                         logger.debug(f"Buy signal rejected: {trend_msg}")
                         return False, [], indicator_signals_map
                 else:
                     signals.append(trend_msg)
+            
+            use_static_strategy = True
+            if self.weaver_enabled and performance_tracker and symbol:
+                try:
+                    buy_confidence = performance_tracker.get_buy_confidence(
+                        symbol=symbol,
+                        indicator_signals=indicator_signals_map,
+                        timeframe=self.config['trading']['candle_interval']
+                    )
+                    
+                    if buy_confidence >= self.min_confidence:
+                        signals.append(f"🧠 AI Confidence: {buy_confidence:.2%}")
+                        logger.info(f"✅ BUY SIGNAL DETECTED (Dynamic Weaver): {', '.join(signals)}")
+                        return True, signals, indicator_signals_map
+                    else:
+                        logger.debug(f"🧠 Dynamic Weaver: Low confidence ({buy_confidence:.2%} < {self.min_confidence:.2%}) - falling back to static strategy")
+                    
+                except Exception as e:
+                    logger.warning(f"Error calculating buy confidence, falling back to static strategy: {e}")
             
             rsi_condition = indicators['rsi'] < self.rsi_oversold
             if rsi_condition:
@@ -177,11 +180,8 @@ class TradingStrategy:
             
             buy_signal = rsi_condition and stoch_condition and bb_condition
             
-            if self.multi_tf_enabled:
-                buy_signal = buy_signal and self.check_trend_alignment(medium_trend, long_trend)[0]
-            
             if buy_signal:
-                logger.info(f"✅ BUY SIGNAL DETECTED: {', '.join(signals)}")
+                logger.info(f"✅ BUY SIGNAL DETECTED (Static Strategy): {', '.join(signals)}")
             
             return buy_signal, signals, indicator_signals_map
             
