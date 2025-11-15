@@ -5,6 +5,7 @@ from datetime import datetime
 def setup_logger(name='binance_bot', log_file='bot.log', level=logging.INFO):
     logger = logging.getLogger(name)
     logger.setLevel(level)
+    logger.propagate = False
     
     if logger.handlers:
         return logger
