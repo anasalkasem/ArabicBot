@@ -29,7 +29,15 @@ The bot is structured into several modular Python files, each responsible for a 
     - **Multi-Timeframe Analysis**: Confirms trends across 5m, 1h, and 4h timeframes.
     - **Dynamic Trailing Stop-Loss**: Automatically protects profits by moving the stop-loss point.
     - **Smart Risk Management**: Adaptive Stop-Loss and Take-Profit based on market conditions, position sizing (5% of balance per trade), and maximum open positions (3).
-    - **Dynamic Strategy Weaver (MVP)**: An adaptive AI system that tracks the performance of individual indicators (RSI, MACD, Stochastic, BB) per trading pair, calculates rolling success rates, and aims to dynamically weight indicators based on historical performance. Currently in data-logging MVP mode.
+    - **Dynamic Strategy Weaver**: An adaptive AI system that learns from indicator performance to optimize trading signals. Features:
+        - **Signal Tracking**: Logs all indicator readings (RSI, MACD, Stochastic, BB) every 5 seconds for comprehensive data collection
+        - **State-Change Gating**: Queues outcome resolution only when indicators flip from bearish → bullish, preventing queue explosion (0-30 entries/hour vs 720/hour)
+        - **1-Hour Outcome Resolution**: Automatically evaluates signal quality by comparing price movement 1 hour after each bullish signal
+        - **Retry Logic**: Handles API failures gracefully with automatic retry instead of data loss
+        - **Dynamic Weighting**: Calculates indicator weights (10-40% range) based on EMA success rates per symbol
+        - **Persistent Storage**: Survives bot restarts via JSON persistence (indicator_performance_data.json)
+        - **API Endpoint**: /strategy-weights exposes real-time weights and success rates for dashboard integration
+        - **Production-Ready**: Queue management, error resilience, and Railway deployment compatible
 
 - **Feature Specifications**:
     - **Trading Strategy**:
