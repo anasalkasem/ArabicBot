@@ -2,6 +2,7 @@ import json
 import time
 import os
 import threading
+import asyncio
 from datetime import datetime
 from flask import Flask, jsonify, render_template
 from binance_client import BinanceClientManager
@@ -16,6 +17,7 @@ from custom_momentum import CustomMomentumIndex
 from indicator_performance_tracker import IndicatorPerformanceTracker
 from logger_setup import setup_logger
 from db_manager import DatabaseManager
+from telegram_bot import TelegramBotController
 
 logger = setup_logger('main_bot')
 app = Flask(__name__)
@@ -25,6 +27,7 @@ recent_logs = []
 MAX_LOGS = 50
 
 bot_instance = None
+telegram_bot_instance = None
 bot_stats = {
     'status': 'initializing',
     'iterations': 0,
@@ -607,6 +610,26 @@ def run_bot():
         logger.error(f"Bot error: {e}")
         bot_stats['status'] = 'error'
 
+def run_telegram_bot():
+    global telegram_bot_instance, bot_instance
+    
+    time.sleep(10)
+    
+    while bot_instance is None:
+        logger.info("⏳ Waiting for trading bot to initialize...")
+        time.sleep(2)
+    
+    try:
+        logger.info("🤖 Starting Telegram bot controller...")
+        telegram_bot_instance = TelegramBotController(bot_instance, bot_instance.db)
+        telegram_bot_instance.run()
+    except Exception as e:
+        logger.error(f"❌ Telegram bot error: {e}")
+        if "TELEGRAM_BOT_TOKEN" in str(e):
+            logger.warning("⚠️ Telegram bot token not configured - skipping Telegram bot")
+        else:
+            raise
+
 if __name__ == "__main__":
     port = int(os.environ.get('PORT', 5000))
     logger.info(f"🌐 Starting web server on port {port}...")
@@ -614,5 +637,13 @@ if __name__ == "__main__":
     
     bot_thread = threading.Thread(target=run_bot, daemon=True)
     bot_thread.start()
+    
+    telegram_enabled = os.getenv('TELEGRAM_BOT_TOKEN') is not None
+    if telegram_enabled:
+        logger.info("📱 Starting Telegram bot in background...")
+        telegram_thread = threading.Thread(target=run_telegram_bot, daemon=True)
+        telegram_thread.start()
+    else:
+        logger.warning("⚠️ TELEGRAM_BOT_TOKEN not set - Telegram bot disabled")
     
     app.run(host='0.0.0.0', port=port, debug=False)
