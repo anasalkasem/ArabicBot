@@ -320,9 +320,10 @@ def get_status():
             'start_time': bot_stats['start_time'],
             'last_check': bot_stats['last_check'],
             'open_positions': len(positions),
-            'positions': positions
+            'positions': positions,
+            'testnet': bot_instance.testnet
         })
-    return jsonify({'status': 'initializing'})
+    return jsonify({'status': 'initializing', 'testnet': True})
 
 @app.route('/logs')
 def get_logs():

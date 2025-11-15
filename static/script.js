@@ -9,6 +9,13 @@ async function updateDashboard() {
         statusBadge.textContent = getStatusText(data.bot_status);
         statusBadge.className = 'value status-badge ' + data.bot_status;
         
+        // تحديث وضع التداول (TESTNET أو LIVE)
+        const modeBadge = document.getElementById('mode');
+        if (modeBadge && data.testnet !== undefined) {
+            modeBadge.textContent = data.testnet ? 'TESTNET' : 'LIVE';
+            modeBadge.className = data.testnet ? 'value mode-badge testnet' : 'value mode-badge live';
+        }
+        
         // تحديث البيانات
         document.getElementById('iterations').textContent = data.iterations || '0';
         document.getElementById('start-time').textContent = formatTime(data.start_time);

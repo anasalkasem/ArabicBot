@@ -244,10 +244,28 @@ header h1 {
 .mode-badge {
     padding: 6px 14px;
     border-radius: 20px;
-    background: linear-gradient(135deg, var(--ios-orange), var(--ios-red));
     font-weight: 700;
     font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.mode-badge.testnet {
+    background: linear-gradient(135deg, var(--ios-orange), var(--ios-red));
+    color: white;
     box-shadow: 0 4px 15px rgba(255, 149, 0, 0.3);
+}
+
+.mode-badge.live {
+    background: linear-gradient(135deg, var(--ios-green), #28a745);
+    color: white;
+    box-shadow: 0 4px 15px rgba(52, 199, 89, 0.3);
+    animation: pulse-glow 2s ease-in-out infinite;
+}
+
+@keyframes pulse-glow {
+    0%, 100% { box-shadow: 0 4px 15px rgba(52, 199, 89, 0.3); }
+    50% { box-shadow: 0 4px 25px rgba(52, 199, 89, 0.6); }
 }
 
 .stats-grid {
