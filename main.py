@@ -460,11 +460,6 @@ class BinanceTradingBot:
                 
                 self.display_status()
                 
-                if self.weaver_enabled and iteration % 10 == 0:
-                    try:
-                        self.performance_tracker.save_to_file(self.pending_resolutions)
-                    except Exception as e:
-                        logger.error(f"Error saving tracker data: {e}")
                 
                 logger.info(f"\n⏸️  Waiting {self.check_interval} seconds until next check...")
                 time.sleep(self.check_interval)
@@ -472,12 +467,6 @@ class BinanceTradingBot:
         except KeyboardInterrupt:
             logger.info("\n\n🛑 Bot stopped by user")
             bot_stats['status'] = 'stopped'
-            if self.weaver_enabled:
-                try:
-                    self.performance_tracker.save_to_file(self.pending_resolutions)
-                    logger.info("💾 Saved Dynamic Strategy Weaver data")
-                except:
-                    pass
             self.display_status()
             logger.info("\n👋 Goodbye!")
         except Exception as e:

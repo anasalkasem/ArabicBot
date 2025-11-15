@@ -381,7 +381,20 @@ class DatabaseManager:
                 else:
                     cursor.execute(query)
                 
-                return cursor.fetchone()
+                result = cursor.fetchone()
+                
+                if not result or result.get('total_trades') == 0 or result.get('total_trades') is None:
+                    return {
+                        'total_trades': 0,
+                        'winning_trades': 0,
+                        'losing_trades': 0,
+                        'total_profit_loss': 0.0,
+                        'avg_profit_percent': 0.0,
+                        'best_trade': 0.0,
+                        'worst_trade': 0.0
+                    }
+                
+                return result
         except Exception as e:
             logger.error(f"Error getting trading statistics: {e}")
             return None
