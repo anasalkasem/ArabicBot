@@ -495,7 +495,16 @@ class TelegramBotController:
     
     def run(self):
         logger.info("🤖 Starting Telegram bot...")
-        self.application.run_polling(allowed_updates=Update.ALL_TYPES)
+        import asyncio
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        try:
+            loop.run_until_complete(self.start_polling_async())
+            loop.run_forever()
+        except KeyboardInterrupt:
+            logger.info("Stopping Telegram bot...")
+        finally:
+            loop.close()
     
     async def start_polling_async(self):
         await self.application.initialize()

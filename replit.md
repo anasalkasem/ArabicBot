@@ -62,6 +62,12 @@ The bot is structured into several modular Python files, each responsible for a 
 ## External Dependencies
 - **Binance API**: For real-time market data and trade execution (supports both mainnet and testnet).
 - **Telegram API**: For instant notifications on trades and critical events.
+- **Telegram Bot API**: Full control panel via Telegram with interactive commands and buttons (see `TELEGRAM_SETUP.md`).
 - **CoinGecko API**: Utilized for sentiment analysis data in the Custom Momentum Index.
 - **VADER Sentiment Analysis**: A lexicon and rule-based sentiment analysis tool (integrated via `sentiment_analyzer.py`).
-- **Python Libraries**: `numpy`, `pandas`, `pandas-ta`, `python-binance`, `requests`.
+- **Python Libraries**: `numpy`, `pandas`, `pandas-ta`, `python-binance`, `python-telegram-bot`, `requests`.
+
+## Recent Updates (November 2025)
+- **Telegram Control Panel**: Added comprehensive Telegram bot controller with 8 commands (`/start`, `/status`, `/stats`, `/balance`, `/positions`, `/regime`, `/logs`, `/help`) and interactive keyboard buttons for full bot management via mobile.
+- **PostgreSQL Integration**: Migrated from JSON to PostgreSQL database for better performance, scalability, and complex analytics.
+- **Dynamic Strategy Weaver**: State-change gating system that learns from indicator performance to optimize trading signals.
