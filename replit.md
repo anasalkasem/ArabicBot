@@ -50,7 +50,13 @@ The bot is structured into several modular Python files, each responsible for a 
 - **System Design Choices**:
     - Python 3.12 environment.
     - Modular design for easy maintenance and extension.
-    - Persistent storage for open positions (`positions.json`) and trading statistics (`trading_stats.json`).
+    - **PostgreSQL Database**: Replaces JSON files for persistent storage with:
+        - `trades` table: Complete trade history with entry/exit prices, P/L, and metadata
+        - `positions` table: Current open positions with real-time tracking
+        - `indicator_signals` & `indicator_outcomes` tables: Strategy Weaver data for ML learning
+        - `daily_stats` & `pair_stats` tables: Performance analytics per day and per symbol
+        - `market_regime_history` table: Historical market state transitions
+    - Hybrid storage: Database-first with JSON fallback for reliability
     - Robust error handling with graceful degradation.
 
 ## External Dependencies

@@ -22,6 +22,7 @@ def migrate_positions():
         
         db = DatabaseManager()
         migrated = 0
+        errors = []
         
         for symbol, pos in positions.items():
             try:
@@ -41,8 +42,13 @@ def migrate_positions():
                 logger.info(f"✅ Migrated position: {symbol}")
             except Exception as e:
                 logger.error(f"❌ Error migrating position {symbol}: {e}")
+                errors.append(f"{symbol}: {e}")
         
-        logger.info(f"✅ Successfully migrated {migrated} positions")
+        if errors:
+            logger.warning(f"Migration completed with {len(errors)} errors. NOT backing up JSON file.")
+            return
+        
+        logger.info(f"✅ Successfully migrated {migrated} positions without errors")
         db.close()
         
         os.rename('positions.json', 'positions.json.backup')
@@ -66,6 +72,7 @@ def migrate_stats():
         
         db = DatabaseManager()
         migrated = 0
+        errors = []
         
         for trade in stats.get('trades', []):
             try:
@@ -95,8 +102,13 @@ def migrate_stats():
                 logger.info(f"✅ Migrated trade: {trade['symbol']}")
             except Exception as e:
                 logger.error(f"❌ Error migrating trade: {e}")
+                errors.append(str(e))
         
-        logger.info(f"✅ Successfully migrated {migrated} trades")
+        if errors:
+            logger.warning(f"Migration completed with {len(errors)} errors. NOT backing up JSON file.")
+            return
+        
+        logger.info(f"✅ Successfully migrated {migrated} trades without errors")
         db.close()
         
         os.rename('trading_stats.json', 'trading_stats.json.backup')
@@ -121,6 +133,7 @@ def migrate_indicator_performance():
         db = DatabaseManager()
         signal_count = 0
         outcome_count = 0
+        errors = []
         
         for key, signals in data.get('signals', {}).items():
             try:
@@ -141,6 +154,7 @@ def migrate_indicator_performance():
                     signal_count += 1
             except Exception as e:
                 logger.error(f"Error migrating signal {key}: {e}")
+                errors.append(str(e))
         
         for item in data.get('pending_resolutions', []):
             try:
@@ -155,8 +169,13 @@ def migrate_indicator_performance():
                 signal_count += 1
             except Exception as e:
                 logger.error(f"Error migrating pending resolution: {e}")
+                errors.append(str(e))
         
-        logger.info(f"✅ Successfully migrated {signal_count} signals and {outcome_count} outcomes")
+        if errors:
+            logger.warning(f"Migration completed with {len(errors)} errors. NOT backing up JSON file.")
+            return
+        
+        logger.info(f"✅ Successfully migrated {signal_count} signals and {outcome_count} outcomes without errors")
         db.close()
         
         os.rename('indicator_performance_data.json', 'indicator_performance_data.json.backup')

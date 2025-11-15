@@ -18,19 +18,19 @@ class StatisticsTracker:
                 db_stats = self.db.get_trading_statistics()
                 if db_stats:
                     return {
-                        'total_trades': db_stats.get('total_trades', 0),
-                        'winning_trades': db_stats.get('winning_trades', 0),
-                        'losing_trades': db_stats.get('losing_trades', 0),
-                        'total_profit_usd': float(db_stats.get('total_profit_loss', 0)),
-                        'total_profit_percent': float(db_stats.get('avg_profit_percent', 0)),
-                        'best_trade': {'symbol': '', 'profit_pct': float(db_stats.get('best_trade', 0)), 'profit_usd': 0.0},
-                        'worst_trade': {'symbol': '', 'profit_pct': float(db_stats.get('worst_trade', 0)), 'profit_usd': 0.0},
+                        'total_trades': db_stats.get('total_trades') or 0,
+                        'winning_trades': db_stats.get('winning_trades') or 0,
+                        'losing_trades': db_stats.get('losing_trades') or 0,
+                        'total_profit_usd': float(db_stats.get('total_profit_loss') or 0),
+                        'total_profit_percent': float(db_stats.get('avg_profit_percent') or 0),
+                        'best_trade': {'symbol': '', 'profit_pct': float(db_stats.get('best_trade') or 0), 'profit_usd': 0.0},
+                        'worst_trade': {'symbol': '', 'profit_pct': float(db_stats.get('worst_trade') or 0), 'profit_usd': 0.0},
                         'trades_history': [],
                         'daily_stats': {},
                         'symbol_stats': {}
                     }
             except Exception as e:
-                logger.error(f"Error loading stats from DB: {e}")
+                logger.warning(f"DB unavailable, falling back to JSON: {e}")
         
         if os.path.exists(self.stats_file):
             try:
