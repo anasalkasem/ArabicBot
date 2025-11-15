@@ -307,7 +307,7 @@ class BinanceTradingBot:
                             del self.symbol_momentum_cache[symbol]
                 
                 buy_signal, signals, indicator_signals = self.trading_strategy.check_buy_signal(
-                    indicators, prev_indicators, medium_trend, long_trend, market_regime
+                    indicators, prev_indicators, medium_trend, long_trend, market_regime, momentum_index
                 )
                 
                 if self.weaver_enabled and indicator_signals:

@@ -107,7 +107,7 @@ class TradingStrategy:
             self.bb_tolerance = self.base_bb_tolerance
             logger.info(f"↔️ Adapted to SIDEWAYS market: Using standard strategy")
     
-    def check_buy_signal(self, indicators, prev_indicators=None, medium_trend=None, long_trend=None, market_regime=None):
+    def check_buy_signal(self, indicators, prev_indicators=None, medium_trend=None, long_trend=None, market_regime=None, momentum_index=None):
         try:
             if not indicators or np.isnan(indicators['rsi']):
                 return False, [], {}
@@ -122,12 +122,20 @@ class TradingStrategy:
                     logger.debug(f"🐻 Buy rejected: Bear market - trading disabled")
                     return False, [f"Bear market: {self.current_regime_reason}"], indicator_signals_map
             
+            strong_momentum_threshold = self.config.get('custom_momentum', {}).get('strong_momentum_threshold', 35)
+            has_strong_momentum = momentum_index is not None and momentum_index < strong_momentum_threshold
+            
             if self.multi_tf_enabled:
                 trend_ok, trend_msg = self.check_trend_alignment(medium_trend, long_trend)
                 if not trend_ok:
-                    logger.debug(f"Buy signal rejected: {trend_msg}")
-                    return False, [], indicator_signals_map
-                signals.append(trend_msg)
+                    if has_strong_momentum:
+                        logger.info(f"🚀 STRONG MOMENTUM OVERRIDE: Ignoring bearish trends (momentum={momentum_index:.1f} < {strong_momentum_threshold})")
+                        signals.append(f"⚡ Strong Momentum Override: {momentum_index:.1f} < {strong_momentum_threshold}")
+                    else:
+                        logger.debug(f"Buy signal rejected: {trend_msg}")
+                        return False, [], indicator_signals_map
+                else:
+                    signals.append(trend_msg)
             
             rsi_condition = indicators['rsi'] < self.rsi_oversold
             if rsi_condition:
