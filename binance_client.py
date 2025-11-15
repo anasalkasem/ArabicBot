@@ -125,10 +125,21 @@ class BinanceClientManager:
                 type='MARKET',
                 quantity=quantity
             )
-            logger.info(f"Market order created: {side} {quantity} {symbol}")
-            return order
+            
+            order_status = order.get('status')
+            if order_status == 'FILLED':
+                executed_qty = float(order.get('executedQty', 0))
+                logger.info(f"✅ Market order FILLED: {side} {executed_qty} {symbol}")
+                return order
+            elif order_status in ['PARTIALLY_FILLED', 'PENDING']:
+                logger.warning(f"⚠️ Order {order_status}: {side} {symbol} (check manually)")
+                return order
+            else:
+                logger.error(f"❌ Order REJECTED/FAILED: {side} {symbol} - Status: {order_status}")
+                return None
+                
         except Exception as e:
-            logger.error(f"Error creating market order: {e}")
+            logger.error(f"❌ Error creating market order for {symbol}: {e}")
             return None
     
     def create_test_order(self, symbol, side, quantity):
