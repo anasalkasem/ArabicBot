@@ -412,7 +412,8 @@ class BinanceTradingBot:
                             pending['indicator'],
                             pending['timeframe'],
                             pending['timestamp'],
-                            current_price
+                            current_price,
+                            pending['price']
                         )
                         
                         price_change = ((current_price - pending['price']) / pending['price']) * 100
