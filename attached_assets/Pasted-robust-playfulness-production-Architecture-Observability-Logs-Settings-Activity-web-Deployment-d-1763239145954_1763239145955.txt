@@ -1,0 +1,319 @@
+robust-playfulness
+
+production
+Architecture
+Observability
+Logs
+Settings
+
+
+
+Activity
+web
+Deployment deploying
+11 minutes ago
+web
+Deployment building
+12 minutes ago
+web
+Deployment successful
+12 minutes ago
+web
+Deployment deploying
+58 minutes ago
+web
+Deployment building
+59 minutes ago
+web
+Deployment successful
+59 minutes ago
+web
+Deployment restarted
+1 hour ago
+web
+Deployment restarted
+1 hour ago
+web
+Deployment deploying
+2 hours ago
+web
+Deployment building
+2 hours ago
+web
+Deployment successful
+2 hours ago
+web
+Deployment deploying
+2 hours ago
+web
+Deployment building
+2 hours ago
+web
+Deployment successful
+2 hours ago
+web
+Deployment deploying
+3 hours ago
+web
+Deployment building
+3 hours ago
+web
+Deployment successful
+3 hours ago
+web
+Deployment successful
+3 hours ago
+web
+Deployment deploying
+3 hours ago
+web
+Deployment building
+3 hours ago
+Scroll to load more
+
+web
+Deployments
+Variables
+Metrics
+Settings
+web-production-3c8a.up.railway.app
+asia-southeast1-eqsg3a
+1 Replica
+
+HISTORY
+web
+/
+caaa6053
+Active
+
+Nov 15, 2025 at 3:25 PM
+web-production-3c8a.up.railway.app
+Details
+Build Logs
+Deploy Logs
+HTTP Logs
+Filter and search logs
+
+2025-11-15 20:37:33,735 - indicator_tracker - WARNING - No database connection, skipping signal tracking
+2025-11-15 20:37:33,735 - indicator_tracker - WARNING - No database connection, skipping signal tracking
+2025-11-15 20:37:33,735 - indicator_tracker - WARNING - No database connection, skipping signal tracking
+2025-11-15 20:37:33 - main_bot - INFO -    ⏭️ Custom Momentum for SOLUSDT: No buy (index=47.4, need <45)
+2025-11-15 20:37:33,736 - main_bot - INFO -    ⏭️ Custom Momentum for SOLUSDT: No buy (index=47.4, need <45)
+2025-11-15 20:37:33 - main_bot - INFO - 
+🔍 Analyzing XRPUSDT...
+2025-11-15 20:37:33,736 - main_bot - INFO - 
+🔍 Analyzing XRPUSDT...
+2025-11-15 20:37:34 - market_regime - INFO - Market regime detected: SIDEWAYS (confidence: high) - Momentum 10 candles: -0.17%, 🐻 Moderate bear: Price below EMAs, negative momentum, ↔️ Sideways: ADX=17.8, Range-bound market
+2025-11-15 20:37:34,092 - market_regime - INFO - Market regime detected: SIDEWAYS (confidence: high) - Momentum 10 candles: -0.17%, 🐻 Moderate bear: Price below EMAs, negative momentum, ↔️ Sideways: ADX=17.8, Range-bound market
+2025-11-15 20:37:34,092 - trading_strategy - INFO - ↔️ Adapted to SIDEWAYS market: Using standard strategy
+2025-11-15 20:37:34 - trading_strategy - INFO - ↔️ Adapted to SIDEWAYS market: Using standard strategy
+2025-11-15 20:37:34 - main_bot - INFO -    📊 RSI: 40.3 | Stoch: 24.8 | Price: $2.25 | BB Lower: $2.25
+2025-11-15 20:37:34,092 - main_bot - INFO -    📊 RSI: 40.3 | Stoch: 24.8 | Price: $2.25 | BB Lower: $2.25
+2025-11-15 20:37:34 - main_bot - INFO -    📈 Trends: 5m=neutral, 1h=bearish, 4h=bearish
+2025-11-15 20:37:34,092 - main_bot - INFO -    📈 Trends: 5m=neutral, 1h=bearish, 4h=bearish
+2025-11-15 20:37:34 - main_bot - INFO -    ↔️ Market Regime: SIDEWAYS
+2025-11-15 20:37:34,092 - main_bot - INFO -    ↔️ Market Regime: SIDEWAYS
+2025-11-15 20:37:34 - main_bot - INFO - 
+🔍 Analyzing BNBUSDT...
+2025-11-15 20:37:34,377 - main_bot - INFO - 
+2025-11-15 20:37:34,377 - indicator_tracker - WARNING - No database connection, skipping signal tracking
+2025-11-15 20:37:34,377 - indicator_tracker - WARNING - No database connection, skipping signal tracking
+2025-11-15 20:37:34,377 - indicator_tracker - WARNING - No database connection, skipping signal tracking
+2025-11-15 20:37:34 - main_bot - INFO -    🎯 Custom Momentum Index for XRPUSDT: 43.2/100 ✓
+2025-11-15 20:37:34 - main_bot - INFO -    ✅ Custom Momentum for XRPUSDT: BUY signal (index=43.2 < 45)
+2025-11-15 20:37:34,376 - main_bot - INFO -    🎯 Custom Momentum Index for XRPUSDT: 43.2/100 ✓
+2025-11-15 20:37:34,377 - main_bot - INFO -    ✅ Custom Momentum for XRPUSDT: BUY signal (index=43.2 < 45)
+2025-11-15 20:37:34,377 - indicator_tracker - WARNING - No database connection, skipping signal tracking
+2025-11-15 20:37:34 - main_bot - INFO -    ⏭️ No buy: Both trends bearish
+2025-11-15 20:37:34,377 - main_bot - INFO -    ⏭️ No buy: Both trends bearish
+🔍 Analyzing BNBUSDT...
+2025-11-15 20:37:34 - market_regime - INFO - Market regime detected: BEAR (confidence: high) - Momentum 10 candles: -0.56%, 🐻 Strong bear: Price below EMAs, ADX=35.3, Negative momentum
+2025-11-15 20:37:34,734 - market_regime - INFO - Market regime detected: BEAR (confidence: high) - Momentum 10 candles: -0.56%, 🐻 Strong bear: Price below EMAs, ADX=35.3, Negative momentum
+2025-11-15 20:37:34 - trading_strategy - WARNING - 🐻 BEAR market detected - Very conservative: RSI<35, Stoch<45, BB tolerance=1.0%
+2025-11-15 20:37:34,734 - trading_strategy - WARNING - 🐻 BEAR market detected - Very conservative: RSI<35, Stoch<45, BB tolerance=1.0%
+2025-11-15 20:37:34 - main_bot - INFO -    📊 RSI: 28.9 | Stoch: 11.9 | Price: $935.59 | BB Lower: $933.92
+2025-11-15 20:37:34 - main_bot - INFO -    📈 Trends: 5m=neutral, 1h=neutral, 4h=bearish
+2025-11-15 20:37:34 - main_bot - INFO -    🐻 Market Regime: BEAR
+2025-11-15 20:37:34,734 - main_bot - INFO -    📊 RSI: 28.9 | Stoch: 11.9 | Price: $935.59 | BB Lower: $933.92
+2025-11-15 20:37:34,734 - main_bot - INFO -    📈 Trends: 5m=neutral, 1h=neutral, 4h=bearish
+2025-11-15 20:37:34,734 - main_bot - INFO -    🐻 Market Regime: BEAR
+2025-11-15 20:37:34 - main_bot - INFO -    🎯 Custom Momentum Index for BNBUSDT: 53.8/100 ✓
+2025-11-15 20:37:34,885 - main_bot - INFO -    🎯 Custom Momentum Index for BNBUSDT: 53.8/100 ✓
+2025-11-15 20:37:34 - trading_strategy - INFO - ✅ BUY SIGNAL DETECTED (Dynamic Weaver): ⚠️ Acceptable: 1h=neutral, 4h=bearish (only one bearish), 🧠 AI Confidence: 75.00%
+2025-11-15 20:37:34,885 - trading_strategy - INFO - ✅ BUY SIGNAL DETECTED (Dynamic Weaver): ⚠️ Acceptable: 1h=neutral, 4h=bearish (only one bearish), 🧠 AI Confidence: 75.00%
+2025-11-15 20:37:34,885 - indicator_tracker - WARNING - No database connection, skipping signal tracking
+2025-11-15 20:37:34,885 - indicator_tracker - WARNING - No database connection, skipping signal tracking
+2025-11-15 20:37:34,885 - indicator_tracker - WARNING - No database connection, skipping signal tracking
+2025-11-15 20:37:34,885 - indicator_tracker - WARNING - No database connection, skipping signal tracking
+2025-11-15 20:37:34 - main_bot - INFO -    ⏭️ Custom Momentum for BNBUSDT: No buy (index=53.8, need <45)
+2025-11-15 20:37:34,885 - main_bot - INFO -    ⏭️ Custom Momentum for BNBUSDT: No buy (index=53.8, need <45)
+2025-11-15 20:37:34 - main_bot - INFO - 
+📊 No open positions
+2025-11-15 20:37:34,885 - main_bot - INFO - 
+📊 No open positions
+2025-11-15 20:37:34 - main_bot - INFO - 
+⏸️  Waiting 5 seconds until next check...
+2025-11-15 20:37:34,885 - main_bot - INFO - 
+⏸️  Waiting 5 seconds until next check...
+2025-11-15 20:37:39 - main_bot - INFO - 
+================================================================================
+2025-11-15 20:37:39,886 - main_bot - INFO - 
+================================================================================
+2025-11-15 20:37:39 - main_bot - INFO - 🔄 Iteration #78 - 2025-11-15 20:37:39
+2025-11-15 20:37:39,886 - main_bot - INFO - 🔄 Iteration #78 - 2025-11-15 20:37:39
+2025-11-15 20:37:39 - main_bot - INFO - ================================================================================
+2025-11-15 20:37:39,886 - main_bot - INFO - ================================================================================
+🔍 Analyzing BTCUSDT...
+2025-11-15 20:37:39,963 - main_bot - INFO - 
+🔍 Analyzing BTCUSDT...
+2025-11-15 20:37:39 - main_bot - INFO - 
+2025-11-15 20:37:40 - market_regime - INFO - Market regime detected: BEAR (confidence: medium) - Momentum 10 candles: -0.39%, 🐻 Moderate bear: Price below EMAs, negative momentum
+2025-11-15 20:37:40 - trading_strategy - WARNING - 🐻 BEAR market detected - Very conservative: RSI<35, Stoch<45, BB tolerance=1.0%
+2025-11-15 20:37:40 - main_bot - INFO -    📊 RSI: 32.9 | Stoch: 12.7 | Price: $95686.00 | BB Lower: $95615.03
+2025-11-15 20:37:40 - main_bot - INFO -    📈 Trends: 5m=neutral, 1h=neutral, 4h=bearish
+2025-11-15 20:37:40,331 - market_regime - INFO - Market regime detected: BEAR (confidence: medium) - Momentum 10 candles: -0.39%, 🐻 Moderate bear: Price below EMAs, negative momentum
+2025-11-15 20:37:40,332 - trading_strategy - WARNING - 🐻 BEAR market detected - Very conservative: RSI<35, Stoch<45, BB tolerance=1.0%
+2025-11-15 20:37:40,332 - main_bot - INFO -    📊 RSI: 32.9 | Stoch: 12.7 | Price: $95686.00 | BB Lower: $95615.03
+2025-11-15 20:37:40,332 - main_bot - INFO -    📈 Trends: 5m=neutral, 1h=neutral, 4h=bearish
+2025-11-15 20:37:40,332 - main_bot - INFO -    🐻 Market Regime: BEAR
+2025-11-15 20:37:40 - main_bot - INFO -    🐻 Market Regime: BEAR
+2025-11-15 20:37:40 - main_bot - INFO -    🎯 Custom Momentum Index for BTCUSDT: 53.4/100 ✓
+2025-11-15 20:37:40,485 - main_bot - INFO -    🎯 Custom Momentum Index for BTCUSDT: 53.4/100 ✓
+2025-11-15 20:37:40 - trading_strategy - INFO - ✅ BUY SIGNAL DETECTED (Dynamic Weaver): ⚠️ Acceptable: 1h=neutral, 4h=bearish (only one bearish), 🧠 AI Confidence: 75.00%
+2025-11-15 20:37:40,486 - trading_strategy - INFO - ✅ BUY SIGNAL DETECTED (Dynamic Weaver): ⚠️ Acceptable: 1h=neutral, 4h=bearish (only one bearish), 🧠 AI Confidence: 75.00%
+2025-11-15 20:37:40,486 - indicator_tracker - WARNING - No database connection, skipping signal tracking
+2025-11-15 20:37:40,486 - indicator_tracker - WARNING - No database connection, skipping signal tracking
+2025-11-15 20:37:40,486 - indicator_tracker - WARNING - No database connection, skipping signal tracking
+2025-11-15 20:37:40,486 - indicator_tracker - WARNING - No database connection, skipping signal tracking
+2025-11-15 20:37:40 - main_bot - INFO -    ⏭️ Custom Momentum for BTCUSDT: No buy (index=53.4, need <45)
+2025-11-15 20:37:40,486 - main_bot - INFO -    ⏭️ Custom Momentum for BTCUSDT: No buy (index=53.4, need <45)
+2025-11-15 20:37:40 - main_bot - INFO - 
+🔍 Analyzing ETHUSDT...
+2025-11-15 20:37:40,486 - main_bot - INFO - 
+🔍 Analyzing ETHUSDT...
+2025-11-15 20:37:40 - market_regime - INFO - Market regime detected: BEAR (confidence: high) - Momentum 10 candles: -0.82%, 🐻 Strong bear: Price below EMAs, ADX=25.1, Negative momentum
+2025-11-15 20:37:40,843 - market_regime - INFO - Market regime detected: BEAR (confidence: high) - Momentum 10 candles: -0.82%, 🐻 Strong bear: Price below EMAs, ADX=25.1, Negative momentum
+2025-11-15 20:37:40 - trading_strategy - WARNING - 🐻 BEAR market detected - Very conservative: RSI<35, Stoch<45, BB tolerance=1.0%
+2025-11-15 20:37:40,843 - trading_strategy - WARNING - 🐻 BEAR market detected - Very conservative: RSI<35, Stoch<45, BB tolerance=1.0%
+2025-11-15 20:37:40 - main_bot - INFO -    📊 RSI: 36.3 | Stoch: 9.3 | Price: $3186.58 | BB Lower: $3181.93
+2025-11-15 20:37:40,843 - main_bot - INFO -    📊 RSI: 36.3 | Stoch: 9.3 | Price: $3186.58 | BB Lower: $3181.93
+2025-11-15 20:37:40 - main_bot - INFO -    📈 Trends: 5m=neutral, 1h=neutral, 4h=bearish
+2025-11-15 20:37:40,843 - main_bot - INFO -    📈 Trends: 5m=neutral, 1h=neutral, 4h=bearish
+2025-11-15 20:37:40 - main_bot - INFO -    🐻 Market Regime: BEAR
+2025-11-15 20:37:40,844 - main_bot - INFO -    🐻 Market Regime: BEAR
+2025-11-15 20:37:40 - main_bot - INFO -    🎯 Custom Momentum Index for ETHUSDT: 53.5/100 ✓
+2025-11-15 20:37:40,991 - main_bot - INFO -    🎯 Custom Momentum Index for ETHUSDT: 53.5/100 ✓
+2025-11-15 20:37:40 - trading_strategy - INFO - ✅ BUY SIGNAL DETECTED (Dynamic Weaver): ⚠️ Acceptable: 1h=neutral, 4h=bearish (only one bearish), 🧠 AI Confidence: 50.00%
+2025-11-15 20:37:40,991 - trading_strategy - INFO - ✅ BUY SIGNAL DETECTED (Dynamic Weaver): ⚠️ Acceptable: 1h=neutral, 4h=bearish (only one bearish), 🧠 AI Confidence: 50.00%
+2025-11-15 20:37:40,991 - indicator_tracker - WARNING - No database connection, skipping signal tracking
+2025-11-15 20:37:40,991 - indicator_tracker - WARNING - No database connection, skipping signal tracking
+2025-11-15 20:37:40,991 - indicator_tracker - WARNING - No database connection, skipping signal tracking
+2025-11-15 20:37:40,991 - indicator_tracker - WARNING - No database connection, skipping signal tracking
+2025-11-15 20:37:40 - main_bot - INFO -    ⏭️ Custom Momentum for ETHUSDT: No buy (index=53.5, need <45)
+2025-11-15 20:37:40,991 - main_bot - INFO -    ⏭️ Custom Momentum for ETHUSDT: No buy (index=53.5, need <45)
+2025-11-15 20:37:40 - main_bot - INFO -    ⏭️ No buy: RSI=36.3 (need <35)
+2025-11-15 20:37:40,991 - main_bot - INFO -    ⏭️ No buy: RSI=36.3 (need <35)
+2025-11-15 20:37:40 - main_bot - INFO - 
+🔍 Analyzing SOLUSDT...
+2025-11-15 20:37:40,991 - main_bot - INFO - 
+🔍 Analyzing SOLUSDT...
+2025-11-15 20:37:41 - market_regime - INFO - Market regime detected: BEAR (confidence: high) - Momentum 10 candles: -1.01%, 🐻 Strong bear: Price below EMAs, ADX=31.9, Negative momentum
+2025-11-15 20:37:41,354 - market_regime - INFO - Market regime detected: BEAR (confidence: high) - Momentum 10 candles: -1.01%, 🐻 Strong bear: Price below EMAs, ADX=31.9, Negative momentum
+2025-11-15 20:37:41,354 - trading_strategy - WARNING - 🐻 BEAR market detected - Very conservative: RSI<35, Stoch<45, BB tolerance=1.0%
+2025-11-15 20:37:41 - trading_strategy - WARNING - 🐻 BEAR market detected - Very conservative: RSI<35, Stoch<45, BB tolerance=1.0%
+2025-11-15 20:37:41 - main_bot - INFO -    📊 RSI: 31.2 | Stoch: 12.7 | Price: $141.04 | BB Lower: $140.68
+2025-11-15 20:37:41,354 - main_bot - INFO -    📊 RSI: 31.2 | Stoch: 12.7 | Price: $141.04 | BB Lower: $140.68
+2025-11-15 20:37:41 - main_bot - INFO -    📈 Trends: 5m=neutral, 1h=neutral, 4h=bearish
+2025-11-15 20:37:41 - trading_strategy - INFO - ✅ BUY SIGNAL DETECTED (Dynamic Weaver): ⚠️ Acceptable: 1h=neutral, 4h=bearish (only one bearish), 🧠 AI Confidence: 75.00%
+2025-11-15 20:37:41,354 - main_bot - INFO -    📈 Trends: 5m=neutral, 1h=neutral, 4h=bearish
+2025-11-15 20:37:41 - main_bot - INFO -    🐻 Market Regime: BEAR
+2025-11-15 20:37:41,354 - main_bot - INFO -    🐻 Market Regime: BEAR
+2025-11-15 20:37:41 - main_bot - INFO -    🎯 Custom Momentum Index for SOLUSDT: 47.6/100 ✓
+2025-11-15 20:37:41,504 - main_bot - INFO -    🎯 Custom Momentum Index for SOLUSDT: 47.6/100 ✓
+2025-11-15 20:37:41,504 - trading_strategy - INFO - ✅ BUY SIGNAL DETECTED (Dynamic Weaver): ⚠️ Acceptable: 1h=neutral, 4h=bearish (only one bearish), 🧠 AI Confidence: 75.00%
+2025-11-15 20:37:41,504 - indicator_tracker - WARNING - No database connection, skipping signal tracking
+2025-11-15 20:37:41,504 - indicator_tracker - WARNING - No database connection, skipping signal tracking
+2025-11-15 20:37:41,504 - indicator_tracker - WARNING - No database connection, skipping signal tracking
+2025-11-15 20:37:41,504 - indicator_tracker - WARNING - No database connection, skipping signal tracking
+2025-11-15 20:37:41 - main_bot - INFO -    ⏭️ Custom Momentum for SOLUSDT: No buy (index=47.6, need <45)
+2025-11-15 20:37:41,504 - main_bot - INFO -    ⏭️ Custom Momentum for SOLUSDT: No buy (index=47.6, need <45)
+2025-11-15 20:37:41 - main_bot - INFO - 
+🔍 Analyzing XRPUSDT...
+2025-11-15 20:37:41,504 - main_bot - INFO - 
+🔍 Analyzing XRPUSDT...
+2025-11-15 20:37:41 - main_bot - INFO -    📈 Trends: 5m=neutral, 1h=bearish, 4h=bearish
+2025-11-15 20:37:41,866 - main_bot - INFO -    📈 Trends: 5m=neutral, 1h=bearish, 4h=bearish
+2025-11-15 20:37:41 - main_bot - INFO -    ↔️ Market Regime: SIDEWAYS
+2025-11-15 20:37:41 - market_regime - INFO - Market regime detected: SIDEWAYS (confidence: high) - Momentum 10 candles: -0.18%, 🐻 Moderate bear: Price below EMAs, negative momentum, ↔️ Sideways: ADX=17.8, Range-bound market
+2025-11-15 20:37:41,866 - main_bot - INFO -    ↔️ Market Regime: SIDEWAYS
+2025-11-15 20:37:41,865 - market_regime - INFO - Market regime detected: SIDEWAYS (confidence: high) - Momentum 10 candles: -0.18%, 🐻 Moderate bear: Price below EMAs, negative momentum, ↔️ Sideways: ADX=17.8, Range-bound market
+2025-11-15 20:37:41,866 - trading_strategy - INFO - ↔️ Adapted to SIDEWAYS market: Using standard strategy
+2025-11-15 20:37:41 - trading_strategy - INFO - ↔️ Adapted to SIDEWAYS market: Using standard strategy
+2025-11-15 20:37:41 - main_bot - INFO -    📊 RSI: 39.9 | Stoch: 24.4 | Price: $2.25 | BB Lower: $2.25
+2025-11-15 20:37:41,866 - main_bot - INFO -    📊 RSI: 39.9 | Stoch: 24.4 | Price: $2.25 | BB Lower: $2.25
+2025-11-15 20:37:42 - main_bot - INFO -    🎯 Custom Momentum Index for XRPUSDT: 43.3/100 ✓
+2025-11-15 20:37:42,018 - main_bot - INFO -    🎯 Custom Momentum Index for XRPUSDT: 43.3/100 ✓
+2025-11-15 20:37:42,018 - indicator_tracker - WARNING - No database connection, skipping signal tracking
+2025-11-15 20:37:42,018 - indicator_tracker - WARNING - No database connection, skipping signal tracking
+2025-11-15 20:37:42,018 - indicator_tracker - WARNING - No database connection, skipping signal tracking
+2025-11-15 20:37:42,018 - indicator_tracker - WARNING - No database connection, skipping signal tracking
+2025-11-15 20:37:42 - main_bot - INFO -    ✅ Custom Momentum for XRPUSDT: BUY signal (index=43.3 < 45)
+2025-11-15 20:37:42,018 - main_bot - INFO -    ✅ Custom Momentum for XRPUSDT: BUY signal (index=43.3 < 45)
+2025-11-15 20:37:42 - main_bot - INFO -    ⏭️ No buy: Both trends bearish
+2025-11-15 20:37:42,018 - main_bot - INFO -    ⏭️ No buy: Both trends bearish
+2025-11-15 20:37:42 - main_bot - INFO - 
+🔍 Analyzing BNBUSDT...
+2025-11-15 20:37:42,018 - main_bot - INFO - 
+🔍 Analyzing BNBUSDT...
+2025-11-15 20:37:42,532 - indicator_tracker - WARNING - No database connection, skipping signal tracking
+2025-11-15 20:37:42,532 - indicator_tracker - WARNING - No database connection, skipping signal tracking
+2025-11-15 20:37:42 - trading_strategy - INFO - ✅ BUY SIGNAL DETECTED (Dynamic Weaver): ⚠️ Acceptable: 1h=neutral, 4h=bearish (only one bearish), 🧠 AI Confidence: 75.00%
+2025-11-15 20:37:42,532 - trading_strategy - INFO - ✅ BUY SIGNAL DETECTED (Dynamic Weaver): ⚠️ Acceptable: 1h=neutral, 4h=bearish (only one bearish), 🧠 AI Confidence: 75.00%
+2025-11-15 20:37:42,532 - indicator_tracker - WARNING - No database connection, skipping signal tracking
+2025-11-15 20:37:42,532 - indicator_tracker - WARNING - No database connection, skipping signal tracking
+2025-11-15 20:37:42 - main_bot - INFO -    ⏭️ Custom Momentum for BNBUSDT: No buy (index=53.9, need <45)
+2025-11-15 20:37:42,532 - main_bot - INFO -    ⏭️ Custom Momentum for BNBUSDT: No buy (index=53.9, need <45)
+2025-11-15 20:37:42 - main_bot - INFO - 
+📊 No open positions
+2025-11-15 20:37:42 - market_regime - INFO - Market regime detected: BEAR (confidence: high) - Momentum 10 candles: -0.57%, 🐻 Strong bear: Price below EMAs, ADX=35.3, Negative momentum
+2025-11-15 20:37:42,382 - market_regime - INFO - Market regime detected: BEAR (confidence: high) - Momentum 10 candles: -0.57%, 🐻 Strong bear: Price below EMAs, ADX=35.3, Negative momentum
+2025-11-15 20:37:42 - trading_strategy - WARNING - 🐻 BEAR market detected - Very conservative: RSI<35, Stoch<45, BB tolerance=1.0%
+2025-11-15 20:37:42,382 - trading_strategy - WARNING - 🐻 BEAR market detected - Very conservative: RSI<35, Stoch<45, BB tolerance=1.0%
+2025-11-15 20:37:42 - main_bot - INFO -    📊 RSI: 28.5 | Stoch: 11.7 | Price: $935.52 | BB Lower: $933.91
+2025-11-15 20:37:42,382 - main_bot - INFO -    📊 RSI: 28.5 | Stoch: 11.7 | Price: $935.52 | BB Lower: $933.91
+2025-11-15 20:37:42 - main_bot - INFO -    📈 Trends: 5m=neutral, 1h=neutral, 4h=bearish
+2025-11-15 20:37:42,382 - main_bot - INFO -    📈 Trends: 5m=neutral, 1h=neutral, 4h=bearish
+2025-11-15 20:37:42 - main_bot - INFO -    🐻 Market Regime: BEAR
+2025-11-15 20:37:42,382 - main_bot - INFO -    🐻 Market Regime: BEAR
+2025-11-15 20:37:42,390 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8229889705:AAHZ2eCIHxFR2yNmfkS-GNQurQOP2tUtoRg/getUpdates "HTTP/1.1 200 OK"
+2025-11-15 20:37:42 - main_bot - INFO -    🎯 Custom Momentum Index for BNBUSDT: 53.9/100 ✓
+2025-11-15 20:37:42,532 - main_bot - INFO -    🎯 Custom Momentum Index for BNBUSDT: 53.9/100 ✓
+2025-11-15 20:37:42,532 - main_bot - INFO - 
+📊 No open positions
+2025-11-15 20:37:42 - main_bot - INFO - 
+⏸️  Waiting 5 seconds until next check...
+2025-11-15 20:37:42,532 - main_bot - INFO - 
+⏸️  Waiting 5 seconds until next check...
+2025-11-15 20:37:43,925 - werkzeug - INFO - 100.64.0.4 - - [15/Nov/2025 20:37:43] "GET /logs HTTP/1.1" 200 -
+2025-11-15 20:37:44,396 - werkzeug - INFO - 100.64.0.4 - - [15/Nov/2025 20:37:44] "GET /status HTTP/1.1" 200 -
+2025-11-15 20:37:44,967 - werkzeug - INFO - 100.64.0.4 - - [15/Nov/2025 20:37:44] "GET /statistics HTTP/1.1" 200 -
+2025-11-15 20:37:45,514 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8229889705:AAHZ2eCIHxFR2yNmfkS-GNQurQOP2tUtoRg/getUpdates "HTTP/1.1 409 Conflict"
+2025-11-15 20:37:45,515 - telegram.ext.Updater - ERROR - Exception happened while polling for updates.
+Traceback (most recent call last):
+  File "/opt/venv/lib/python3.12/site-packages/telegram/ext/_utils/networkloop.py", line 134, in network_retry_loop
+    await do_action()
+  File "/opt/venv/lib/python3.12/site-packages/telegram/ext/_utils/networkloop.py", line 127, in do_action
+    action_cb_task.result()
+  File "/opt/venv/lib/python3.12/site-packages/telegram/ext/_updater.py", line 340, in polling_action_cb
+    updates = await self.bot.get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/telegram/ext/_extbot.py", line 676, in get_updates
+    updates = await super().get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/telegram/_bot.py", line 4780, in get_updates
+    await self._post(
+  File "/opt/venv/lib/python3.12/site-packages/telegram/_bot.py", line 703, in _post
+    return await self._do_post(
+
+
+web | Railway
