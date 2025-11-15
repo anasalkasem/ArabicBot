@@ -79,11 +79,11 @@ class CustomMomentumIndex:
                 'relative_strength': {'score': relative_strength_score, 'weight': self.relative_strength_weight}
             }
             
-            logger.info(f"📊 Custom Momentum Index for {symbol}: {momentum_index:.1f}/100")
-            logger.info(f"   🔧 Technical: {technical_score:.1f} ({self.technical_weight}%)")
-            logger.info(f"   💭 Sentiment: {sentiment_score:.1f} ({self.sentiment_weight}%) - {sentiment_source}")
-            logger.info(f"   📈 Volume: {volume_score:.1f} ({self.volume_weight}%)")
-            logger.info(f"   ⚖️  Rel.Strength: {relative_strength_score:.1f} ({self.relative_strength_weight}%)")
+            logger.debug(f"📊 Custom Momentum Index for {symbol}: {momentum_index:.1f}/100")
+            logger.debug(f"   🔧 Technical: {technical_score:.1f} ({self.technical_weight}%)")
+            logger.debug(f"   💭 Sentiment: {sentiment_score:.1f} ({self.sentiment_weight}%) - {sentiment_source}")
+            logger.debug(f"   📈 Volume: {volume_score:.1f} ({self.volume_weight}%)")
+            logger.debug(f"   ⚖️  Rel.Strength: {relative_strength_score:.1f} ({self.relative_strength_weight}%)")
             
             return momentum_index, components
             

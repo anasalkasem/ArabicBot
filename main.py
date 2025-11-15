@@ -71,6 +71,7 @@ class BinanceTradingBot:
         
         self.prev_indicators = {}
         self.prev_indicator_signals = {}
+        self.symbol_momentum_cache = {}
         self.multi_tf_enabled = self.config.get('multi_timeframe', {}).get('enabled', False)
         self.regime_enabled = self.config.get('market_regime', {}).get('enabled', False)
         self.momentum_enabled = self.config.get('custom_momentum', {}).get('enabled', False)
@@ -284,14 +285,26 @@ class BinanceTradingBot:
                 momentum_index = None
                 momentum_components = None
                 if self.momentum_enabled:
-                    volume_24h_avg, symbol_open_24h = self.get_24h_data(symbol)
-                    btc_change_24h = self.calculate_btc_change_24h()
-                    
-                    momentum_index, momentum_components = self.custom_momentum.compute(
-                        symbol, indicators, volume_24h_avg=volume_24h_avg, btc_change_24h=btc_change_24h, symbol_open_24h=symbol_open_24h
-                    )
-                    if momentum_index is not None:
-                        logger.info(f"   🎯 Custom Momentum Index: {momentum_index:.1f}/100")
+                    try:
+                        volume_24h_avg, symbol_open_24h = self.get_24h_data(symbol)
+                        btc_change_24h = self.calculate_btc_change_24h()
+                        
+                        momentum_index, momentum_components = self.custom_momentum.compute(
+                            symbol, indicators, volume_24h_avg=volume_24h_avg, btc_change_24h=btc_change_24h, symbol_open_24h=symbol_open_24h
+                        )
+                        
+                        if momentum_index is not None:
+                            self.symbol_momentum_cache[symbol] = momentum_index
+                            logger.info(f"   🎯 Custom Momentum Index for {symbol}: {momentum_index:.1f}/100 ✓")
+                        else:
+                            logger.warning(f"   ⚠️ Failed to compute Custom Momentum for {symbol} - skipping momentum check")
+                            if symbol in self.symbol_momentum_cache:
+                                del self.symbol_momentum_cache[symbol]
+                    except Exception as e:
+                        logger.error(f"   ❌ Error computing Custom Momentum for {symbol}: {e}")
+                        momentum_index = None
+                        if symbol in self.symbol_momentum_cache:
+                            del self.symbol_momentum_cache[symbol]
                 
                 buy_signal, signals, indicator_signals = self.trading_strategy.check_buy_signal(
                     indicators, prev_indicators, medium_trend, long_trend, market_regime
@@ -330,12 +343,19 @@ class BinanceTradingBot:
                     except Exception as e:
                         logger.error(f"Error tracking indicators: {e}")
                 
-                if self.momentum_enabled and momentum_index is not None:
-                    if not self.custom_momentum.should_buy(momentum_index):
-                        buy_signal = False
-                        logger.info(f"   ⏭️ Custom Momentum: No buy (index={momentum_index:.1f}, need <{self.custom_momentum.buy_threshold})")
+                if self.momentum_enabled:
+                    cached_momentum = self.symbol_momentum_cache.get(symbol)
+                    if cached_momentum is not None and momentum_index is not None and abs(cached_momentum - momentum_index) < 0.01:
+                        if not self.custom_momentum.should_buy(momentum_index):
+                            buy_signal = False
+                            logger.info(f"   ⏭️ Custom Momentum for {symbol}: No buy (index={momentum_index:.1f}, need <{self.custom_momentum.buy_threshold})")
+                        else:
+                            logger.info(f"   ✅ Custom Momentum for {symbol}: BUY signal (index={momentum_index:.1f} < {self.custom_momentum.buy_threshold})")
+                    elif momentum_index is None:
+                        logger.warning(f"   ⚠️ Custom Momentum check skipped for {symbol} - momentum_index is None")
                     else:
-                        logger.info(f"   ✅ Custom Momentum: BUY signal (index={momentum_index:.1f} < {self.custom_momentum.buy_threshold})")
+                        logger.error(f"   ❌ CRITICAL: Momentum data mismatch for {symbol}! Expected cached={cached_momentum}, got computed={momentum_index}")
+                        buy_signal = False
                 
                 if buy_signal and self.risk_manager.can_open_position(symbol):
                     quantity = self.risk_manager.calculate_position_size(symbol, current_price)
