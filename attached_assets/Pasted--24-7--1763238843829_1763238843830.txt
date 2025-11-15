@@ -1,0 +1,121 @@
+🤖 بوت التداول الآلي
+مراقبة وتحليل الأسواق 24/7
+
+🔄
+تحديث الآن
+
+📝
+إظهار/إخفاء السجلات
+
+💾
+تصدير السجلات
+📊 حالة البوت
+
+الحالة:
+يعمل 🟢
+التحليلات:
+48
+وقت البدء:
+١٥‏/١١‏/٢٠٢٥، ٠٨:٢٧:٣١ م
+آخر فحص:
+١٥‏/١١‏/٢٠٢٥، ٠٨:٣٣:٤٧ م
+💼 الحساب
+
+الوضع:
+LIVE
+الصفقات:
+0
+📊 حالة السوق
+
+↔️
+SIDEWAYS
+السوق في حالة تذبذب جانبي
+
+الاستراتيجية:
+استراتيجية متوازنة - BB Bands
+🎯 مؤشر الزخم المخصص
+
+55.2 /100
+محايد
+🔧 تحليل فني 74.2
+💭 معنويات 35.0
+📈 حجم تداول 50.0
+⚖️ قوة نسبية 50.0
+📊 الإحصائيات
+
+0
+إجمالي الصفقات
+0.0%
+نسبة النجاح
+$0.00
+إجمالي الأرباح
+0
+صفقات اليوم
+📈 التداول
+
+BTC/USDT
+ETH/USDT
+SOL/USDT
+XRP/USDT
+BNB/USDT
+💰 الصفقات المفتوحة
+
+تحديث
+لا توجد صفقات مفتوحة حالياً
+📝 السجلات الأخيرة
+
+مسح العرض
+2025-11-15 20:33:48 - main_bot - INFO - 📈 Trends: 5m=neutral, 1h=neutral, 4h=bearish
+2025-11-15 20:33:48 - main_bot - INFO - 🐻 Market Regime: BEAR
+2025-11-15 20:33:48 - main_bot - INFO - 🎯 Custom Momentum Index for BTCUSDT: 54.2/100 ✓
+2025-11-15 20:33:48 - trading_strategy - INFO - ✅ BUY SIGNAL DETECTED (Dynamic Weaver): ⚠️ Acceptable: 1h=neutral, 4h=bearish (only one bearish), 🧠 AI Confidence: 75.00%
+2025-11-15 20:33:48 - main_bot - INFO - ⏭️ Custom Momentum for BTCUSDT: No buy (index=54.2, need <45)
+2025-11-15 20:33:48 - main_bot - INFO -
+🔍 Analyzing ETHUSDT...
+2025-11-15 20:33:48 - market_regime - INFO - Market regime detected: BEAR (confidence: medium) - Momentum 10 candles: -0.83%, 🐻 Moderate bear: Price below EMAs, negative momentum
+2025-11-15 20:33:48 - trading_strategy - WARNING - 🐻 BEAR market detected - Very conservative: RSI<35, Stoch<45, BB tolerance=1.0%
+2025-11-15 20:33:48 - main_bot - INFO - 📊 RSI: 35.4 | Stoch: 10.6 | Price: $3186.41 | BB Lower: $3183.71
+2025-11-15 20:33:48 - main_bot - INFO - 📈 Trends: 5m=neutral, 1h=neutral, 4h=bearish
+2025-11-15 20:33:48 - main_bot - INFO - 🐻 Market Regime: BEAR
+2025-11-15 20:33:48 - main_bot - INFO - 🎯 Custom Momentum Index for ETHUSDT: 53.5/100 ✓
+2025-11-15 20:33:48 - trading_strategy - INFO - ✅ BUY SIGNAL DETECTED (Dynamic Weaver): ⚠️ Acceptable: 1h=neutral, 4h=bearish (only one bearish), 🧠 AI Confidence: 50.00%
+2025-11-15 20:33:48 - main_bot - INFO - ⏭️ Custom Momentum for ETHUSDT: No buy (index=53.5, need <45)
+2025-11-15 20:33:48 - main_bot - INFO - ⏭️ No buy: RSI=35.4 (need <35)
+2025-11-15 20:33:48 - main_bot - INFO -
+🔍 Analyzing SOLUSDT...
+2025-11-15 20:33:49 - market_regime - INFO - Market regime detected: BEAR (confidence: high) - Momentum 10 candles: -1.07%, 🐻 Strong bear: Price below EMAs, ADX=30.7, Negative momentum
+2025-11-15 20:33:49 - trading_strategy - WARNING - 🐻 BEAR market detected - Very conservative: RSI<35, Stoch<45, BB tolerance=1.0%
+2025-11-15 20:33:49 - main_bot - INFO - 📊 RSI: 28.6 | Stoch: 12.8 | Price: $140.96 | BB Lower: $140.83
+2025-11-15 20:33:49 - main_bot - INFO - 📈 Trends: 5m=neutral, 1h=neutral, 4h=bearish
+2025-11-15 20:33:49 - main_bot - INFO - 🐻 Market Regime: BEAR
+2025-11-15 20:33:49 - main_bot - INFO - 🎯 Custom Momentum Index for SOLUSDT: 48.0/100 ✓
+2025-11-15 20:33:49 - trading_strategy - INFO - ✅ BUY SIGNAL DETECTED (Dynamic Weaver): ⚠️ Acceptable: 1h=neutral, 4h=bearish (only one bearish), 🧠 AI Confidence: 75.00%
+2025-11-15 20:33:49 - main_bot - INFO - ⏭️ Custom Momentum for SOLUSDT: No buy (index=48.0, need <45)
+2025-11-15 20:33:49 - main_bot - INFO -
+🔍 Analyzing XRPUSDT...
+2025-11-15 20:33:49 - market_regime - INFO - Market regime detected: SIDEWAYS (confidence: high) - Momentum 10 candles: -0.12%, 🐻 Moderate bear: Price below EMAs, negative momentum, ↔️ Sideways: ADX=17.3, Range-bound market
+2025-11-15 20:33:49 - trading_strategy - INFO - ↔️ Adapted to SIDEWAYS market: Using standard strategy
+2025-11-15 20:33:49 - main_bot - INFO - 📊 RSI: 41.7 | Stoch: 26.3 | Price: $2.25 | BB Lower: $2.25
+2025-11-15 20:33:49 - main_bot - INFO - 📈 Trends: 5m=neutral, 1h=bearish, 4h=bearish
+2025-11-15 20:33:49 - main_bot - INFO - ↔️ Market Regime: SIDEWAYS
+2025-11-15 20:33:49 - main_bot - INFO - 🎯 Custom Momentum Index for XRPUSDT: 42.9/100 ✓
+2025-11-15 20:33:49 - main_bot - INFO - ✅ Custom Momentum for XRPUSDT: BUY signal (index=42.9 < 45)
+2025-11-15 20:33:49 - main_bot - INFO - ⏭️ No buy: Both trends bearish
+2025-11-15 20:33:49 - main_bot - INFO -
+🔍 Analyzing BNBUSDT...
+2025-11-15 20:33:50 - market_regime - INFO - Market regime detected: SIDEWAYS (confidence: medium) - Momentum 10 candles: -0.61%, ↔️ Sideways: ADX=34.2, Range-bound market
+2025-11-15 20:33:50 - trading_strategy - INFO - ↔️ Adapted to SIDEWAYS market: Using standard strategy
+2025-11-15 20:33:50 - main_bot - INFO - 📊 RSI: 26.4 | Stoch: 8.2 | Price: $935.16 | BB Lower: $934.58
+2025-11-15 20:33:50 - main_bot - INFO - 📈 Trends: 5m=neutral, 1h=neutral, 4h=bearish
+2025-11-15 20:33:50 - main_bot - INFO - ↔️ Market Regime: SIDEWAYS
+2025-11-15 20:33:50 - main_bot - INFO - 🎯 Custom Momentum Index for BNBUSDT: 55.1/100 ✓
+2025-11-15 20:33:50 - trading_strategy - INFO - ✅ BUY SIGNAL DETECTED (Dynamic Weaver): ⚠️ Acceptable: 1h=neutral, 4h=bearish (only one bearish), 🧠 AI Confidence: 75.00%
+2025-11-15 20:33:50 - main_bot - INFO - ⏭️ Custom Momentum for BNBUSDT: No buy (index=55.1, need <45)
+2025-11-15 20:33:50 - main_bot - INFO -
+📊 No open positions
+2025-11-15 20:33:50 - main_bot - INFO -
+⏸️ Waiting 5 seconds until next check...
+⚠️ التداول في العملات الرقمية يحمل مخاطر عالية
+
+آخر تحديث: ١٥‏/١١‏/٢٠٢٥، ٣:٣٣:٥١ م
+تم التحديث بنجاح! ✅
