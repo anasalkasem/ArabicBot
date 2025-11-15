@@ -24,13 +24,13 @@ class MarketRegime:
             if not indicators or np.isnan(indicators.get('adx', np.nan)):
                 return 'sideways', "Insufficient data"
             
-            close = indicators['close']
-            ema_50 = indicators.get('ema_short', np.nan)
-            ema_200 = indicators.get('ema_long', np.nan)
-            adx = indicators['adx']
-            bb_upper = indicators['bb_upper']
-            bb_lower = indicators['bb_lower']
-            bb_middle = indicators['bb_middle']
+            close = float(indicators['close'])
+            ema_50 = float(indicators.get('ema_short', np.nan))
+            ema_200 = float(indicators.get('ema_long', np.nan))
+            adx = float(indicators['adx'])
+            bb_upper = float(indicators['bb_upper'])
+            bb_lower = float(indicators['bb_lower'])
+            bb_middle = float(indicators['bb_middle'])
             
             signals = []
             
@@ -50,7 +50,7 @@ class MarketRegime:
             # 4. حساب momentum من البيانات التاريخية
             momentum_bullish = False
             if historical_data and len(historical_data) >= self.trend_strength_periods:
-                recent_prices = [candle[4] for candle in historical_data[-self.trend_strength_periods:]]
+                recent_prices = [float(candle[4]) for candle in historical_data[-self.trend_strength_periods:]]
                 price_change_pct = ((recent_prices[-1] - recent_prices[0]) / recent_prices[0]) * 100
                 momentum_bullish = price_change_pct > 0
                 signals.append(f"Momentum {self.trend_strength_periods} candles: {price_change_pct:+.2f}%")
