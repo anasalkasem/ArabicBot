@@ -89,6 +89,10 @@ class BinanceTradingBot:
         
         if self.weaver_enabled:
             logger.info("✨ Dynamic Strategy Weaver: ENABLED (MVP mode)")
+            if self.config.get('dynamic_strategy_weaver', {}).get('enabled', False):
+                min_confidence = self.config['dynamic_strategy_weaver']['min_confidence_threshold']
+                logger.info(f"   🎯 Min confidence threshold: {min_confidence:.2%}")
+                logger.info(f"   📊 Learning period: {self.config['dynamic_strategy_weaver']['learning_period_days']} days")
         
         trailing_enabled = self.config.get('risk_management', {}).get('trailing_stop_loss', {}).get('enabled', False)
         if trailing_enabled:
@@ -310,6 +314,13 @@ class BinanceTradingBot:
                     indicators, prev_indicators, medium_trend, long_trend, market_regime, momentum_index,
                     performance_tracker=self.performance_tracker, symbol=symbol
                 )
+                
+                if self.weaver_enabled and self.config.get('dynamic_strategy_weaver', {}).get('enabled', False):
+                    try:
+                        weights = self.performance_tracker.get_indicator_weights(symbol, self.config['trading']['candle_interval'])
+                        logger.debug(f"   🧠 Dynamic Weights for {symbol}: RSI={weights['rsi']:.2%}, Stoch={weights['stochastic']:.2%}, BB={weights['bollinger_bands']:.2%}, MACD={weights['macd']:.2%}")
+                    except Exception as e:
+                        logger.debug(f"Error displaying weights: {e}")
                 
                 if self.weaver_enabled and indicator_signals:
                     try:
@@ -602,20 +613,27 @@ def get_strategy_weights():
     if bot_instance and bot_instance.weaver_enabled:
         try:
             timeframe = bot_instance.config['trading']['candle_interval']
+            weaver_config = bot_instance.config.get('dynamic_strategy_weaver', {})
             weights_data = {}
             
             for symbol in bot_instance.trading_pairs:
                 weights = bot_instance.performance_tracker.get_indicator_weights(symbol, timeframe)
                 stats = bot_instance.performance_tracker.get_statistics(symbol, timeframe)
                 
+                total_signals = sum(s['total_signals'] for s in stats['indicators'].values())
+                
                 weights_data[symbol] = {
-                    'weights': {k: round(v, 3) for k, v in weights.items()},
-                    'statistics': stats
+                    'weights': {k: round(v * 100, 1) for k, v in weights.items()},
+                    'statistics': stats,
+                    'total_learning_signals': total_signals,
+                    'is_learning': total_signals < weaver_config.get('min_signals_for_learning', 10)
                 }
             
             return jsonify({
-                'enabled': True,
+                'enabled': weaver_config.get('enabled', False),
                 'timeframe': timeframe,
+                'min_confidence': weaver_config.get('min_confidence_threshold', 0.50),
+                'learning_period_days': weaver_config.get('learning_period_days', 30),
                 'symbols': weights_data
             })
         except Exception as e:
