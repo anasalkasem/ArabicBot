@@ -1,0 +1,50 @@
+2025-11-15 03:48:18 - custom_momentum - INFO - 🔧 Technical: 35.3 (40%)
+2025-11-15 03:48:18 - custom_momentum - INFO - 💭 Sentiment: 35.0 (30%) - coingecko
+2025-11-15 03:48:18 - custom_momentum - INFO - 📈 Volume: 50.0 (20%)
+2025-11-15 03:48:18 - custom_momentum - INFO - ⚖️ Rel.Strength: 50.0 (10%)
+2025-11-15 03:48:18 - custom_momentum - INFO - 📊 Custom Momentum Index for BNBUSDT: 37.0/100
+2025-11-15 03:48:18 - custom_momentum - INFO - 🔧 Technical: 28.8 (40%)
+2025-11-15 03:48:18 - custom_momentum - INFO - 💭 Sentiment: 35.0 (30%) - coingecko
+2025-11-15 03:48:18 - custom_momentum - INFO - 📈 Volume: 50.0 (20%)
+2025-11-15 03:48:18 - custom_momentum - INFO - ⚖️ Rel.Strength: 50.0 (10%)
+2025-11-15 03:48:21 - main_bot - INFO -
+================================================================================
+2025-11-15 03:48:21 - main_bot - INFO - 🔄 Iteration #28 - 2025-11-15 03:48:21
+2025-11-15 03:48:21 - main_bot - INFO - ================================================================================
+2025-11-15 03:48:21 - main_bot - INFO -
+🔍 Analyzing BTCUSDT...
+2025-11-15 03:48:22 - market_regime - INFO - Market regime detected: BULL (confidence: high) - Momentum 10 candles: +0.86%, 🐂 Strong bull: Price above EMAs, ADX=41.1, Strong momentum
+2025-11-15 03:48:22 - trading_strategy - INFO - 🐂 Adapted to BULL market: RSI<55, Stoch<70, BB tolerance=2.0%
+2025-11-15 03:48:22 - main_bot - INFO - 📊 RSI: 56.4 | Stoch: 46.0 | Price: $96250.57 | BB Lower: $95461.16
+2025-11-15 03:48:22 - main_bot - INFO - 📈 Trends: 5m=neutral, 1h=bearish, 4h=bearish
+2025-11-15 03:48:22 - main_bot - INFO - 🐂 Market Regime: BULL
+2025-11-15 03:48:22 - custom_momentum - INFO - 📊 Custom Momentum Index for BTCUSDT: 45.8/100
+2025-11-15 03:48:22 - custom_momentum - INFO - 🔧 Technical: 65.8 (40%)
+2025-11-15 03:48:22 - custom_momentum - INFO - 💭 Sentiment: 35.0 (30%) - coingecko
+2025-11-15 03:48:22 - custom_momentum - INFO - 📈 Volume: 20.0 (20%)
+2025-11-15 03:48:22 - custom_momentum - INFO - ⚖️ Rel.Strength: 50.0 (10%)
+2025-11-15 03:48:22 - main_bot - INFO - 🎯 Custom Momentum Index: 45.8/100
+2025-11-15 03:48:22 - main_bot - INFO - ⏭️ Custom Momentum: No buy (index=45.8, need <20)
+2025-11-15 03:48:22 - main_bot - INFO - ⏭️ No buy: RSI=56.4 (need <50), Price 0.83% above BB (tolerance: 0.5%), Both trends bearish
+2025-11-15 03:48:22 - main_bot - INFO -
+🔍 Analyzing ETHUSDT...
+2025-11-15 03:48:22 - market_regime - INFO - Market regime detected: SIDEWAYS (confidence: medium) - Momentum 10 candles: +0.43%, ↔️ Sideways: ADX=32.8, Range-bound market
+2025-11-15 03:48:22 - trading_strategy - INFO - ↔️ Adapted to SIDEWAYS market: Using standard strategy
+2025-11-15 03:48:22 - main_bot - INFO - 📊 RSI: 50.9 | Stoch: 21.8 | Price: $3174.84 | BB Lower: $3164.29
+2025-11-15 03:48:22 - main_bot - INFO - 📈 Trends: 5m=neutral, 1h=bearish, 4h=bearish
+2025-11-15 03:48:22 - main_bot - INFO - ↔️ Market Regime: SIDEWAYS
+2025-11-15 03:48:22 - custom_momentum - INFO - 📊 Custom Momentum Index for ETHUSDT: 50.4/100
+2025-11-15 03:48:22 - custom_momentum - INFO - 🔧 Technical: 75.7 (40%)
+2025-11-15 03:48:22 - custom_momentum - INFO - 💭 Sentiment: 35.0 (30%) - coingecko
+2025-11-15 03:48:22 - custom_momentum - INFO - 📈 Volume: 20.0 (20%)
+2025-11-15 03:48:22 - custom_momentum - INFO - ⚖️ Rel.Strength: 56.3 (10%)
+2025-11-15 03:48:22 - main_bot - INFO - 🎯 Custom Momentum Index: 50.4/100
+2025-11-15 03:48:22 - main_bot - INFO - ⏭️ Custom Momentum: No buy (index=50.4, need <20)
+2025-11-15 03:48:22 - main_bot - INFO - ⏭️ No buy: RSI=50.9 (need <50), Both trends bearish
+2025-11-15 03:48:22 - main_bot - INFO -
+🔍 Analyzing SOLUSDT...
+2025-11-15 03:48:23 - market_regime - INFO - Market regime detected: BULL (confidence: high) - Momentum 10 candles: +0.83%, 🐂 Strong bull: Price above EMAs, ADX=37.1, Strong momentum
+2025-11-15 03:48:23 - trading_strategy - INFO - 🐂 Adapted to BULL market: RSI<55, Stoch<70, BB tolerance=2.0%
+2025-11-15 03:48:23 - main_bot - INFO - 📊 RSI: 53.6 | Stoch: 43.8 | Price: $142.60 | BB Lower: $142.00
+2025-11-15 03:48:23 - main_bot - INFO - 📈 Trends: 5m=neutral, 1h=bearish, 4h=bearish
+2025-11-15 03:48:23 - main_bot - INFO - 🐂 Market Regime: BULL
