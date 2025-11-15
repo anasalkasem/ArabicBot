@@ -13,6 +13,7 @@ class IndicatorPerformanceTracker:
         self.max_signals_per_indicator = max_signals_per_indicator
         
         self.signals = defaultdict(lambda: defaultdict(lambda: deque(maxlen=max_signals_per_indicator)))
+        self.pending_resolutions = []
         
         self.default_weights = {
             'rsi': 0.25,
@@ -159,10 +160,11 @@ class IndicatorPerformanceTracker:
         
         return stats
     
-    def save_to_file(self):
+    def save_to_file(self, pending_resolutions_list=None):
         try:
             data = {
                 'signals': {},
+                'pending_resolutions': pending_resolutions_list or [],
                 'last_save': datetime.now().isoformat()
             }
             
@@ -187,7 +189,11 @@ class IndicatorPerformanceTracker:
                 for key, signals_list in indicators.items():
                     self.signals[symbol][key] = deque(signals_list, maxlen=self.max_signals_per_indicator)
             
+            self.pending_resolutions = data.get('pending_resolutions', [])
+            
             logger.info(f"📂 Loaded indicator performance data from {self.data_file}")
+            if self.pending_resolutions:
+                logger.info(f"📂 Loaded {len(self.pending_resolutions)} pending resolutions")
         except FileNotFoundError:
             logger.info(f"📂 No existing data file found, starting fresh")
         except Exception as e:

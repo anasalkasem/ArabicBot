@@ -59,10 +59,12 @@ class BinanceTradingBot:
         self.performance_tracker = IndicatorPerformanceTracker()
         
         self.prev_indicators = {}
+        self.prev_indicator_signals = {}
         self.multi_tf_enabled = self.config.get('multi_timeframe', {}).get('enabled', False)
         self.regime_enabled = self.config.get('market_regime', {}).get('enabled', False)
         self.momentum_enabled = self.config.get('custom_momentum', {}).get('enabled', False)
         self.weaver_enabled = True
+        self.pending_resolutions = self.performance_tracker.pending_resolutions
         
         if self.multi_tf_enabled:
             logger.info("✨ Multi-Timeframe Analysis: ENABLED")
@@ -291,11 +293,29 @@ class BinanceTradingBot:
                         else:
                             timeframe = self.config['trading']['candle_interval']
                         
+                        signal_timestamp = time.time()
+                        prev_signals = self.prev_indicator_signals.get(symbol, {})
+                        
                         for indicator_name, is_bullish in indicator_signals.items():
                             self.performance_tracker.track_signal(
                                 symbol, indicator_name, timeframe,
                                 is_bullish, current_price
                             )
+                            
+                            prev_bullish = prev_signals.get(indicator_name, False)
+                            
+                            if is_bullish and not prev_bullish:
+                                self.pending_resolutions.append({
+                                    'symbol': symbol,
+                                    'indicator': indicator_name,
+                                    'timeframe': timeframe,
+                                    'timestamp': signal_timestamp,
+                                    'price': current_price,
+                                    'was_bullish': is_bullish
+                                })
+                                logger.debug(f"📍 {indicator_name} flipped bullish for {symbol} @ ${current_price:.2f}")
+                        
+                        self.prev_indicator_signals[symbol] = indicator_signals.copy()
                     except Exception as e:
                         logger.error(f"Error tracking indicators: {e}")
                 
@@ -339,6 +359,53 @@ class BinanceTradingBot:
         except Exception as e:
             logger.error(f"Error processing {symbol}: {e}")
     
+    def resolve_pending_outcomes(self):
+        """حل نتائج الإشارات بعد ساعة واحدة"""
+        if not self.weaver_enabled or not self.pending_resolutions:
+            return
+        
+        current_time = time.time()
+        resolved_indices = []
+        failed_count = 0
+        
+        for idx, pending in enumerate(self.pending_resolutions):
+            time_elapsed = current_time - pending['timestamp']
+            
+            if time_elapsed >= 3600:
+                try:
+                    current_price = self.binance_client.get_symbol_price(pending['symbol'])
+                    
+                    if current_price:
+                        self.performance_tracker.resolve_outcome(
+                            pending['symbol'],
+                            pending['indicator'],
+                            pending['timeframe'],
+                            pending['timestamp'],
+                            current_price
+                        )
+                        
+                        price_change = ((current_price - pending['price']) / pending['price']) * 100
+                        logger.info(f"✅ Resolved {pending['indicator']} for {pending['symbol']}: "
+                                  f"{price_change:+.2f}% after 1h")
+                        
+                        resolved_indices.append(idx)
+                    else:
+                        failed_count += 1
+                except Exception as e:
+                    logger.debug(f"Cannot resolve {pending['symbol']} yet (retrying later): {str(e)[:50]}")
+                    failed_count += 1
+                    
+                    if time_elapsed > 7200:
+                        logger.warning(f"⚠️ Dropping stale pending for {pending['symbol']} (>2h old)")
+                        resolved_indices.append(idx)
+        
+        for idx in reversed(resolved_indices):
+            self.pending_resolutions.pop(idx)
+        
+        if resolved_indices or failed_count:
+            logger.info(f"📊 Resolved: {len(resolved_indices)}, Retrying: {failed_count}, "
+                      f"Total pending: {len(self.pending_resolutions)}")
+    
     def display_status(self):
         open_positions = self.risk_manager.get_open_positions()
         
@@ -376,6 +443,9 @@ class BinanceTradingBot:
                 logger.info(f"🔄 Iteration #{iteration} - {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
                 logger.info(f"{'='*80}")
                 
+                if self.weaver_enabled:
+                    self.resolve_pending_outcomes()
+                
                 for symbol in self.trading_pairs:
                     logger.info(f"\n🔍 Analyzing {symbol}...")
                     self.process_symbol(symbol)
@@ -384,7 +454,7 @@ class BinanceTradingBot:
                 
                 if self.weaver_enabled and iteration % 10 == 0:
                     try:
-                        self.performance_tracker.save_to_file()
+                        self.performance_tracker.save_to_file(self.pending_resolutions)
                     except Exception as e:
                         logger.error(f"Error saving tracker data: {e}")
                 
@@ -396,7 +466,7 @@ class BinanceTradingBot:
             bot_stats['status'] = 'stopped'
             if self.weaver_enabled:
                 try:
-                    self.performance_tracker.save_to_file()
+                    self.performance_tracker.save_to_file(self.pending_resolutions)
                     logger.info("💾 Saved Dynamic Strategy Weaver data")
                 except:
                     pass
