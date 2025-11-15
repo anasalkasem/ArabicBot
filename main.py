@@ -405,18 +405,23 @@ class BinanceTradingBot:
                             self.telegram.notify_buy(symbol, current_price, quantity, signals)
                 elif not buy_signal:
                     reasons = []
-                    rsi_threshold = self.config['indicators']['rsi_oversold']
-                    stoch_threshold = self.config['indicators']['stochastic_oversold']
+                    rsi_threshold = self.trading_strategy.rsi_oversold
+                    stoch_threshold = self.trading_strategy.stoch_oversold
+                    bb_tolerance_pct = ((self.trading_strategy.bb_tolerance - 1) * 100)
+                    
                     if indicators['rsi'] >= rsi_threshold:
                         reasons.append(f"RSI={indicators['rsi']:.1f} (need <{rsi_threshold})")
                     if indicators['stoch_k'] >= stoch_threshold:
                         reasons.append(f"Stoch={indicators['stoch_k']:.1f} (need <{stoch_threshold})")
-                    bb_tolerance = indicators['bb_lower'] * 1.005
-                    if current_price > bb_tolerance:
+                    
+                    bb_tolerance_price = indicators['bb_lower'] * self.trading_strategy.bb_tolerance
+                    if current_price > bb_tolerance_price:
                         price_diff_pct = ((current_price - indicators['bb_lower']) / indicators['bb_lower']) * 100
-                        reasons.append(f"Price {price_diff_pct:.2f}% above BB (tolerance: 0.5%)")
+                        reasons.append(f"Price {price_diff_pct:.2f}% above BB (tolerance: {bb_tolerance_pct:.1f}%)")
+                    
                     if medium_trend == 'bearish' and long_trend == 'bearish':
                         reasons.append(f"Both trends bearish")
+                    
                     if reasons:
                         logger.info(f"   ⏭️ No buy: {', '.join(reasons)}")
         
