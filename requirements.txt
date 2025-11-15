@@ -9,3 +9,4 @@ requests>=2.31.0
 nltk
 vaderSentiment
 psycopg2-binary
+python-telegram-bot
