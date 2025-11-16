@@ -35,30 +35,34 @@ class RiskManager:
                 if pos.get('status') == 'open':
                     try:
                         from datetime import datetime
-                        entry_price = pos['entry_price']
+                        entry_price = float(pos['entry_price'])
                         
                         stop_loss_price = None
                         if pos.get('stop_loss_percent'):
-                            stop_loss_price = entry_price * (1 - pos['stop_loss_percent'] / 100)
+                            stop_loss_price = float(entry_price * (1 - float(pos['stop_loss_percent']) / 100))
                         
                         take_profit_price = None
                         if pos.get('take_profit_percent'):
-                            take_profit_price = entry_price * (1 + pos['take_profit_percent'] / 100)
+                            take_profit_price = float(entry_price * (1 + float(pos['take_profit_percent']) / 100))
                         
                         trailing = pos.get('trailing_stop', {})
                         trailing_stop_price = None
                         if trailing.get('current_stop_percent'):
-                            trailing_stop_price = entry_price * (1 - trailing['current_stop_percent'] / 100)
+                            trailing_stop_price = float(entry_price * (1 - float(trailing['current_stop_percent']) / 100))
+                        
+                        highest_price = None
+                        if trailing.get('highest_price'):
+                            highest_price = float(trailing.get('highest_price'))
                         
                         self.db.save_position(
                             symbol=symbol,
                             entry_price=entry_price,
-                            quantity=pos['quantity'],
+                            quantity=float(pos['quantity']),
                             entry_time=datetime.fromisoformat(pos['entry_time']) if isinstance(pos['entry_time'], str) else pos['entry_time'],
                             stop_loss=stop_loss_price,
                             take_profit=take_profit_price,
                             trailing_stop_price=trailing_stop_price,
-                            highest_price=trailing.get('highest_price'),
+                            highest_price=highest_price,
                             market_regime=pos.get('market_regime'),
                             buy_signals=pos.get('signals')
                         )

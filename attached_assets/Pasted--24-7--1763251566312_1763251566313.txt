@@ -1,0 +1,131 @@
+🤖 بوت التداول الآلي
+مراقبة وتحليل الأسواق 24/7
+
+🔄
+تحديث الآن
+
+📝
+إظهار/إخفاء السجلات
+
+💾
+تصدير السجلات
+📊 حالة البوت
+
+الحالة:
+يعمل 🟢
+التحليلات:
+176
+وقت البدء:
+١٥‏/١١‏/٢٠٢٥، ١١:٢٦:٥٩ م
+آخر فحص:
+١٦‏/١١‏/٢٠٢٥، ١٢:٠٥:٤٣ ص
+💼 الحساب
+
+الوضع:
+LIVE
+الصفقات:
+2
+📊 حالة السوق
+
+↔️
+SIDEWAYS
+السوق في حالة تذبذب جانبي
+
+الاستراتيجية:
+استراتيجية متوازنة - BB Bands
+🎯 مؤشر الزخم المخصص
+
+45.2 /100
+محايد
+🔧 تحليل فني 49.1
+💭 معنويات 35.0
+📈 حجم تداول 50.0
+⚖️ قوة نسبية 50.0
+📊 الإحصائيات
+
+3
+إجمالي الصفقات
+0.0%
+نسبة النجاح
+$-0.10
+إجمالي الأرباح
+3
+صفقات اليوم
+📈 التداول
+
+BTC/USDT
+ETH/USDT
+SOL/USDT
+XRP/USDT
+BNB/USDT
+💰 الصفقات المفتوحة
+
+🔴 بيع الكل
+تحديث
+BNBUSDT
+-0.04%
+سعر الدخول: $932.34
+الكمية: 0.015000
+Stop-Loss: $904.37
+Take-Profit: $969.63
+SOLUSDT
+-0.03%
+سعر الدخول: $139.24
+الكمية: 0.096000
+Stop-Loss: $135.06
+Take-Profit: $144.81
+📝 السجلات الأخيرة
+
+مسح العرض
+2025-11-16 00:05:38 - main_bot - INFO -
+📊 Open Positions:
+2025-11-16 00:05:38 - main_bot - INFO - ETHUSDT: Entry $3173.73 | Current $3165.60 | P/L: -0.26%
+2025-11-16 00:05:38 - main_bot - INFO - BNBUSDT: Entry $932.34 | Current $932.31 | P/L: -0.00%
+2025-11-16 00:05:38 - main_bot - INFO -
+⏸️ Waiting 5 seconds until next check...
+2025-11-16 00:05:43 - main_bot - INFO -
+================================================================================
+2025-11-16 00:05:43 - main_bot - INFO - 🔄 Iteration #176 - 2025-11-16 00:05:43
+2025-11-16 00:05:43 - main_bot - INFO - ================================================================================
+2025-11-16 00:05:44 - main_bot - INFO -
+🔍 Analyzing BTCUSDT...
+2025-11-16 00:05:44 - market_regime - INFO - Market regime detected: SIDEWAYS (confidence: high) - Momentum 10 candles: +0.23%, ↔️ Sideways: ADX=12.9, Range-bound market
+2025-11-16 00:05:44 - trading_strategy - INFO - ↔️ Adapted to SIDEWAYS market: Using standard strategy
+2025-11-16 00:05:44 - main_bot - INFO - 📊 RSI: 45.7 | Stoch: 40.7 | Price: $95500.01 | BB Lower: $95430.88
+2025-11-16 00:05:44 - main_bot - INFO - 📈 Trends: 5m=neutral, 1h=neutral, 4h=bearish
+2025-11-16 00:05:44 - main_bot - INFO - ↔️ Market Regime: SIDEWAYS
+2025-11-16 00:05:44 - main_bot - INFO - 🎯 Custom Momentum Index for BTCUSDT: 48.0/100 ✓
+2025-11-16 00:05:45 - trading_strategy - INFO - ✅ BUY SIGNAL DETECTED (Dynamic Weaver): ⚠️ Acceptable: 1h=neutral, 4h=bearish (only one bearish), 🧠 AI Confidence: 75.00%
+2025-11-16 00:05:47 - main_bot - INFO - ⏭️ Custom Momentum for BTCUSDT: No buy (index=48.0, need <45)
+2025-11-16 00:05:47 - main_bot - INFO -
+🔍 Analyzing ETHUSDT...
+2025-11-16 00:05:47 - market_regime - INFO - Market regime detected: SIDEWAYS (confidence: high) - Momentum 10 candles: +0.19%, ↔️ Sideways: ADX=13.6, Range-bound market
+2025-11-16 00:05:47 - trading_strategy - INFO - ↔️ Adapted to SIDEWAYS market: Using standard strategy
+2025-11-16 00:05:47 - trading_strategy - INFO - ❌ SELL SIGNAL DETECTED (MACD_BEARISH_CROSS): MACD bearish crossover detected
+2025-11-16 00:05:47 - main_bot - INFO - 💵 Selling ETHUSDT at $3163.89
+2025-11-16 00:05:47 - binance_client - INFO - ✅ Market order FILLED: SELL 0.0035 ETHUSDT
+2025-11-16 00:05:48 - risk_manager - ERROR - Error saving position BNBUSDT to DB: schema "np" does not exist
+LINE 5: VALUES ('BNBUSDT', np.float64(932.34), 0...
+^
+2025-11-16 00:05:48 - risk_manager - INFO - 📉 Position closed: ETHUSDT @ $3163.89, Profit: -0.31% ($-0.03), Reason: MACD_BEARISH_CROSS
+2025-11-16 00:05:48 - statistics_tracker - INFO - 📊 Trade recorded: ETHUSDT -0.31% ($-0.03)
+2025-11-16 00:05:48 - main_bot - INFO -
+🔍 Analyzing SOLUSDT...
+2025-11-16 00:05:49 - market_regime - INFO - Market regime detected: SIDEWAYS (confidence: medium) - Momentum 10 candles: +0.19%, ↔️ Sideways: ADX=23.3, Range-bound market
+2025-11-16 00:05:49 - trading_strategy - INFO - ↔️ Adapted to SIDEWAYS market: Using standard strategy
+2025-11-16 00:05:49 - main_bot - INFO - 📊 RSI: 38.4 | Stoch: 18.6 | Price: $139.24 | BB Lower: $139.15
+2025-11-16 00:05:49 - main_bot - INFO - 📈 Trends: 5m=neutral, 1h=neutral, 4h=bearish
+2025-11-16 00:05:49 - main_bot - INFO - ↔️ Market Regime: SIDEWAYS
+2025-11-16 00:05:49 - main_bot - INFO - 🎯 Custom Momentum Index for SOLUSDT: 44.5/100 ✓
+2025-11-16 00:05:50 - trading_strategy - INFO - ✅ BUY SIGNAL DETECTED (Dynamic Weaver): ⚠️ Acceptable: 1h=neutral, 4h=bearish (only one bearish), 🧠 AI Confidence: 75.00%
+2025-11-16 00:05:51 - main_bot - INFO - ✅ Custom Momentum for SOLUSDT: BUY signal (index=44.5 < 45)
+2025-11-16 00:05:52 - risk_manager - INFO - Position size for SOLUSDT: 0.09600000 ($13.31)
+2025-11-16 00:05:52 - main_bot - INFO - 💸 Buying SOLUSDT at $139.24
+2025-11-16 00:05:52 - binance_client - INFO - ✅ Market order FILLED: BUY 0.096 SOLUSDT
+2025-11-16 00:05:53 - risk_manager - ERROR - Error saving position SOLUSDT to DB: schema "np" does not exist
+LINE 5: VALUES ('SOLUSDT', np.float64(139.24), 0...
+^
+⚠️ التداول في العملات الرقمية يحمل مخاطر عالية
+
+آخر تحديث: ١٥‏/١١‏/٢٠٢٥، ٧:٠٥:٥٩ م
+تم التحديث بنجاح! ✅
