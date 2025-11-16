@@ -20,6 +20,7 @@ from strategy_coordinator import StrategyCoordinator
 from logger_setup import setup_logger
 from db_manager import DatabaseManager
 from telegram_bot import TelegramBotController
+from swarm_intelligence import SwarmManager
 
 logger = setup_logger('main_bot')
 
@@ -142,6 +143,21 @@ class BinanceTradingBot:
                 min_confidence = self.config['dynamic_strategy_weaver']['min_confidence_threshold']
                 logger.info(f"   🎯 Min confidence threshold: {min_confidence:.2%}")
                 logger.info(f"   📊 Learning period: {self.config['dynamic_strategy_weaver']['learning_period_days']} days")
+        
+        self.swarm_enabled = self.config.get('swarm_intelligence', {}).get('enabled', False)
+        if self.swarm_enabled:
+            try:
+                num_workers = self.config['swarm_intelligence']['num_workers']
+                self.swarm = SwarmManager(num_workers=num_workers)
+                logger.info(f"🐝 Swarm Intelligence: ENABLED ({num_workers} worker bots)")
+                logger.info(f"   📊 Decision mode: Collective Voting")
+                logger.info(f"   💡 Paper trading: Active")
+            except Exception as e:
+                logger.error(f"❌ Swarm initialization failed: {e}")
+                self.swarm_enabled = False
+                self.swarm = None
+        else:
+            self.swarm = None
         
         trailing_enabled = self.config.get('risk_management', {}).get('trailing_stop_loss', {}).get('enabled', False)
         if trailing_enabled:
@@ -578,6 +594,42 @@ class BinanceTradingBot:
         if resolved_indices or failed_count:
             logger.info(f"📊 Resolved: {len(resolved_indices)}, Retrying: {failed_count}, "
                       f"Total pending: {len(self.pending_resolutions)}")
+    
+    def get_swarm_decision(self, symbol, indicators):
+        """الحصول على قرار السرب عبر التصويت الجماعي"""
+        if not self.swarm_enabled or not self.swarm:
+            return None
+        
+        try:
+            market_data = {
+                'price': indicators['close'],
+                'rsi': indicators['rsi'],
+                'macd': indicators['macd'],
+                'stoch_k': indicators.get('stoch_k', 50),
+                'bb_lower': indicators['bb_lower'],
+                'bb_upper': indicators['bb_upper'],
+                'ema_9': indicators.get('ema_9', indicators['close']),
+                'ema_21': indicators.get('ema_21', indicators['close']),
+                'ema_50': indicators.get('ema_50', indicators['close']),
+                'volume_ratio': indicators.get('volume_ratio', 1.0),
+                'price_change_pct': indicators.get('price_change', 0),
+                'adx': indicators.get('adx', 25)
+            }
+            
+            vote = self.swarm.conduct_vote(symbol, market_data)
+            
+            if self.db:
+                self.db.save_swarm_vote(vote)
+            
+            if self.swarm_enabled and self.config.get('swarm_intelligence', {}).get('paper_trading_enabled', True):
+                current_price = indicators['close']
+                self.swarm.run_paper_trading_cycle(symbol, market_data)
+            
+            return vote
+            
+        except Exception as e:
+            logger.error(f"Swarm decision error: {e}")
+            return None
     
     def display_status(self):
         open_positions = self.risk_manager.get_open_positions()
@@ -1056,6 +1108,21 @@ def create_demo_position():
     except Exception as e:
         logger.error(f"❌ Error creating demo position: {e}")
         return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/swarm-stats')
+def get_swarm_stats():
+    """إحصائيات السرب"""
+    if bot_instance and bot_instance.swarm_enabled and bot_instance.swarm:
+        try:
+            stats = bot_instance.swarm.get_swarm_stats()
+            return jsonify({
+                'success': True,
+                'enabled': True,
+                'stats': stats
+            })
+        except Exception as e:
+            return jsonify({'success': False, 'error': str(e)})
+    return jsonify({'success': False, 'enabled': False, 'message': 'Swarm not enabled'})
 
 def run_bot():
     global bot_instance
