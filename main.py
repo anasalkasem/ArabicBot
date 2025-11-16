@@ -302,6 +302,8 @@ class BinanceTradingBot:
                 market_regime, regime_reason = self.market_regime.detect_regime(indicators, klines)
                 self.trading_strategy.adapt_to_regime(market_regime, regime_reason)
             
+            swarm_vote = self.get_swarm_decision(symbol, indicators)
+            
             position = self.risk_manager.get_position(symbol)
             
             if position and position.get('status') == 'open':
@@ -1114,13 +1116,38 @@ def get_swarm_stats():
     """إحصائيات السرب"""
     if bot_instance and bot_instance.swarm_enabled and bot_instance.swarm:
         try:
-            stats = bot_instance.swarm.get_swarm_stats()
+            raw_stats = bot_instance.swarm.get_swarm_stats()
+            
+            total_paper_trades = sum(w.performance.total_trades for w in bot_instance.swarm.workers)
+            
+            votes_today = 0
+            latest_decision = None
+            if bot_instance.swarm.vote_history:
+                from datetime import datetime as dt
+                votes_today = len([v for v in bot_instance.swarm.vote_history 
+                                 if (dt.now() - v.timestamp).days == 0])
+                latest_vote = bot_instance.swarm.vote_history[-1]
+                latest_decision = latest_vote.final_decision
+            
+            stats = {
+                'total_bots': raw_stats['total_workers'],
+                'top_performer': {
+                    'bot_id': raw_stats['best_bot']['id'],
+                    'win_rate': raw_stats['best_bot'].get('roi', 0)
+                },
+                'average_accuracy': raw_stats.get('profitability_rate', 0),
+                'total_paper_trades': total_paper_trades,
+                'votes_today': votes_today,
+                'latest_decision': latest_decision
+            }
+            
             return jsonify({
                 'success': True,
                 'enabled': True,
                 'stats': stats
             })
         except Exception as e:
+            logger.error(f"Swarm stats error: {e}")
             return jsonify({'success': False, 'error': str(e)})
     return jsonify({'success': False, 'enabled': False, 'message': 'Swarm not enabled'})
 
