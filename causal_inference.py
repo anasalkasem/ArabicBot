@@ -330,11 +330,17 @@ class CausalInferenceEngine:
             
             causal_confidence = min(100, causal_confidence * 10)
             
-            swarm_confidence = swarm_vote.get('confidence', 0)
+            if hasattr(swarm_vote, 'confidence'):
+                swarm_confidence = swarm_vote.confidence
+                decision = swarm_vote.final_decision
+            elif isinstance(swarm_vote, dict):
+                swarm_confidence = swarm_vote.get('confidence', 0)
+                decision = swarm_vote.get('decision', 'HOLD')
+            else:
+                swarm_confidence = 0
+                decision = 'HOLD'
             
             final_confidence = (causal_confidence * 0.6) + (swarm_confidence * 0.4)
-            
-            decision = swarm_vote.get('decision', 'HOLD')
             
             if final_confidence < 60:
                 decision = 'HOLD'
@@ -351,6 +357,11 @@ class CausalInferenceEngine:
         
         except Exception as e:
             logger.error(f"❌ Error in causal recommendation: {e}")
+            if hasattr(swarm_vote, '__dict__'):
+                return {
+                    'decision': getattr(swarm_vote, 'final_decision', 'HOLD'),
+                    'confidence': getattr(swarm_vote, 'confidence', 0)
+                }
             return swarm_vote
     
     def export_causal_graph(self) -> Dict:
