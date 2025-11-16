@@ -21,6 +21,7 @@ from logger_setup import setup_logger
 from db_manager import DatabaseManager
 from telegram_bot import TelegramBotController
 from swarm_intelligence import SwarmManager
+from causal_inference import CausalInferenceEngine
 
 logger = setup_logger('main_bot')
 
@@ -158,6 +159,21 @@ class BinanceTradingBot:
                 self.swarm = None
         else:
             self.swarm = None
+        
+        self.causal_enabled = self.config.get('causal_inference', {}).get('enabled', True)
+        if self.causal_enabled:
+            try:
+                self.causal_engine = CausalInferenceEngine(db_manager=self.db)
+                logger.info("🧠 Causal Inference Engine: ENABLED")
+                logger.info("   📊 Analysis type: Structural Causal Models")
+                logger.info("   🎯 Filtering: Spurious Correlations")
+                logger.info("   💡 Method: Do-Calculus & Granger Causality")
+            except Exception as e:
+                logger.error(f"❌ Causal Inference initialization failed: {e}")
+                self.causal_enabled = False
+                self.causal_engine = None
+        else:
+            self.causal_engine = None
         
         trailing_enabled = self.config.get('risk_management', {}).get('trailing_stop_loss', {}).get('enabled', False)
         if trailing_enabled:
@@ -640,6 +656,25 @@ class BinanceTradingBot:
             if self.swarm_enabled and self.config.get('swarm_intelligence', {}).get('paper_trading_enabled', True):
                 current_price = indicators['close']
                 self.swarm.run_paper_trading_cycle(symbol, market_data)
+            
+            if self.causal_enabled and self.causal_engine:
+                technical_signals = {
+                    'rsi': indicators['rsi'],
+                    'stochastic': indicators['stoch_k'],
+                    'macd': macd_dict.get('macd', 0),
+                    'bb_position': (indicators['close'] - indicators['bb_lower']) / (indicators['bb_upper'] - indicators['bb_lower']),
+                    'volume_ratio': market_data['volume_ratio'],
+                    'price_change': market_data['price_change_pct'],
+                    'ema_alignment': 1 if indicators['close'] > indicators.get('ema_50', 0) else 0
+                }
+                
+                causal_vote = self.causal_engine.get_causal_recommendation(vote, technical_signals)
+                
+                logger.info(f"   🧠 Causal Analysis: {causal_vote['decision']} "
+                          f"(Confidence: {causal_vote['confidence']:.1f}%, "
+                          f"Filtered: {causal_vote.get('filtered_spurious', 0)} spurious signals)")
+                
+                return causal_vote
             
             return vote
             
