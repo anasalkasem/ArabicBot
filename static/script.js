@@ -520,8 +520,11 @@ async function updateSwarmData() {
             // تحديث أفضل بوت
             if (stats.top_performer) {
                 const topBot = stats.top_performer;
+                const winRate = typeof topBot.win_rate === 'number' 
+                    ? topBot.win_rate.toFixed(1) 
+                    : parseFloat(topBot.win_rate || 0).toFixed(1);
                 document.getElementById('swarm-top-bot').textContent = 
-                    `#${topBot.bot_id} (${topBot.win_rate}%)`;
+                    `#${topBot.bot_id} (${winRate}%)`;
             }
             
             // تحديث متوسط الدقة
