@@ -199,10 +199,36 @@ function updatePositions(positions) {
     // تحويل الـ object إلى array
     const positionsArray = Object.values(positions);
     
-    container.innerHTML = positionsArray.map(pos => `
+    container.innerHTML = positionsArray.map(pos => {
+        const positionType = pos.position_type || 'SPOT';
+        const leverage = pos.leverage || 1;
+        const liquidationPrice = pos.liquidation_price;
+        
+        let typeColor, typeIcon, typeText;
+        if (positionType === 'LONG' || positionType === 'BUY') {
+            typeColor = '#10b981';
+            typeIcon = '🟢';
+            typeText = 'LONG';
+        } else if (positionType === 'SHORT' || positionType === 'SELL') {
+            typeColor = '#ef4444';
+            typeIcon = '🔴';
+            typeText = 'SHORT';
+        } else {
+            typeColor = '#6b7280';
+            typeIcon = '⚪';
+            typeText = 'SPOT';
+        }
+        
+        return `
         <div class="position-item">
             <div class="position-header">
-                <span class="position-symbol">${pos.symbol}</span>
+                <div class="position-title">
+                    <span class="position-type-badge" style="background: ${typeColor};">
+                        ${typeIcon} ${typeText}
+                    </span>
+                    <span class="position-symbol">${pos.symbol}</span>
+                    ${leverage > 1 ? `<span class="leverage-badge">${leverage}x</span>` : ''}
+                </div>
                 <span class="profit ${pos.current_profit >= 0 ? 'profit-positive' : 'profit-negative'}">
                     ${pos.current_profit >= 0 ? '+' : ''}${pos.current_profit ? pos.current_profit.toFixed(2) : '0.00'}%
                 </span>
@@ -212,9 +238,11 @@ function updatePositions(positions) {
                 <div><strong>الكمية:</strong> ${pos.quantity ? pos.quantity.toFixed(6) : '0.000000'}</div>
                 <div><strong>Stop-Loss:</strong> $${pos.stop_loss ? pos.stop_loss.toFixed(2) : '0.00'}</div>
                 <div><strong>Take-Profit:</strong> $${pos.take_profit ? pos.take_profit.toFixed(2) : '0.00'}</div>
+                ${liquidationPrice ? `<div class="liquidation-row"><strong>🛡️ سعر التصفية:</strong> <span class="liquidation-price">$${liquidationPrice.toFixed(2)}</span></div>` : ''}
             </div>
         </div>
-    `).join('');
+        `;
+    }).join('');
 }
 
 // تحديث السجلات

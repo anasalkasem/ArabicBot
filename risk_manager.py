@@ -1,17 +1,20 @@
 from logger_setup import setup_logger
 import json
 import os
+from futures_risk_manager import FuturesRiskMixin
 
 logger = setup_logger('risk_manager')
 
-class RiskManager:
-    def __init__(self, config, binance_client, trading_strategy=None, db_manager=None):
+class RiskManager(FuturesRiskMixin):
+    def __init__(self, config, binance_client, trading_strategy=None, db_manager=None, futures_client=None):
         self.config = config
         self.binance_client = binance_client
+        self.futures_client = futures_client
         self.trading_strategy = trading_strategy
         self.db = db_manager
         self.positions_file = 'positions.json'
         self.positions = self.load_positions()
+        self.futures_enabled = config.get('futures', {}).get('enabled', False)
     
     def load_positions(self):
         if self.db:
@@ -54,6 +57,12 @@ class RiskManager:
                         if trailing.get('highest_price'):
                             highest_price = float(trailing.get('highest_price'))
                         
+                        position_type = pos.get('position_type', 'SPOT')
+                        leverage = int(pos.get('leverage', 1))
+                        liquidation_price = float(pos.get('liquidation_price')) if pos.get('liquidation_price') else None
+                        unrealized_pnl = float(pos.get('unrealized_pnl')) if pos.get('unrealized_pnl') else None
+                        funding_rate = float(pos.get('funding_rate')) if pos.get('funding_rate') else None
+                        
                         self.db.save_position(
                             symbol=symbol,
                             entry_price=entry_price,
@@ -64,7 +73,12 @@ class RiskManager:
                             trailing_stop_price=trailing_stop_price,
                             highest_price=highest_price,
                             market_regime=pos.get('market_regime'),
-                            buy_signals=pos.get('signals')
+                            buy_signals=pos.get('signals'),
+                            position_type=position_type,
+                            leverage=leverage,
+                            liquidation_price=liquidation_price,
+                            unrealized_pnl=unrealized_pnl,
+                            funding_rate=funding_rate
                         )
                     except Exception as e:
                         logger.error(f"Error saving position {symbol} to DB: {e}")

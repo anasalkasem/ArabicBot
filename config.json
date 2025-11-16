@@ -100,7 +100,7 @@
     "weight_adjustment_speed": 0.3
   },
   "futures": {
-    "enabled": false,
+    "enabled": true,
     "testnet": true,
     "default_leverage": 2,
     "max_leverage": 3,

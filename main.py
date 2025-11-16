@@ -6,6 +6,7 @@ import asyncio
 from datetime import datetime
 from flask import Flask, jsonify, render_template
 from binance_client import BinanceClientManager
+from binance_derivatives_client import BinanceDerivativesClient
 from technical_indicators import TechnicalIndicators
 from trading_strategy import TradingStrategy
 from risk_manager import RiskManager
@@ -15,6 +16,7 @@ from market_regime import MarketRegime
 from sentiment_analyzer import SentimentAnalyzer
 from custom_momentum import CustomMomentumIndex
 from indicator_performance_tracker import IndicatorPerformanceTracker
+from strategy_coordinator import StrategyCoordinator
 from logger_setup import setup_logger
 from db_manager import DatabaseManager
 from telegram_bot import TelegramBotController
@@ -56,8 +58,15 @@ class BinanceTradingBot:
         self.trading_pairs = self.config['trading_pairs']
         self.check_interval = self.config['trading']['check_interval_seconds']
         
+        self.futures_enabled = self.config.get('futures', {}).get('enabled', False)
+        
         logger.info(f"Mode: {'TESTNET' if self.testnet else 'LIVE TRADING'}")
         logger.info(f"Trading Pairs: {', '.join(self.trading_pairs)}")
+        
+        if self.futures_enabled:
+            logger.info("🔥 FUTURES TRADING ENABLED")
+        else:
+            logger.info("💰 SPOT TRADING ONLY")
         
         try:
             self.db = DatabaseManager()
@@ -67,9 +76,35 @@ class BinanceTradingBot:
             self.db = None
         
         self.binance_client = BinanceClientManager(testnet=self.testnet)
+        
+        if self.futures_enabled:
+            futures_testnet = self.config.get('futures', {}).get('testnet', True)
+            try:
+                self.futures_client = BinanceDerivativesClient(testnet=futures_testnet)
+                logger.info(f"✅ Futures Client initialized ({'TESTNET' if futures_testnet else 'LIVE'})")
+            except Exception as e:
+                logger.error(f"❌ Futures Client initialization failed: {e}")
+                self.futures_client = None
+                self.futures_enabled = False
+        else:
+            self.futures_client = None
+        
         self.technical_indicators = TechnicalIndicators(self.config)
         self.trading_strategy = TradingStrategy(self.config)
-        self.risk_manager = RiskManager(self.config, self.binance_client, self.trading_strategy, db_manager=self.db)
+        
+        if self.futures_enabled and self.futures_client:
+            self.strategy_coordinator = StrategyCoordinator(self.config)
+            logger.info("✅ Strategy Coordinator initialized")
+        else:
+            self.strategy_coordinator = None
+        
+        self.risk_manager = RiskManager(
+            self.config, 
+            self.binance_client, 
+            self.trading_strategy, 
+            db_manager=self.db,
+            futures_client=self.futures_client
+        )
         self.telegram = TelegramNotifier(self.config)
         self.stats = StatisticsTracker(db_manager=self.db)
         self.market_regime = MarketRegime(self.config)
@@ -254,50 +289,65 @@ class BinanceTradingBot:
             
             if position and position.get('status') == 'open':
                 entry_price = position['entry_price']
+                position_type = position.get('position_type', 'SPOT')
                 
-                self.risk_manager.update_trailing_stop(symbol, current_price)
-                
-                if self.risk_manager.check_trailing_stop(symbol, current_price):
-                    logger.warning(f"🛑 TRAILING STOP triggered for {symbol}")
-                    order = self.binance_client.create_market_order(
-                        symbol=symbol,
-                        side='SELL',
-                        quantity=position['quantity']
+                if self.futures_enabled and position_type in ['LONG', 'SHORT']:
+                    self.risk_manager.update_futures_trailing_stop(symbol, current_price)
+                    
+                    should_exit, exit_reason, profit_pct = self.strategy_coordinator.check_exit_signal(
+                        symbol, position, current_price, indicators
                     )
-                    if order:
-                        self.risk_manager.close_position(symbol, current_price, "TRAILING_STOP")
-                        self.stats.record_trade(symbol, entry_price, current_price, position['quantity'], "TRAILING_STOP")
-                        self.telegram.notify_sell(symbol, current_price, position['quantity'], entry_price, "TRAILING_STOP")
-                    return
-                
-                if self.trading_strategy.should_stop_loss(current_price, entry_price, position):
-                    logger.warning(f"🛑 STOP LOSS triggered for {symbol}")
-                    order = self.binance_client.create_market_order(
-                        symbol=symbol,
-                        side='SELL',
-                        quantity=position['quantity']
+                    
+                    if should_exit:
+                        logger.info(f"💵 Closing {position_type} {symbol} at ${current_price:.2f} ({exit_reason})")
+                        closed_position = self.risk_manager.close_futures_position(symbol, current_price, exit_reason)
+                        if closed_position:
+                            self.stats.record_trade(symbol, entry_price, current_price, position['quantity'], exit_reason)
+                            self.telegram.notify_sell(symbol, current_price, position['quantity'], entry_price, exit_reason)
+                else:
+                    self.risk_manager.update_trailing_stop(symbol, current_price)
+                    
+                    if self.risk_manager.check_trailing_stop(symbol, current_price):
+                        logger.warning(f"🛑 TRAILING STOP triggered for {symbol}")
+                        order = self.binance_client.create_market_order(
+                            symbol=symbol,
+                            side='SELL',
+                            quantity=position['quantity']
+                        )
+                        if order:
+                            self.risk_manager.close_position(symbol, current_price, "TRAILING_STOP")
+                            self.stats.record_trade(symbol, entry_price, current_price, position['quantity'], "TRAILING_STOP")
+                            self.telegram.notify_sell(symbol, current_price, position['quantity'], entry_price, "TRAILING_STOP")
+                        return
+                    
+                    if self.trading_strategy.should_stop_loss(current_price, entry_price, position):
+                        logger.warning(f"🛑 STOP LOSS triggered for {symbol}")
+                        order = self.binance_client.create_market_order(
+                            symbol=symbol,
+                            side='SELL',
+                            quantity=position['quantity']
+                        )
+                        if order:
+                            self.risk_manager.close_position(symbol, current_price, "STOP_LOSS")
+                            self.stats.record_trade(symbol, entry_price, current_price, position['quantity'], "STOP_LOSS")
+                            self.telegram.notify_sell(symbol, current_price, position['quantity'], entry_price, "STOP_LOSS")
+                        return
+                    
+                    sell_signal, signals, reason = self.trading_strategy.check_sell_signal(
+                        indicators, entry_price, prev_indicators, market_regime, position
                     )
-                    if order:
-                        self.risk_manager.close_position(symbol, current_price, "STOP_LOSS")
-                        self.stats.record_trade(symbol, entry_price, current_price, position['quantity'], "STOP_LOSS")
-                        self.telegram.notify_sell(symbol, current_price, position['quantity'], entry_price, "STOP_LOSS")
-                    return
-                
-                sell_signal, signals, reason = self.trading_strategy.check_sell_signal(
-                    indicators, entry_price, prev_indicators, market_regime, position
-                )
-                
-                if sell_signal:
-                    logger.info(f"💵 Selling {symbol} at ${current_price:.2f}")
-                    order = self.binance_client.create_market_order(
-                        symbol=symbol,
-                        side='SELL',
-                        quantity=position['quantity']
-                    )
-                    if order:
-                        self.risk_manager.close_position(symbol, current_price, reason)
-                        self.stats.record_trade(symbol, entry_price, current_price, position['quantity'], reason)
-                        self.telegram.notify_sell(symbol, current_price, position['quantity'], entry_price, reason)
+                    
+                    if sell_signal:
+                        logger.info(f"💵 Selling {symbol} at ${current_price:.2f}")
+                        order = self.binance_client.create_market_order(
+                            symbol=symbol,
+                            side='SELL',
+                            quantity=position['quantity']
+                        )
+                        if order:
+                            self.risk_manager.close_position(symbol, current_price, reason)
+                            self.stats.record_trade(symbol, entry_price, current_price, position['quantity'], reason)
+                            self.telegram.notify_sell(symbol, current_price, position['quantity'], entry_price, reason)
             
             else:
                 logger.info(f"   📊 RSI: {indicators['rsi']:.1f} | Stoch: {indicators['stoch_k']:.1f} | "
@@ -391,18 +441,70 @@ class BinanceTradingBot:
                         buy_signal = False
                 
                 if buy_signal and self.risk_manager.can_open_position(symbol):
-                    quantity = self.risk_manager.calculate_position_size(symbol, current_price)
-                    
-                    if quantity > 0:
-                        logger.info(f"💸 Buying {symbol} at ${current_price:.2f}")
-                        order = self.binance_client.create_market_order(
-                            symbol=symbol,
-                            side='BUY',
-                            quantity=quantity
-                        )
-                        if order:
-                            self.risk_manager.open_position(symbol, current_price, quantity, signals)
-                            self.telegram.notify_buy(symbol, current_price, quantity, signals)
+                    if self.futures_enabled and self.strategy_coordinator:
+                        allowed_strategies = self.strategy_coordinator.get_allowed_strategies(market_regime)
+                        position_opened = False
+                        
+                        if 'LONG' in allowed_strategies:
+                            should_long, long_reason = self.strategy_coordinator.long_strategy.check_entry_signal(
+                                symbol, indicators, market_regime, {
+                                    'short_trend': short_trend,
+                                    'medium_trend': medium_trend,
+                                    'long_trend': long_trend
+                                }
+                            )
+                            
+                            if should_long:
+                                quantity = self.risk_manager.calculate_futures_position_size(symbol, current_price)
+                                if quantity > 0:
+                                    success = self.risk_manager.open_futures_position(
+                                        symbol=symbol,
+                                        entry_price=current_price,
+                                        quantity=quantity,
+                                        position_type='LONG',
+                                        signals=signals,
+                                        market_regime=market_regime
+                                    )
+                                    if success:
+                                        position_opened = True
+                                        self.telegram.notify_buy(symbol, current_price, quantity, signals)
+                        
+                        if not position_opened and 'SHORT' in allowed_strategies:
+                            should_short, short_reason = self.strategy_coordinator.short_strategy.check_entry_signal(
+                                symbol, indicators, market_regime, {
+                                    'short_trend': short_trend,
+                                    'medium_trend': medium_trend,
+                                    'long_trend': long_trend
+                                }
+                            )
+                            
+                            if should_short:
+                                quantity = self.risk_manager.calculate_futures_position_size(symbol, current_price)
+                                if quantity > 0:
+                                    success = self.risk_manager.open_futures_position(
+                                        symbol=symbol,
+                                        entry_price=current_price,
+                                        quantity=quantity,
+                                        position_type='SHORT',
+                                        signals=signals,
+                                        market_regime=market_regime
+                                    )
+                                    if success:
+                                        position_opened = True
+                                        self.telegram.notify_buy(symbol, current_price, quantity, signals)
+                    else:
+                        quantity = self.risk_manager.calculate_position_size(symbol, current_price)
+                        
+                        if quantity > 0:
+                            logger.info(f"💸 Buying {symbol} at ${current_price:.2f}")
+                            order = self.binance_client.create_market_order(
+                                symbol=symbol,
+                                side='BUY',
+                                quantity=quantity
+                            )
+                            if order:
+                                self.risk_manager.open_position(symbol, current_price, quantity, signals)
+                                self.telegram.notify_buy(symbol, current_price, quantity, signals)
                 elif not buy_signal:
                     reasons = []
                     rsi_threshold = self.trading_strategy.rsi_oversold
@@ -565,18 +667,33 @@ def get_status():
         for symbol, pos in positions_raw.items():
             current_price = bot_instance.binance_client.get_symbol_price(symbol)
             entry_price = pos.get('entry_price', 0)
+            position_type = pos.get('position_type', 'SPOT')
+            leverage = pos.get('leverage', 1)
             
             current_profit = 0
             if current_price and entry_price:
-                current_profit = ((current_price - entry_price) / entry_price) * 100
+                if position_type in ['LONG', 'BUY', 'SPOT']:
+                    current_profit = ((current_price - entry_price) / entry_price) * 100
+                elif position_type in ['SHORT', 'SELL']:
+                    current_profit = ((entry_price - current_price) / entry_price) * 100
+                
+                if position_type in ['LONG', 'SHORT']:
+                    current_profit = current_profit * leverage
             
             stop_loss_price = None
             take_profit_price = None
             if entry_price:
                 if pos.get('stop_loss_percent'):
-                    stop_loss_price = entry_price * (1 - pos['stop_loss_percent'] / 100)
+                    if position_type in ['LONG', 'BUY', 'SPOT']:
+                        stop_loss_price = entry_price * (1 - pos['stop_loss_percent'] / 100)
+                    else:
+                        stop_loss_price = entry_price * (1 + pos['stop_loss_percent'] / 100)
+                        
                 if pos.get('take_profit_percent'):
-                    take_profit_price = entry_price * (1 + pos['take_profit_percent'] / 100)
+                    if position_type in ['LONG', 'BUY', 'SPOT']:
+                        take_profit_price = entry_price * (1 + pos['take_profit_percent'] / 100)
+                    else:
+                        take_profit_price = entry_price * (1 - pos['take_profit_percent'] / 100)
             
             positions_enriched[symbol] = {
                 **pos,
@@ -584,7 +701,11 @@ def get_status():
                 'current_price': current_price,
                 'current_profit': round(current_profit, 2),
                 'stop_loss': stop_loss_price,
-                'take_profit': take_profit_price
+                'take_profit': take_profit_price,
+                'position_type': position_type,
+                'leverage': leverage,
+                'liquidation_price': pos.get('liquidation_price'),
+                'unrealized_pnl': pos.get('unrealized_pnl', 0)
             }
         
         market_regime = bot_instance.trading_strategy.current_regime if bot_instance.regime_enabled else 'sideways'
