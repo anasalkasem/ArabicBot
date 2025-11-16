@@ -624,15 +624,24 @@ class DatabaseManager:
     
     def save_swarm_vote(self, vote):
         try:
+            import numpy as np
+            
+            def convert_to_native(val):
+                if isinstance(val, (np.integer, np.floating)):
+                    return val.item()
+                return val
+            
             with self.connection.cursor() as cursor:
                 cursor.execute("""
                     INSERT INTO swarm_votes (symbol, timestamp, total_bots, buy_votes, sell_votes,
                                            hold_votes, buy_weight, sell_weight, hold_weight,
                                            final_decision, confidence, top_performers)
                     VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-                """, (vote.symbol, vote.timestamp, vote.total_bots, vote.buy_votes, vote.sell_votes,
-                     vote.hold_votes, vote.buy_weight, vote.sell_weight, vote.hold_weight,
-                     vote.final_decision, vote.confidence, json.dumps(vote.top_performers)))
+                """, (vote.symbol, vote.timestamp, int(vote.total_bots), int(vote.buy_votes), int(vote.sell_votes),
+                     int(vote.hold_votes), float(convert_to_native(vote.buy_weight)), 
+                     float(convert_to_native(vote.sell_weight)), float(convert_to_native(vote.hold_weight)),
+                     vote.final_decision, float(convert_to_native(vote.confidence)), 
+                     json.dumps(vote.top_performers)))
                 self.connection.commit()
         except Exception as e:
             self.connection.rollback()

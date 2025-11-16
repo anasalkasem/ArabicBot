@@ -603,19 +603,33 @@ class BinanceTradingBot:
             return None
         
         try:
+            macd_data = indicators['macd']
+            if isinstance(macd_data, dict):
+                macd_dict = macd_data
+            else:
+                macd_dict = {'macd': float(macd_data), 'signal': 0, 'histogram': 0}
+            
             market_data = {
-                'price': indicators['close'],
-                'rsi': indicators['rsi'],
-                'macd': indicators['macd'],
-                'stoch_k': indicators.get('stoch_k', 50),
-                'bb_lower': indicators['bb_lower'],
-                'bb_upper': indicators['bb_upper'],
-                'ema_9': indicators.get('ema_9', indicators['close']),
-                'ema_21': indicators.get('ema_21', indicators['close']),
-                'ema_50': indicators.get('ema_50', indicators['close']),
-                'volume_ratio': indicators.get('volume_ratio', 1.0),
-                'price_change_pct': indicators.get('price_change', 0),
-                'adx': indicators.get('adx', 25)
+                'price': float(indicators['close']),
+                'rsi': float(indicators['rsi']),
+                'macd': macd_dict,
+                'stoch_k': float(indicators.get('stoch_k', 50)),
+                'bb_lower': float(indicators['bb_lower']),
+                'bb_upper': float(indicators['bb_upper']),
+                'ema_9': float(indicators.get('ema_9', indicators['close'])),
+                'ema_21': float(indicators.get('ema_21', indicators['close'])),
+                'ema_50': float(indicators.get('ema_50', indicators['close'])),
+                'ema_200': float(indicators.get('ema_200', indicators['close'])),
+                'sma_20': float(indicators.get('sma_20', indicators['close'])),
+                'volume_ratio': float(indicators.get('volume_ratio', 1.0)),
+                'price_change_pct': float(indicators.get('price_change', 0)),
+                'adx': float(indicators.get('adx', 25)),
+                'atr': float(indicators.get('atr', 0)),
+                'atr_avg': float(indicators.get('atr_avg', 1)),
+                'bb_width': float(indicators.get('bb_width', 0)),
+                'high_20': float(indicators.get('high_20', indicators['close'])),
+                'low_20': float(indicators.get('low_20', indicators['close'])),
+                'rate_of_change': float(indicators.get('rate_of_change', 0))
             }
             
             vote = self.swarm.conduct_vote(symbol, market_data)
