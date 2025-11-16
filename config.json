@@ -98,5 +98,48 @@
     "min_signals_for_learning": 10,
     "learning_period_days": 30,
     "weight_adjustment_speed": 0.3
+  },
+  "futures": {
+    "enabled": false,
+    "testnet": true,
+    "default_leverage": 2,
+    "max_leverage": 3,
+    "position_mode": "one-way",
+    "margin_type": "ISOLATED",
+    "risk_management": {
+      "position_size_percent": 2.0,
+      "max_positions": 2,
+      "stop_loss_percent": 2.0,
+      "take_profit_percent": 4.0,
+      "liquidation_buffer_percent": 5.0,
+      "trailing_stop_loss": {
+        "enabled": true,
+        "activation_profit_percent": 3.0,
+        "trail_percent": 2.0
+      }
+    },
+    "short_strategy": {
+      "enabled": true,
+      "entry_conditions": {
+        "rsi_threshold": 75,
+        "stochastic_threshold": 80,
+        "bb_upper_tolerance": 0.5,
+        "require_bear_market": true
+      },
+      "exit_conditions": {
+        "take_profit_percent": 4.0,
+        "stop_loss_percent": 2.0,
+        "rsi_reversal_threshold": 30
+      }
+    },
+    "long_strategy": {
+      "enabled": true,
+      "same_as_spot": true
+    },
+    "market_regime_strategy": {
+      "bull_market": "LONG_ONLY",
+      "bear_market": "SHORT_ONLY",
+      "sideways_market": "BOTH"
+    }
   }
 }

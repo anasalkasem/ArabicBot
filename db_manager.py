@@ -12,6 +12,7 @@ class DatabaseManager:
         self.connection = None
         self.connect()
         self.create_tables()
+        self.apply_migrations()
     
     def connect(self):
         try:
@@ -181,15 +182,55 @@ class DatabaseManager:
             logger.error(f"❌ Error creating tables: {e}")
             raise
     
-    def save_position(self, symbol, entry_price, quantity, entry_time, stop_loss, take_profit, 
-                     trailing_stop_price, highest_price, market_regime, buy_signals):
+    def apply_migrations(self):
         try:
             with self.connection.cursor() as cursor:
                 cursor.execute("""
+                    ALTER TABLE positions 
+                    ADD COLUMN IF NOT EXISTS position_type VARCHAR(10) DEFAULT 'SPOT',
+                    ADD COLUMN IF NOT EXISTS leverage INTEGER DEFAULT 1,
+                    ADD COLUMN IF NOT EXISTS liquidation_price DECIMAL(20, 8),
+                    ADD COLUMN IF NOT EXISTS unrealized_pnl DECIMAL(20, 8),
+                    ADD COLUMN IF NOT EXISTS funding_rate DECIMAL(10, 8),
+                    ADD COLUMN IF NOT EXISTS is_futures BOOLEAN DEFAULT FALSE;
+                """)
+                
+                cursor.execute("""
+                    ALTER TABLE trades
+                    ADD COLUMN IF NOT EXISTS position_type VARCHAR(10) DEFAULT 'SPOT',
+                    ADD COLUMN IF NOT EXISTS leverage INTEGER DEFAULT 1,
+                    ADD COLUMN IF NOT EXISTS liquidation_price DECIMAL(20, 8),
+                    ADD COLUMN IF NOT EXISTS funding_paid DECIMAL(20, 8),
+                    ADD COLUMN IF NOT EXISTS is_futures BOOLEAN DEFAULT FALSE;
+                """)
+                
+                cursor.execute("CREATE INDEX IF NOT EXISTS idx_positions_type ON positions(position_type);")
+                cursor.execute("CREATE INDEX IF NOT EXISTS idx_trades_type ON trades(position_type);")
+                cursor.execute("CREATE INDEX IF NOT EXISTS idx_positions_futures ON positions(is_futures);")
+                cursor.execute("CREATE INDEX IF NOT EXISTS idx_trades_futures ON trades(is_futures);")
+                
+                cursor.execute("UPDATE positions SET position_type = 'SPOT', leverage = 1, is_futures = FALSE WHERE position_type IS NULL;")
+                cursor.execute("UPDATE trades SET position_type = 'SPOT', leverage = 1, is_futures = FALSE WHERE position_type IS NULL;")
+                
+                self.connection.commit()
+                logger.info("✅ Database migrations applied successfully (Futures support added)")
+        except Exception as e:
+            self.connection.rollback()
+            logger.error(f"⚠️ Error applying migrations: {e}")
+            logger.info("Database will continue with existing schema")
+    
+    def save_position(self, symbol, entry_price, quantity, entry_time, stop_loss, take_profit, 
+                     trailing_stop_price, highest_price, market_regime, buy_signals,
+                     position_type='SPOT', leverage=1, liquidation_price=None, unrealized_pnl=None, funding_rate=None):
+        try:
+            with self.connection.cursor() as cursor:
+                is_futures = position_type in ['LONG', 'SHORT']
+                cursor.execute("""
                     INSERT INTO positions (symbol, entry_price, quantity, entry_time, stop_loss, 
                                          take_profit, trailing_stop_price, highest_price, 
-                                         market_regime, buy_signals, updated_at)
-                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, CURRENT_TIMESTAMP)
+                                         market_regime, buy_signals, position_type, leverage,
+                                         liquidation_price, unrealized_pnl, funding_rate, is_futures, updated_at)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, CURRENT_TIMESTAMP)
                     ON CONFLICT (symbol) DO UPDATE SET
                         entry_price = EXCLUDED.entry_price,
                         quantity = EXCLUDED.quantity,
@@ -197,10 +238,17 @@ class DatabaseManager:
                         take_profit = EXCLUDED.take_profit,
                         trailing_stop_price = EXCLUDED.trailing_stop_price,
                         highest_price = EXCLUDED.highest_price,
+                        position_type = EXCLUDED.position_type,
+                        leverage = EXCLUDED.leverage,
+                        liquidation_price = EXCLUDED.liquidation_price,
+                        unrealized_pnl = EXCLUDED.unrealized_pnl,
+                        funding_rate = EXCLUDED.funding_rate,
+                        is_futures = EXCLUDED.is_futures,
                         updated_at = CURRENT_TIMESTAMP
                 """, (symbol, entry_price, quantity, entry_time, stop_loss, take_profit,
                      trailing_stop_price, highest_price, market_regime, 
-                     json.dumps(buy_signals) if buy_signals else None))
+                     json.dumps(buy_signals) if buy_signals else None,
+                     position_type, leverage, liquidation_price, unrealized_pnl, funding_rate, is_futures))
                 self.connection.commit()
         except Exception as e:
             self.connection.rollback()
