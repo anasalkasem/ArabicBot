@@ -49,6 +49,7 @@ async function updateDashboard() {
         
         // تحديث نظام السرب الذكي
         updateSwarmData();
+        updateCausalData();
         
         // تحديث وقت التحديث
         document.getElementById('update-time').textContent = new Date().toLocaleString('ar-EG');
@@ -566,5 +567,32 @@ async function updateSwarmData() {
         }
     } catch (error) {
         console.error('خطأ في تحديث بيانات السرب:', error);
+    }
+}
+
+async function updateCausalData() {
+    try {
+        const response = await fetch('/causal-graph');
+        const data = await response.json();
+        
+        const causalContainer = document.getElementById('causal-card-container');
+        
+        if (data.success && data.enabled) {
+            causalContainer.style.display = 'block';
+            
+            const graph = data.graph;
+            
+            if (graph.total_nodes) {
+                document.getElementById('causal-nodes').textContent = graph.total_nodes;
+            }
+            
+            if (graph.total_edges) {
+                document.getElementById('causal-edges').textContent = graph.total_edges;
+            }
+        } else {
+            causalContainer.style.display = 'none';
+        }
+    } catch (error) {
+        console.error('خطأ في تحديث بيانات التحليل السببي:', error);
     }
 }

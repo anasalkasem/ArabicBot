@@ -153,6 +153,44 @@
                 </div>
             </div>
 
+            <!-- التحليل السببي -->
+            <div class="card causal-card" id="causal-card-container" style="display: none;">
+                <h2>🧠 التحليل السببي</h2>
+                <div class="causal-info">
+                    <div class="causal-header">
+                        <div class="causal-status">
+                            <span class="status-indicator active"></span>
+                            <span class="status-text">Do-Calculus نشط</span>
+                        </div>
+                        <div class="causal-method">
+                            <span class="method-label">الطريقة:</span>
+                            <span class="method-value">Granger Causality</span>
+                        </div>
+                    </div>
+                    <div class="causal-stats-grid">
+                        <div class="causal-stat">
+                            <span class="causal-stat-label">🎯 علاقات سببية</span>
+                            <span class="causal-stat-value" id="causal-edges">-</span>
+                        </div>
+                        <div class="causal-stat">
+                            <span class="causal-stat-label">🔍 متغيرات محللة</span>
+                            <span class="causal-stat-value" id="causal-nodes">-</span>
+                        </div>
+                        <div class="causal-stat">
+                            <span class="causal-stat-label">🚫 إشارات مفلترة</span>
+                            <span class="causal-stat-value" id="causal-filtered">0</span>
+                        </div>
+                        <div class="causal-stat">
+                            <span class="causal-stat-label">✅ ثقة سببية</span>
+                            <span class="causal-stat-value" id="causal-confidence">0%</span>
+                        </div>
+                    </div>
+                    <div class="causal-note">
+                        <p>📊 يحلل العلاقات السببية الحقيقية بين المتغيرات لفلترة الارتباطات الزائفة</p>
+                    </div>
+                </div>
+            </div>
+
             <!-- إحصائيات الأداء -->
             <div class="card stats-card">
                 <h2>📊 الإحصائيات</h2>
