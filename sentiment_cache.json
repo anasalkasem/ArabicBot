@@ -2,26 +2,26 @@
   "BTCUSDT": {
     "score": 35.0,
     "source": "coingecko",
-    "timestamp": "2025-11-16T11:23:52.607750"
+    "timestamp": "2025-11-16T12:04:29.408708"
   },
   "ETHUSDT": {
     "score": 35.0,
     "source": "coingecko",
-    "timestamp": "2025-11-16T11:23:53.168127"
+    "timestamp": "2025-11-16T12:04:29.993782"
   },
   "SOLUSDT": {
     "score": 35.0,
     "source": "coingecko",
-    "timestamp": "2025-11-16T11:23:53.658131"
+    "timestamp": "2025-11-16T12:04:30.242010"
   },
   "XRPUSDT": {
     "score": 35.0,
     "source": "coingecko",
-    "timestamp": "2025-11-16T11:23:54.214425"
+    "timestamp": "2025-11-16T12:04:30.630680"
   },
   "BNBUSDT": {
-    "score": 35.0,
-    "source": "coingecko",
-    "timestamp": "2025-11-16T11:23:54.765671"
+    "score": 50.0,
+    "source": "default",
+    "timestamp": "2025-11-16T12:04:30.848477"
   }
 }
