@@ -16,6 +16,22 @@ async function updateDashboard() {
             modeBadge.className = data.testnet ? 'value mode-badge testnet' : 'value mode-badge live';
         }
         
+        // تحديث حالة زر التداول
+        const tradingBtn = document.getElementById('toggle-trading-btn');
+        const tradingIcon = document.getElementById('trading-icon');
+        const tradingText = document.getElementById('trading-text');
+        if (tradingBtn && data.trading_enabled !== undefined) {
+            if (data.trading_enabled) {
+                tradingIcon.textContent = '⏸️';
+                tradingText.textContent = 'إيقاف التداول';
+                tradingBtn.className = 'btn btn-trading btn-stop';
+            } else {
+                tradingIcon.textContent = '▶️';
+                tradingText.textContent = 'بدء التداول';
+                tradingBtn.className = 'btn btn-trading btn-start';
+            }
+        }
+        
         // تحديث البيانات
         document.getElementById('iterations').textContent = data.iterations || '0';
         document.getElementById('start-time').textContent = formatTime(data.start_time);
@@ -164,6 +180,7 @@ async function updateStatistics() {
 function getStatusText(status) {
     const statusMap = {
         'running': 'يعمل 🟢',
+        'paused': 'متوقف مؤقتاً ⏸️',
         'stopped': 'متوقف 🔴',
         'initializing': 'جاري التشغيل... 🟡',
         'error': 'خطأ ❌'
@@ -274,6 +291,50 @@ function refreshData() {
     setTimeout(() => {
         showToast('تم التحديث بنجاح! ✅', 'success');
     }, 500);
+}
+
+async function toggleTrading() {
+    const btn = document.getElementById('toggle-trading-btn');
+    const icon = document.getElementById('trading-icon');
+    const text = document.getElementById('trading-text');
+    
+    btn.disabled = true;
+    
+    try {
+        const response = await fetch('/toggle-trading', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            if (data.trading_enabled) {
+                icon.textContent = '⏸️';
+                text.textContent = 'إيقاف التداول';
+                btn.className = 'btn btn-trading btn-stop';
+                showToast('✅ تم بدء التداول بنجاح', 'success');
+            } else {
+                icon.textContent = '▶️';
+                text.textContent = 'بدء التداول';
+                btn.className = 'btn btn-trading btn-start';
+                showToast('⏸️ تم إيقاف التداول مؤقتاً', 'warning');
+            }
+            
+            setTimeout(() => {
+                updateDashboard();
+            }, 500);
+        } else {
+            showToast('❌ خطأ: ' + data.error, 'error');
+        }
+    } catch (error) {
+        console.error('خطأ في تبديل حالة التداول:', error);
+        showToast('❌ خطأ في الاتصال بالخادم', 'error');
+    } finally {
+        btn.disabled = false;
+    }
 }
 
 function toggleLogs() {

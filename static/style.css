@@ -152,6 +152,35 @@ header h1 {
     box-shadow: 0 8px 25px rgba(175, 82, 222, 0.4);
 }
 
+.btn-trading {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: white;
+    font-weight: 700;
+    font-size: 1rem;
+    min-width: 160px;
+    box-shadow: 0 4px 20px rgba(239, 68, 68, 0.4);
+}
+
+.btn-trading:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(239, 68, 68, 0.6);
+}
+
+.btn-trading.btn-start {
+    background: linear-gradient(135deg, #10b981, #059669);
+    box-shadow: 0 4px 20px rgba(16, 185, 129, 0.4);
+}
+
+.btn-trading.btn-start:hover {
+    box-shadow: 0 8px 30px rgba(16, 185, 129, 0.6);
+}
+
+.btn-trading:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
 .btn-icon {
     font-size: 1.1rem;
 }

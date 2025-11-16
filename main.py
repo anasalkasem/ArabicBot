@@ -38,6 +38,7 @@ MAX_LOGS = 50
 
 bot_instance = None
 telegram_bot_instance = None
+trading_enabled = True
 bot_stats = {
     'status': 'initializing',
     'iterations': 0,
@@ -611,6 +612,15 @@ class BinanceTradingBot:
                 bot_stats['iterations'] = iteration
                 bot_stats['last_check'] = datetime.now().isoformat()
                 
+                global trading_enabled
+                if not trading_enabled:
+                    bot_stats['status'] = 'paused'
+                    logger.warning("⏸️  التداول متوقف - في وضع الانتظار")
+                    time.sleep(5)
+                    continue
+                
+                bot_stats['status'] = 'running'
+                
                 logger.info(f"\n{'='*80}")
                 logger.info(f"🔄 Iteration #{iteration} - {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
                 logger.info(f"{'='*80}")
@@ -737,13 +747,14 @@ def get_status():
             'open_positions': len(positions_enriched),
             'positions': positions_enriched,
             'testnet': bot_instance.testnet,
+            'trading_enabled': trading_enabled,
             'market_regime': market_regime,
             'regime_reason': regime_reason,
             'regime_enabled': bot_instance.regime_enabled,
             'momentum_enabled': bot_instance.momentum_enabled,
             'momentum_data': momentum_data
         })
-    return jsonify({'status': 'initializing', 'testnet': True, 'market_regime': 'unknown', 'regime_enabled': False, 'momentum_enabled': False})
+    return jsonify({'status': 'initializing', 'testnet': True, 'trading_enabled': True, 'market_regime': 'unknown', 'regime_enabled': False, 'momentum_enabled': False})
 
 @app.route('/logs')
 def get_logs():
@@ -918,6 +929,34 @@ def sell_all_positions():
         
     except Exception as e:
         logger.error(f"❌ Error in sell-all endpoint: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/toggle-trading', methods=['POST'])
+def toggle_trading():
+    """تبديل حالة التداول (تشغيل/إيقاف)"""
+    global trading_enabled
+    
+    try:
+        trading_enabled = not trading_enabled
+        
+        if trading_enabled:
+            logger.info("▶️ التداول تم تشغيله من لوحة التحكم")
+            bot_stats['status'] = 'running'
+            message = "تم بدء التداول بنجاح"
+        else:
+            logger.warning("⏸️ التداول تم إيقافه من لوحة التحكم")
+            bot_stats['status'] = 'paused'
+            message = "تم إيقاف التداول مؤقتاً"
+        
+        return jsonify({
+            'success': True,
+            'trading_enabled': trading_enabled,
+            'status': bot_stats['status'],
+            'message': message
+        })
+        
+    except Exception as e:
+        logger.error(f"Error toggling trading: {e}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
 @app.route('/create-demo-position', methods=['POST'])
