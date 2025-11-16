@@ -47,6 +47,9 @@ async function updateDashboard() {
         // تحديث مؤشر الزخم المخصص
         updateCustomMomentum(data);
         
+        // تحديث نظام السرب الذكي
+        updateSwarmData();
+        
         // تحديث وقت التحديث
         document.getElementById('update-time').textContent = new Date().toLocaleString('ar-EG');
         
@@ -494,3 +497,71 @@ async function sellAllPositions() {
 setTimeout(() => {
     showToast('مرحباً! يتم تحديث البيانات تلقائياً كل 5 ثواني 👋', 'success');
 }, 1000);
+
+// تحديث بيانات نظام السرب
+async function updateSwarmData() {
+    try {
+        const response = await fetch('/swarm-stats');
+        const data = await response.json();
+        
+        const swarmContainer = document.getElementById('swarm-card-container');
+        
+        if (data.success && data.enabled) {
+            swarmContainer.style.display = 'block';
+            
+            const stats = data.stats;
+            
+            // تحديث الحالة
+            if (stats.total_bots) {
+                document.getElementById('swarm-status-text').textContent = 
+                    `${stats.total_bots} بوت نشط`;
+            }
+            
+            // تحديث أفضل بوت
+            if (stats.top_performer) {
+                const topBot = stats.top_performer;
+                document.getElementById('swarm-top-bot').textContent = 
+                    `#${topBot.bot_id} (${topBot.win_rate}%)`;
+            }
+            
+            // تحديث متوسط الدقة
+            if (stats.average_accuracy !== undefined) {
+                document.getElementById('swarm-avg-accuracy').textContent = 
+                    `${stats.average_accuracy.toFixed(1)}%`;
+            }
+            
+            // تحديث تجارب ورقية
+            if (stats.total_paper_trades !== undefined) {
+                document.getElementById('swarm-paper-trades').textContent = 
+                    stats.total_paper_trades;
+            }
+            
+            // تحديث تصويتات اليوم
+            if (stats.votes_today !== undefined) {
+                document.getElementById('swarm-today-votes').textContent = 
+                    stats.votes_today;
+            }
+            
+            // تحديث القرار الحالي
+            if (stats.latest_decision) {
+                const voteValue = document.querySelector('#swarm-current-vote .vote-value');
+                const decision = stats.latest_decision;
+                
+                if (decision === 'BUY') {
+                    voteValue.textContent = 'شراء 🟢';
+                    voteValue.className = 'vote-value buy';
+                } else if (decision === 'SELL') {
+                    voteValue.textContent = 'بيع 🔴';
+                    voteValue.className = 'vote-value sell';
+                } else {
+                    voteValue.textContent = 'محايد';
+                    voteValue.className = 'vote-value';
+                }
+            }
+        } else {
+            swarmContainer.style.display = 'none';
+        }
+    } catch (error) {
+        console.error('خطأ في تحديث بيانات السرب:', error);
+    }
+}

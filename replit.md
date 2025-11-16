@@ -23,6 +23,7 @@ The bot features a modular Python architecture designed for maintainability and 
     - Responsive design for mobile and tablet devices.
 
 - **Technical Implementations**:
+    - **Swarm Intelligence System**: Revolutionary collective decision-making with 50 autonomous worker bots. Each bot uses a distinct strategy (RSI-only, MACD-only, Bollinger-Stochastic, EMA-crossover, Volume-spike, Mean-reversion, Breakout, Trend-following, Volatility-based, Multi-indicator combos - 15 base strategies with variations). Features continuous paper trading, weighted voting based on 24-hour performance, automatic strategy promotion/demotion, and database tracking of all swarm activities.
     - **Custom Momentum Index**: A composite index (0-100) based on Technical Analysis (RSI, Stochastic, MACD - 40%), Sentiment Analysis (CoinGecko, VADER NLP - 30%), Volume Analysis (24-hour average comparison - 20%), and Relative Strength (asset vs. BTC - 10%). Generates buy signals below 40 and sell signals above 80.
     - **Market Regime Adaptation**: Automatically identifies market states (Bull/Bear/Sideways) and dynamically adjusts trading parameters.
     - **Advanced Technical Analysis**: Employs RSI, Stochastic, Bollinger Bands, MACD, EMA (50, 200), and ADX (14) for trend and momentum analysis across multiple timeframes (5m, 1h, 4h).
