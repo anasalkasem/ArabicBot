@@ -141,5 +141,26 @@
       "bear_market": "SHORT_ONLY",
       "sideways_market": "BOTH"
     }
+  },
+  "swarm_intelligence": {
+    "enabled": true,
+    "num_workers": 50,
+    "paper_trading_enabled": true,
+    "paper_trading_update_interval": 30,
+    "decision_mode": "voting",
+    "min_vote_confidence": 60.0,
+    "top_performers_count": 10,
+    "vote_weight_calculation": {
+      "profit_weight": 0.4,
+      "win_rate_weight": 0.3,
+      "trade_count_weight": 0.2,
+      "consistency_weight": 0.1
+    },
+    "worker_bot_settings": {
+      "initial_balance": 1000.0,
+      "min_trades_for_full_weight": 10,
+      "max_vote_weight": 5.0,
+      "min_vote_weight": 0.1
+    }
   }
 }
