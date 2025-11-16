@@ -1200,6 +1200,39 @@ def get_swarm_stats():
             return jsonify({'success': False, 'error': str(e)})
     return jsonify({'success': False, 'enabled': False, 'message': 'Swarm not enabled'})
 
+@app.route('/causal-graph')
+def get_causal_graph():
+    """الرسم البياني السببي للعلاقات بين المتغيرات"""
+    if bot_instance and bot_instance.causal_enabled and bot_instance.causal_engine:
+        try:
+            graph_data = bot_instance.causal_engine.export_causal_graph()
+            
+            return jsonify({
+                'success': True,
+                'enabled': True,
+                'graph': graph_data
+            })
+        except Exception as e:
+            logger.error(f"Causal graph error: {e}")
+            return jsonify({'success': False, 'error': str(e)})
+    return jsonify({'success': False, 'enabled': False, 'message': 'Causal Inference not enabled'})
+
+@app.route('/market-drivers/<symbol>')
+def get_market_drivers(symbol):
+    """تحديد المحركات الحقيقية للسوق"""
+    if bot_instance and bot_instance.causal_enabled and bot_instance.causal_engine:
+        try:
+            drivers = bot_instance.causal_engine.identify_market_drivers(symbol)
+            
+            return jsonify({
+                'success': True,
+                'drivers': drivers
+            })
+        except Exception as e:
+            logger.error(f"Market drivers error: {e}")
+            return jsonify({'success': False, 'error': str(e)})
+    return jsonify({'success': False, 'enabled': False, 'message': 'Causal Inference not enabled'})
+
 def run_bot():
     global bot_instance
     try:

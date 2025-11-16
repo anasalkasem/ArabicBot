@@ -162,5 +162,30 @@
       "max_vote_weight": 5.0,
       "min_vote_weight": 0.1
     }
+  },
+  "causal_inference": {
+    "enabled": true,
+    "analysis_method": "do_calculus",
+    "min_causal_strength": 0.5,
+    "filter_spurious_correlations": true,
+    "confidence_weight": {
+      "causal_analysis": 0.6,
+      "swarm_voting": 0.4
+    },
+    "min_confidence_threshold": 60.0,
+    "learning_period_days": 30,
+    "variables": [
+      "rsi",
+      "stochastic",
+      "macd",
+      "bb_position",
+      "volume_ratio",
+      "price_change",
+      "ema_alignment",
+      "market_regime",
+      "sentiment_score",
+      "btc_correlation",
+      "swarm_confidence"
+    ]
   }
 }
