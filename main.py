@@ -920,6 +920,104 @@ def sell_all_positions():
         logger.error(f"❌ Error in sell-all endpoint: {e}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
+@app.route('/create-demo-position', methods=['POST'])
+def create_demo_position():
+    """إنشاء صفقة تجريبية لعرض Futures UI"""
+    if not bot_instance:
+        return jsonify({'success': False, 'error': 'Bot not initialized'}), 500
+    
+    try:
+        demo_positions = [
+            {
+                'symbol': 'BTCUSDT',
+                'position_type': 'LONG',
+                'entry_price': 94500.00,
+                'quantity': 0.001,
+                'leverage': 2,
+                'liquidation_price': 47250.00
+            },
+            {
+                'symbol': 'ETHUSDT',
+                'position_type': 'SHORT',
+                'entry_price': 3250.00,
+                'quantity': 0.015,
+                'leverage': 3,
+                'liquidation_price': 4875.00
+            }
+        ]
+        
+        created_count = 0
+        for pos_data in demo_positions:
+            liquidation_price = pos_data['liquidation_price']
+            entry_price = pos_data['entry_price']
+            
+            if pos_data['position_type'] == 'LONG':
+                stop_loss_price = entry_price * 0.98
+                take_profit_price = entry_price * 1.04
+            else:
+                stop_loss_price = entry_price * 1.02
+                take_profit_price = entry_price * 0.96
+            
+            bot_instance.risk_manager.positions[pos_data['symbol']] = {
+                'status': 'open',
+                'entry_price': entry_price,
+                'quantity': pos_data['quantity'],
+                'signals': {'demo': True},
+                'entry_time': str(datetime.now()),
+                'market_regime': 'sideways',
+                'position_type': pos_data['position_type'],
+                'leverage': pos_data['leverage'],
+                'liquidation_price': liquidation_price,
+                'stop_loss_percent': 2.0,
+                'take_profit_percent': 4.0,
+                'unrealized_pnl': 0.0,
+                'funding_rate': None,
+                'trailing_stop': {
+                    'enabled': True,
+                    'current_stop_percent': -2.0 if pos_data['position_type'] == 'LONG' else 2.0,
+                    'highest_price': entry_price if pos_data['position_type'] == 'LONG' else None,
+                    'lowest_price': entry_price if pos_data['position_type'] == 'SHORT' else None,
+                    'activation_profit': 3.0,
+                    'trail_percent': 2.0
+                }
+            }
+            
+            if bot_instance.db:
+                try:
+                    bot_instance.db.save_position(
+                        symbol=pos_data['symbol'],
+                        entry_price=entry_price,
+                        quantity=pos_data['quantity'],
+                        entry_time=datetime.now(),
+                        stop_loss=stop_loss_price,
+                        take_profit=take_profit_price,
+                        trailing_stop_price=stop_loss_price,
+                        highest_price=entry_price,
+                        market_regime='sideways',
+                        buy_signals={'demo': 'true'},
+                        position_type=pos_data['position_type'],
+                        leverage=pos_data['leverage'],
+                        liquidation_price=liquidation_price
+                    )
+                except Exception as e:
+                    logger.error(f"Error saving demo position to DB: {e}")
+            
+            bot_instance.risk_manager.save_positions()
+            created_count += 1
+            
+            pos_emoji = "🟢" if pos_data['position_type'] == 'LONG' else "🔴"
+            logger.info(f"{pos_emoji} Created DEMO {pos_data['position_type']} position: {pos_data['symbol']} @ ${entry_price:.2f} ({pos_data['leverage']}x)")
+        
+        return jsonify({
+            'success': True,
+            'created': created_count,
+            'message': f'Created {created_count} demo Futures positions'
+        })
+        
+    except Exception as e:
+        logger.error(f"❌ Error creating demo position: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
 def run_bot():
     global bot_instance
     try:

@@ -353,11 +353,14 @@ class DatabaseManager:
     
     def save_indicator_signal(self, symbol, indicator_name, timeframe, is_bullish, price, signal_time):
         try:
+            is_bullish_native = bool(is_bullish) if hasattr(is_bullish, 'item') else bool(is_bullish)
+            price_native = float(price) if hasattr(price, 'item') else float(price)
+            
             with self.connection.cursor() as cursor:
                 cursor.execute("""
                     INSERT INTO indicator_signals (symbol, indicator_name, timeframe, is_bullish, price, signal_time)
                     VALUES (%s, %s, %s, %s, %s, %s)
-                """, (symbol, indicator_name, timeframe, is_bullish, price, signal_time))
+                """, (symbol, indicator_name, timeframe, is_bullish_native, price_native, signal_time))
                 self.connection.commit()
         except Exception as e:
             self.connection.rollback()
@@ -366,14 +369,19 @@ class DatabaseManager:
     def save_indicator_outcome(self, symbol, indicator_name, timeframe, signal_price, outcome_price,
                               price_change_percent, was_successful, signal_time, outcome_time):
         try:
+            signal_price_native = float(signal_price) if hasattr(signal_price, 'item') else float(signal_price)
+            outcome_price_native = float(outcome_price) if hasattr(outcome_price, 'item') else float(outcome_price)
+            price_change_native = float(price_change_percent) if hasattr(price_change_percent, 'item') else float(price_change_percent)
+            was_successful_native = bool(was_successful) if hasattr(was_successful, 'item') else bool(was_successful)
+            
             with self.connection.cursor() as cursor:
                 cursor.execute("""
                     INSERT INTO indicator_outcomes (symbol, indicator_name, timeframe, signal_price,
                                                    outcome_price, price_change_percent, was_successful,
                                                    signal_time, outcome_time)
                     VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
-                """, (symbol, indicator_name, timeframe, signal_price, outcome_price, 
-                     price_change_percent, was_successful, signal_time, outcome_time))
+                """, (symbol, indicator_name, timeframe, signal_price_native, outcome_price_native, 
+                     price_change_native, was_successful_native, signal_time, outcome_time))
                 self.connection.commit()
         except Exception as e:
             self.connection.rollback()
