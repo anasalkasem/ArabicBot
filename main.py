@@ -1262,9 +1262,8 @@ def run_telegram_bot():
         else:
             raise
 
-if __name__ == "__main__":
-    port = int(os.environ.get('PORT', 5000))
-    logger.info(f"🌐 Starting web server on port {port}...")
+def init_background_services():
+    """تهيئة الخدمات الخلفية (البوت و Telegram)"""
     logger.info("🤖 Starting trading bot in background...")
     
     bot_thread = threading.Thread(target=run_bot, daemon=True)
@@ -1277,5 +1276,11 @@ if __name__ == "__main__":
         telegram_thread.start()
     else:
         logger.warning("⚠️ TELEGRAM_BOT_TOKEN not set - Telegram bot disabled")
-    
+
+if not os.environ.get('GUNICORN_WORKER'):
+    init_background_services()
+
+if __name__ == "__main__":
+    port = int(os.environ.get('PORT', 5000))
+    logger.info(f"🌐 Starting web server on port {port}...")
     app.run(host='0.0.0.0', port=port, debug=False)
