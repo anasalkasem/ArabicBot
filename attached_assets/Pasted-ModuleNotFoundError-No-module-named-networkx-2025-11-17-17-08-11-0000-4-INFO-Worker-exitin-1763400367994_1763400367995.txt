@@ -1,0 +1,120 @@
+ModuleNotFoundError: No module named 'networkx'
+[2025-11-17 17:08:11 +0000] [4] [INFO] Worker exiting (pid: 4)
+[2025-11-17 17:08:11 +0000] [1] [ERROR] Worker (pid:4) exited with code 3
+[2025-11-17 17:08:11 +0000] [1] [ERROR] Shutting down: Master
+[2025-11-17 17:08:11 +0000] [1] [ERROR] Reason: Worker failed to boot.
+[2025-11-17 17:08:13 +0000] [1] [INFO] Starting gunicorn 23.0.0
+[2025-11-17 17:08:13 +0000] [1] [INFO] Listening at: http://0.0.0.0:8080 (1)
+[2025-11-17 17:08:13 +0000] [1] [INFO] Using worker: gthread
+[2025-11-17 17:08:13 +0000] [4] [INFO] Booting worker with pid: 4
+[2025-11-17 17:08:13 +0000] [4] [ERROR] Worker (pid:5) exited with code 1
+[2025-11-17 17:08:13 +0000] [4] [ERROR] Worker (pid:5) exited with code 1.
+[2025-11-17 17:08:13 +0000] [4] [ERROR] Worker (pid:16) exited with code 1
+[2025-11-17 17:08:13 +0000] [4] [ERROR] Worker (pid:16) exited with code 1.
+[2025-11-17 17:08:14 +0000] [4] [ERROR] Exception in worker process
+Traceback (most recent call last):
+  File "/opt/venv/lib/python3.12/site-packages/gunicorn/arbiter.py", line 607, in spawn_worker
+    self.cfg.post_fork(self, worker)
+  File "/app/gunicorn_config.py", line 20, in post_fork
+    from main import run_bot, run_telegram_bot
+  File "/app/main.py", line 24, in <module>
+    from causal_inference import CausalInferenceEngine
+  File "/app/causal_inference.py", line 2, in <module>
+    import networkx as nx
+ModuleNotFoundError: No module named 'networkx'
+[2025-11-17 17:08:14 +0000] [4] [INFO] Worker exiting (pid: 4)
+[2025-11-17 17:08:15 +0000] [1] [ERROR] Worker (pid:4) exited with code 3
+[2025-11-17 17:08:15 +0000] [1] [ERROR] Shutting down: Master
+[2025-11-17 17:08:15 +0000] [1] [ERROR] Reason: Worker failed to boot.
+[2025-11-17 17:08:16 +0000] [1] [INFO] Starting gunicorn 23.0.0
+[2025-11-17 17:08:16 +0000] [1] [INFO] Listening at: http://0.0.0.0:8080 (1)
+[2025-11-17 17:08:16 +0000] [1] [INFO] Using worker: gthread
+[2025-11-17 17:08:16 +0000] [4] [INFO] Booting worker with pid: 4
+[2025-11-17 17:08:16 +0000] [4] [ERROR] Worker (pid:5) exited with code 1
+[2025-11-17 17:08:16 +0000] [4] [ERROR] Worker (pid:5) exited with code 1.
+[2025-11-17 17:08:16 +0000] [4] [ERROR] Worker (pid:16) exited with code 1
+[2025-11-17 17:08:16 +0000] [4] [ERROR] Worker (pid:16) exited with code 1.
+Traceback (most recent call last):
+  File "/opt/venv/lib/python3.12/site-packages/gunicorn/arbiter.py", line 607, in spawn_worker
+    self.cfg.post_fork(self, worker)
+  File "/app/gunicorn_config.py", line 20, in post_fork
+    from main import run_bot, run_telegram_bot
+  File "/app/main.py", line 24, in <module>
+    from causal_inference import CausalInferenceEngine
+  File "/app/causal_inference.py", line 2, in <module>
+    import networkx as nx
+ModuleNotFoundError: No module named 'networkx'
+[2025-11-17 17:08:17 +0000] [4] [INFO] Worker exiting (pid: 4)
+[2025-11-17 17:08:17 +0000] [4] [ERROR] Exception in worker process
+[2025-11-17 17:08:18 +0000] [1] [ERROR] Worker (pid:4) exited with code 3
+[2025-11-17 17:08:18 +0000] [1] [ERROR] Shutting down: Master
+[2025-11-17 17:08:18 +0000] [1] [ERROR] Reason: Worker failed to boot.
+[2025-11-17 17:08:19 +0000] [1] [INFO] Starting gunicorn 23.0.0
+[2025-11-17 17:08:19 +0000] [1] [INFO] Listening at: http://0.0.0.0:8080 (1)
+[2025-11-17 17:08:19 +0000] [1] [INFO] Using worker: gthread
+[2025-11-17 17:08:19 +0000] [4] [INFO] Booting worker with pid: 4
+[2025-11-17 17:08:19 +0000] [4] [ERROR] Worker (pid:5) exited with code 1
+[2025-11-17 17:08:19 +0000] [4] [ERROR] Worker (pid:5) exited with code 1.
+[2025-11-17 17:08:19 +0000] [4] [ERROR] Worker (pid:16) exited with code 1
+[2025-11-17 17:08:19 +0000] [4] [ERROR] Worker (pid:16) exited with code 1.
+[2025-11-17 17:08:20 +0000] [4] [ERROR] Exception in worker process
+Traceback (most recent call last):
+  File "/opt/venv/lib/python3.12/site-packages/gunicorn/arbiter.py", line 607, in spawn_worker
+    self.cfg.post_fork(self, worker)
+  File "/app/gunicorn_config.py", line 20, in post_fork
+    from main import run_bot, run_telegram_bot
+  File "/app/main.py", line 24, in <module>
+    from causal_inference import CausalInferenceEngine
+  File "/app/causal_inference.py", line 2, in <module>
+    import networkx as nx
+ModuleNotFoundError: No module named 'networkx'
+[2025-11-17 17:08:20 +0000] [4] [INFO] Worker exiting (pid: 4)
+[2025-11-17 17:08:21 +0000] [1] [ERROR] Worker (pid:4) exited with code 3
+[2025-11-17 17:08:21 +0000] [1] [ERROR] Shutting down: Master
+[2025-11-17 17:08:21 +0000] [1] [ERROR] Reason: Worker failed to boot.
+[2025-11-17 17:08:22 +0000] [1] [INFO] Starting gunicorn 23.0.0
+[2025-11-17 17:08:22 +0000] [1] [INFO] Listening at: http://0.0.0.0:8080 (1)
+[2025-11-17 17:08:22 +0000] [1] [INFO] Using worker: gthread
+[2025-11-17 17:08:22 +0000] [4] [INFO] Booting worker with pid: 4
+[2025-11-17 17:08:22 +0000] [4] [ERROR] Worker (pid:5) exited with code 1
+[2025-11-17 17:08:22 +0000] [4] [ERROR] Worker (pid:5) exited with code 1.
+[2025-11-17 17:08:22 +0000] [4] [ERROR] Worker (pid:16) exited with code 1
+[2025-11-17 17:08:22 +0000] [4] [ERROR] Worker (pid:16) exited with code 1.
+[2025-11-17 17:08:23 +0000] [4] [ERROR] Exception in worker process
+Traceback (most recent call last):
+  File "/opt/venv/lib/python3.12/site-packages/gunicorn/arbiter.py", line 607, in spawn_worker
+    self.cfg.post_fork(self, worker)
+  File "/app/gunicorn_config.py", line 20, in post_fork
+    from main import run_bot, run_telegram_bot
+  File "/app/main.py", line 24, in <module>
+    from causal_inference import CausalInferenceEngine
+  File "/app/causal_inference.py", line 2, in <module>
+    import networkx as nx
+ModuleNotFoundError: No module named 'networkx'
+[2025-11-17 17:08:23 +0000] [4] [INFO] Worker exiting (pid: 4)
+[2025-11-17 17:08:24 +0000] [1] [ERROR] Reason: Worker failed to boot.
+[2025-11-17 17:08:24 +0000] [1] [ERROR] Worker (pid:4) exited with code 3
+[2025-11-17 17:08:24 +0000] [1] [ERROR] Shutting down: Master
+[2025-11-17 17:08:25 +0000] [1] [INFO] Starting gunicorn 23.0.0
+[2025-11-17 17:08:25 +0000] [1] [INFO] Listening at: http://0.0.0.0:8080 (1)
+[2025-11-17 17:08:25 +0000] [1] [INFO] Using worker: gthread
+[2025-11-17 17:08:25 +0000] [4] [INFO] Booting worker with pid: 4
+[2025-11-17 17:08:25 +0000] [4] [ERROR] Worker (pid:5) exited with code 1
+[2025-11-17 17:08:25 +0000] [4] [ERROR] Worker (pid:5) exited with code 1.
+[2025-11-17 17:08:25 +0000] [4] [ERROR] Worker (pid:16) exited with code 1
+[2025-11-17 17:08:25 +0000] [4] [ERROR] Worker (pid:16) exited with code 1.
+[2025-11-17 17:08:26 +0000] [4] [ERROR] Exception in worker process
+Traceback (most recent call last):
+  File "/opt/venv/lib/python3.12/site-packages/gunicorn/arbiter.py", line 607, in spawn_worker
+    self.cfg.post_fork(self, worker)
+  File "/app/gunicorn_config.py", line 20, in post_fork
+    from main import run_bot, run_telegram_bot
+  File "/app/main.py", line 24, in <module>
+    from causal_inference import CausalInferenceEngine
+  File "/app/causal_inference.py", line 2, in <module>
+    import networkx as nx
+ModuleNotFoundError: No module named 'networkx'
+[2025-11-17 17:08:26 +0000] [4] [INFO] Worker exiting (pid: 4)
+[2025-11-17 17:08:27 +0000] [1] [ERROR] Worker (pid:4) exited with code 3
+[2025-11-17 17:08:27 +0000] [1] [ERROR] Shutting down: Master
+[2025-11-17 17:08:27 +0000] [1] [ERROR] Reason: Worker failed to boot.

@@ -1,18 +1,22 @@
 # 🚀 Railway Healthcheck - الحل النهائي
 
-## ❌ المشكلة
+## ❌ المشاكل
 ```
-Healthcheck failed!
-Attempt #1-7 failed with service unavailable
-1/1 replicas never became healthy!
+1. Healthcheck failed!
+   Attempt #1-7 failed with service unavailable
+   1/1 replicas never became healthy!
+
+2. ModuleNotFoundError: No module named 'networkx'
+   Worker failed to boot.
 ```
 
-## 🔍 السبب الجذري
+## 🔍 الأسباب الجذرية
 1. **Flask Development Server**: `app.run()` غير مناسب للإنتاج
 2. **Timeout قصير**: 100 ثانية غير كافية للتهيئة الكاملة
-3. **Threading**: البوت يعمل في خيط منفصل، وقد يتأخر
+3. **Threading مع Gunicorn --preload**: البوت لا يبدأ في worker!
+4. **مكتبات مفقودة**: networkx, dowhy, scipy, statsmodels غير موجودة في requirements.txt
 
-## ✅ الحل (مُطبَّق تلقائياً)
+## ✅ الحلول (مُطبَّقة تلقائياً)
 
 ### 1. استخدام Gunicorn مع Post-Fork Hook
 ```bash
@@ -33,7 +37,15 @@ GUNICORN_WORKER=1 gunicorn --config gunicorn_config.py main:app
 "healthcheckTimeout": 300  // كان 100، الآن 300 ثانية
 ```
 
-### 3. تهيئة ذكية للخدمات الخلفية
+### 3. إضافة مكتبات Causal Inference إلى requirements.txt
+```txt
+networkx>=3.1
+dowhy>=0.11
+scipy>=1.11.0
+statsmodels>=0.14.0
+```
+
+### 4. تهيئة ذكية للخدمات الخلفية
 ```python
 # في main.py - فقط في وضع development
 if not os.environ.get('GUNICORN_WORKER'):

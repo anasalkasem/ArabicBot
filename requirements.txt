@@ -12,3 +12,7 @@ vaderSentiment
 psycopg2-binary
 python-telegram-bot
 openai>=2.0.0
+networkx>=3.1
+dowhy>=0.11
+scipy>=1.11.0
+statsmodels>=0.14.0
