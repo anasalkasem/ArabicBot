@@ -54,6 +54,9 @@ async function updateDashboard() {
         // تحديث وقت التحديث
         document.getElementById('update-time').textContent = new Date().toLocaleString('ar-EG');
         
+        // تحديث نص زر التبديل
+        updateModeToggleButton();
+        
     } catch (error) {
         console.error('خطأ في جلب البيانات:', error);
         showToast('خطأ في الاتصال بالخادم', 'error');
@@ -594,5 +597,65 @@ async function updateCausalData() {
         }
     } catch (error) {
         console.error('خطأ في تحديث بيانات التحليل السببي:', error);
+    }
+}
+
+async function toggleTradingMode() {
+    const currentMode = document.getElementById('mode').textContent;
+    const isTestnet = currentMode === 'TESTNET';
+    const newMode = isTestnet ? 'LIVE' : 'TESTNET';
+    
+    const warningMessage = isTestnet 
+        ? '⚠️ تحذير: أنت على وشك التبديل إلى الوضع الحقيقي!\n\n🔴 سيتم استخدام أموال حقيقية للتداول\n💰 تأكد من أن لديك رصيد كافٍ في حسابك\n🔐 تأكد من صحة API Keys\n\nهل أنت متأكد من المتابعة؟'
+        : '📝 التبديل إلى وضع التجربة (Testnet)\n\n✅ سيتم استخدام أموال وهمية للتداول\n🔬 مثالي للاختبار دون مخاطر\n\nهل تريد المتابعة؟';
+    
+    if (!confirm(warningMessage)) {
+        return;
+    }
+    
+    const toggleBtn = document.getElementById('toggle-mode-btn');
+    const originalText = toggleBtn.innerHTML;
+    
+    try {
+        toggleBtn.disabled = true;
+        toggleBtn.innerHTML = '<span class="btn-icon">⏳</span><span class="btn-text">جاري التبديل...</span>';
+        
+        const response = await fetch('/toggle-mode', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ testnet: !isTestnet })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showToast(`✅ تم التبديل إلى وضع ${data.mode === 'TESTNET' ? 'التجربة' : 'التداول الحقيقي'} بنجاح!\n⏳ سيتم إعادة تشغيل البوت خلال 3 ثوان...`, 'success');
+            
+            setTimeout(() => {
+                location.reload();
+            }, 3000);
+        } else {
+            showToast(`❌ خطأ: ${data.error || 'فشل التبديل'}`, 'error');
+            toggleBtn.disabled = false;
+            toggleBtn.innerHTML = originalText;
+        }
+        
+    } catch (error) {
+        console.error('Error toggling trading mode:', error);
+        showToast('❌ خطأ في الاتصال بالخادم', 'error');
+        toggleBtn.disabled = false;
+        toggleBtn.innerHTML = originalText;
+    }
+}
+
+function updateModeToggleButton() {
+    const currentMode = document.getElementById('mode').textContent;
+    const isTestnet = currentMode === 'TESTNET';
+    const modeToggleText = document.getElementById('mode-toggle-text');
+    
+    if (modeToggleText) {
+        modeToggleText.textContent = isTestnet ? 'التبديل للوضع الحقيقي 🔴' : 'التبديل لوضع التجربة 🔬';
     }
 }

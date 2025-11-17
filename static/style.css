@@ -297,6 +297,42 @@ header h1 {
     50% { box-shadow: 0 4px 25px rgba(52, 199, 89, 0.6); }
 }
 
+.btn-mode-toggle {
+    width: 100%;
+    margin-top: 15px;
+    background: linear-gradient(135deg, rgba(0, 122, 255, 0.2), rgba(175, 82, 222, 0.2));
+    color: var(--text-primary);
+    border: 2px solid rgba(0, 122, 255, 0.4);
+    padding: 12px 20px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-mode-toggle:hover {
+    background: linear-gradient(135deg, rgba(0, 122, 255, 0.3), rgba(175, 82, 222, 0.3));
+    border-color: rgba(0, 122, 255, 0.6);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 122, 255, 0.4);
+}
+
+.btn-mode-toggle:active {
+    transform: translateY(0);
+}
+
+.btn-mode-toggle:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.account-card {
+    position: relative;
+}
+
+.account-info {
+    margin-bottom: 10px;
+}
+
 .stats-grid {
     grid-template-columns: repeat(2, 1fr);
 }

@@ -1080,6 +1080,38 @@ def toggle_trading():
         logger.error(f"Error toggling trading: {e}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
+@app.route('/toggle-mode', methods=['POST'])
+def toggle_mode():
+    """تبديل بين وضع التجربة (Testnet) والتداول الحقيقي (Live)"""
+    global bot_instance
+    
+    try:
+        data = request.get_json()
+        new_testnet_mode = data.get('testnet', True)
+        
+        import json
+        with open('config.json', 'r', encoding='utf-8') as f:
+            config = json.load(f)
+        
+        config['trading']['testnet'] = new_testnet_mode
+        
+        with open('config.json', 'w', encoding='utf-8') as f:
+            json.dump(config, f, indent=4, ensure_ascii=False)
+        
+        mode_text = 'TESTNET' if new_testnet_mode else 'LIVE'
+        logger.warning(f"🔄 تم تبديل وضع التداول إلى: {mode_text}")
+        
+        return jsonify({
+            'success': True,
+            'mode': mode_text,
+            'testnet': new_testnet_mode,
+            'message': f'تم التبديل إلى وضع {mode_text} - يرجى إعادة تشغيل البوت'
+        })
+        
+    except Exception as e:
+        logger.error(f"Error toggling mode: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
 @app.route('/create-demo-position', methods=['POST'])
 def create_demo_position():
     """إنشاء صفقة تجريبية لعرض Futures UI"""
