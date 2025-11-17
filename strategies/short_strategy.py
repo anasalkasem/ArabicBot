@@ -36,15 +36,20 @@ class ShortStrategy(BaseStrategy):
         stoch_threshold = entry_conditions.get('stochastic_threshold', 80)
         bb_tolerance = entry_conditions.get('bb_upper_tolerance', 0.5)
         
-        if rsi < rsi_threshold:
-            return False, f"RSI too low ({rsi:.1f} < {rsi_threshold})"
+        tolerance_percent = 0.10
         
-        if stoch < stoch_threshold:
-            return False, f"Stochastic too low ({stoch:.1f} < {stoch_threshold})"
+        rsi_threshold_adjusted = rsi_threshold * (1 - tolerance_percent)
+        if rsi < rsi_threshold_adjusted:
+            return False, f"RSI too low ({rsi:.1f} < {rsi_threshold_adjusted:.1f})"
+        
+        stoch_threshold_adjusted = stoch_threshold * (1 - tolerance_percent)
+        if stoch < stoch_threshold_adjusted:
+            return False, f"Stochastic too low ({stoch:.1f} < {stoch_threshold_adjusted:.1f})"
         
         bb_distance = ((bb_upper - current_price) / bb_upper) * 100
-        if bb_distance > bb_tolerance:
-            return False, f"Price too far from BB upper ({bb_distance:.2f}% > {bb_tolerance}%)"
+        bb_threshold = bb_tolerance * (1 + tolerance_percent)
+        if bb_distance > bb_threshold:
+            return False, f"Price too far from BB upper ({bb_distance:.2f}% > {bb_threshold:.1f}%)"
         
         if trends:
             bullish_count = sum(1 for trend in trends.values() if trend == 'bullish')

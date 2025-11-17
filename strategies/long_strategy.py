@@ -30,15 +30,20 @@ class LongStrategy(BaseStrategy):
             adjusted_stoch += regime_config.get('stoch_oversold_adjustment', 0)
             bb_tolerance += regime_config.get('bb_tolerance_adjustment', 0)
         
-        if rsi >= adjusted_rsi:
-            return False, f"RSI too high ({rsi:.1f} >= {adjusted_rsi})"
+        tolerance_percent = 0.10
         
-        if stoch >= adjusted_stoch:
-            return False, f"Stochastic too high ({stoch:.1f} >= {adjusted_stoch})"
+        rsi_threshold = adjusted_rsi * (1 + tolerance_percent)
+        if rsi >= rsi_threshold:
+            return False, f"RSI too high ({rsi:.1f} >= {rsi_threshold:.1f})"
+        
+        stoch_threshold = adjusted_stoch * (1 + tolerance_percent)
+        if stoch >= stoch_threshold:
+            return False, f"Stochastic too high ({stoch:.1f} >= {stoch_threshold:.1f})"
         
         bb_distance = ((current_price - bb_lower) / bb_lower) * 100
-        if bb_distance > bb_tolerance:
-            return False, f"Price too far from BB lower ({bb_distance:.2f}% > {bb_tolerance}%)"
+        bb_threshold = bb_tolerance * (1 + tolerance_percent)
+        if bb_distance > bb_threshold:
+            return False, f"Price too far from BB lower ({bb_distance:.2f}% > {bb_threshold:.1f}%)"
         
         if trends:
             bearish_count = sum(1 for trend in trends.values() if trend == 'bearish')
