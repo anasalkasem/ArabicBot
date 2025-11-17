@@ -9,12 +9,14 @@ from collections import defaultdict
 logger = logging.getLogger('causal_inference')
 
 class CausalInferenceEngine:
-    def __init__(self, db_manager=None, min_causal_strength=0.5):
+    def __init__(self, db_manager=None, min_causal_strength=0.5, config=None):
         self.db = db_manager
         self.min_causal_strength = min_causal_strength
+        self.config = config or {}
         self.causal_graph = nx.DiGraph()
         self.causal_effects = {}
         self.variable_history = defaultdict(list)
+        self.start_time = datetime.now()
         
         self.variables = [
             'rsi', 'stochastic', 'macd', 'bb_position', 
@@ -23,7 +25,8 @@ class CausalInferenceEngine:
             'swarm_confidence', 'whale_activity'
         ]
         
-        logger.info(f"🧠 Causal Inference Engine initialized (min_strength={min_causal_strength})")
+        training_hours = self.config.get('causal_inference', {}).get('training_mode_hours', 24)
+        logger.info(f"🧠 Causal Inference Engine initialized (min_strength={min_causal_strength}, training_mode={training_hours}h)")
         
         self._initialize_graph()
     
@@ -363,8 +366,14 @@ class CausalInferenceEngine:
         دمج تصويت السرب مع التحليل السببي
         """
         try:
-            signals = []
+            causal_config = self.config.get('causal_inference', {})
+            training_mode = causal_config.get('training_mode_enabled', False)
+            training_hours = causal_config.get('training_mode_hours', 24)
             
+            hours_running = (datetime.now() - self.start_time).total_seconds() / 3600
+            in_training = training_mode and hours_running < training_hours
+            
+            signals = []
             for indicator, value in technical_signals.items():
                 if isinstance(value, (int, float)):
                     signals.append({
@@ -372,14 +381,18 @@ class CausalInferenceEngine:
                         'value': value
                     })
             
-            causal_signals = self.filter_spurious_correlations(signals)
-            
-            causal_confidence = 0.0
-            for sig in causal_signals:
-                if not sig.get('is_spurious', False):
-                    causal_confidence += sig.get('causal_strength', 0)
-            
-            causal_confidence = min(100, causal_confidence * 10)
+            if in_training:
+                causal_signals = signals
+                causal_confidence = 100.0
+                logger.info(f"🎓 Training Mode: {hours_running:.1f}h/{training_hours}h - All signals accepted, causal confidence=100%")
+            else:
+                causal_signals = self.filter_spurious_correlations(signals)
+                causal_confidence = 0.0
+                for sig in causal_signals:
+                    if not sig.get('is_spurious', False):
+                        causal_confidence += sig.get('causal_strength', 0)
+                
+                causal_confidence = min(100, causal_confidence * 10)
             
             if hasattr(swarm_vote, 'confidence'):
                 swarm_confidence = swarm_vote.confidence
@@ -391,9 +404,17 @@ class CausalInferenceEngine:
                 swarm_confidence = 0
                 decision = 'HOLD'
             
-            final_confidence = (causal_confidence * 0.6) + (swarm_confidence * 0.4)
+            weights = causal_config.get('confidence_weight', {
+                'causal_analysis': 0.4,
+                'swarm_voting': 0.6
+            })
+            causal_weight = weights.get('causal_analysis', 0.4)
+            swarm_weight = weights.get('swarm_voting', 0.6)
             
-            if final_confidence < 60:
+            final_confidence = (causal_confidence * causal_weight) + (swarm_confidence * swarm_weight)
+            
+            min_threshold = causal_config.get('min_confidence_threshold', 50.0)
+            if final_confidence < min_threshold:
                 decision = 'HOLD'
             
             return {
@@ -403,7 +424,8 @@ class CausalInferenceEngine:
                 'swarm_confidence': round(swarm_confidence, 2),
                 'true_signals': len(causal_signals),
                 'filtered_spurious': len(signals) - len(causal_signals),
-                'explanation': f'Causal analysis filtered {len(signals) - len(causal_signals)} spurious signals'
+                'in_training_mode': in_training,
+                'explanation': f'Training Mode' if in_training else f'Causal analysis filtered {len(signals) - len(causal_signals)} spurious signals'
             }
         
         except Exception as e:

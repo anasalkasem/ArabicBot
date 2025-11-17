@@ -164,8 +164,12 @@ class BinanceTradingBot:
         if self.causal_enabled:
             try:
                 min_strength = self.config.get('causal_inference', {}).get('min_causal_strength', 0.5)
-                self.causal_engine = CausalInferenceEngine(db_manager=self.db, min_causal_strength=min_strength)
+                self.causal_engine = CausalInferenceEngine(db_manager=self.db, min_causal_strength=min_strength, config=self.config)
+                training_mode = self.config.get('causal_inference', {}).get('training_mode_enabled', False)
+                training_hours = self.config.get('causal_inference', {}).get('training_mode_hours', 24)
                 logger.info(f"🧠 Causal Inference Engine: ENABLED (min_strength={min_strength})")
+                if training_mode:
+                    logger.info(f"   🎓 Training Mode: {training_hours}h warmup period")
                 logger.info("   📊 Analysis type: Structural Causal Models")
                 logger.info("   🎯 Filtering: Spurious Correlations")
                 logger.info("   💡 Method: Do-Calculus & Granger Causality")
@@ -487,14 +491,21 @@ class BinanceTradingBot:
                         allowed_strategies = self.strategy_coordinator.get_allowed_strategies(market_regime)
                         position_opened = False
                         
+                        indicators_for_strategy = indicators.copy()
+                        indicators_for_strategy['stochastic'] = indicators.get('stoch_k')
+                        indicators_for_strategy['current_price'] = current_price
+                        
                         if 'LONG' in allowed_strategies:
                             should_long, long_reason = self.strategy_coordinator.long_strategy.check_entry_signal(
-                                symbol, indicators, market_regime, {
+                                symbol, indicators_for_strategy, market_regime, {
                                     'short_trend': short_trend,
                                     'medium_trend': medium_trend,
                                     'long_trend': long_trend
                                 }
                             )
+                            
+                            if not should_long:
+                                logger.info(f"   ⏭️ LONG strategy rejected: {long_reason}")
                             
                             if should_long:
                                 quantity = self.risk_manager.calculate_futures_position_size(symbol, current_price)
@@ -513,7 +524,7 @@ class BinanceTradingBot:
                         
                         if not position_opened and 'SHORT' in allowed_strategies:
                             should_short, short_reason = self.strategy_coordinator.short_strategy.check_entry_signal(
-                                symbol, indicators, market_regime, {
+                                symbol, indicators_for_strategy, market_regime, {
                                     'short_trend': short_trend,
                                     'medium_trend': medium_trend,
                                     'long_trend': long_trend

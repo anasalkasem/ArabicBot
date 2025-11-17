@@ -169,13 +169,15 @@
   "causal_inference": {
     "enabled": true,
     "analysis_method": "do_calculus",
-    "min_causal_strength": 0.5,
+    "min_causal_strength": 0.2,
     "filter_spurious_correlations": true,
+    "training_mode_enabled": true,
+    "training_mode_hours": 24,
     "confidence_weight": {
-      "causal_analysis": 0.6,
-      "swarm_voting": 0.4
+      "causal_analysis": 0.4,
+      "swarm_voting": 0.6
     },
-    "min_confidence_threshold": 60.0,
+    "min_confidence_threshold": 50.0,
     "learning_period_days": 30,
     "variables": [
       "rsi",
