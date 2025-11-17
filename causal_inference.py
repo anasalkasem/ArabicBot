@@ -23,6 +23,23 @@ class CausalInferenceEngine:
         ]
         
         logger.info("🧠 Causal Inference Engine initialized")
+        
+        self._initialize_graph()
+    
+    def _initialize_graph(self):
+        """تهيئة الرسم البياني السببي مع البيانات التاريخية إن وُجدت"""
+        historical_data = []
+        
+        if self.db:
+            try:
+                rows = self.db.get_all_trades(limit=100)
+                if rows:
+                    logger.info(f"📊 Loading {len(rows)} historical trades for causal analysis")
+                    historical_data = rows
+            except Exception as e:
+                logger.warning(f"⚠️ Could not load historical data: {e}")
+        
+        self.build_causal_graph(historical_data)
     
     def build_causal_graph(self, historical_data: List[Dict]) -> nx.DiGraph:
         """
@@ -174,6 +191,24 @@ class CausalInferenceEngine:
         بدلاً من: "ماذا يحدث للسعر عندما يتغير RSI؟"
         """
         try:
+            if treatment not in self.causal_graph.nodes():
+                logger.debug(f"⚠️ Variable '{treatment}' not in causal graph")
+                return {
+                    'effect': 0.0,
+                    'confidence': 0.0,
+                    'is_causal': False,
+                    'explanation': f'Variable {treatment} not in graph'
+                }
+            
+            if outcome not in self.causal_graph.nodes():
+                logger.debug(f"⚠️ Variable '{outcome}' not in causal graph")
+                return {
+                    'effect': 0.0,
+                    'confidence': 0.0,
+                    'is_causal': False,
+                    'explanation': f'Variable {outcome} not in graph'
+                }
+            
             if not nx.has_path(self.causal_graph, treatment, outcome):
                 return {
                     'effect': 0.0,
