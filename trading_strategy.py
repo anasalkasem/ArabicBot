@@ -105,10 +105,12 @@ class TradingStrategy:
             logger.warning(f"🐻 BEAR market detected - Very conservative: RSI<{self.rsi_oversold}, Stoch<{self.stoch_oversold}, BB tolerance={((self.bb_tolerance-1)*100):.1f}%")
         
         else:
-            self.rsi_oversold = self.base_rsi_oversold
-            self.stoch_oversold = self.base_stoch_oversold
-            self.bb_tolerance = self.base_bb_tolerance
-            logger.info(f"↔️ Adapted to SIDEWAYS market: Using standard strategy")
+            sideways_config = self.regime_config.get('sideways_strategy', {})
+            self.rsi_oversold = self.base_rsi_oversold + sideways_config.get('rsi_oversold_adjustment', 5)
+            self.stoch_oversold = self.base_stoch_oversold + sideways_config.get('stoch_oversold_adjustment', 5)
+            bb_adjustment = sideways_config.get('bb_tolerance_adjustment', 2.0)
+            self.bb_tolerance = self.base_bb_tolerance + (bb_adjustment / 100)
+            logger.info(f"↔️ Adapted to SIDEWAYS market: RSI<{self.rsi_oversold}, Stoch<{self.stoch_oversold}, BB tolerance={((self.bb_tolerance-1)*100):.1f}%")
     
     def check_buy_signal(self, indicators, prev_indicators=None, medium_trend=None, long_trend=None, market_regime=None, momentum_index=None, performance_tracker=None, symbol=None):
         try:

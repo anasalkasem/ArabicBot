@@ -485,9 +485,25 @@ class SwarmManager:
         self.num_workers = num_workers
         self.workers: List[WorkerBot] = []
         self.vote_history: List[SwarmVote] = []
+        self.regime_adjustments = {}
         
         logger.info(f"🐝 Initializing Swarm with {num_workers} worker bots...")
         self._initialize_swarm()
+    
+    def set_regime_adjustments(self, rsi_oversold: int = None, stoch_oversold: int = None, bb_tolerance: float = None):
+        """تحديث عتبات السوق بناءً على market regime"""
+        if rsi_oversold is not None:
+            self.regime_adjustments['rsi_oversold'] = rsi_oversold
+        if stoch_oversold is not None:
+            self.regime_adjustments['stoch_oversold'] = stoch_oversold
+        if bb_tolerance is not None:
+            self.regime_adjustments['bb_tolerance'] = bb_tolerance
+        
+        for worker in self.workers:
+            if rsi_oversold is not None:
+                worker.config.rsi_buy_threshold = rsi_oversold
+            if stoch_oversold is not None:
+                worker.config.stoch_buy = stoch_oversold
     
     def _initialize_swarm(self):
         """إنشاء السرب من 50 بوت متنوع"""

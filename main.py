@@ -163,8 +163,9 @@ class BinanceTradingBot:
         self.causal_enabled = self.config.get('causal_inference', {}).get('enabled', True)
         if self.causal_enabled:
             try:
-                self.causal_engine = CausalInferenceEngine(db_manager=self.db)
-                logger.info("🧠 Causal Inference Engine: ENABLED")
+                min_strength = self.config.get('causal_inference', {}).get('min_causal_strength', 0.5)
+                self.causal_engine = CausalInferenceEngine(db_manager=self.db, min_causal_strength=min_strength)
+                logger.info(f"🧠 Causal Inference Engine: ENABLED (min_strength={min_strength})")
                 logger.info("   📊 Analysis type: Structural Causal Models")
                 logger.info("   🎯 Filtering: Spurious Correlations")
                 logger.info("   💡 Method: Do-Calculus & Granger Causality")
@@ -317,6 +318,12 @@ class BinanceTradingBot:
                 klines = self.binance_client.get_historical_klines(symbol, timeframe, limit=100)
                 market_regime, regime_reason = self.market_regime.detect_regime(indicators, klines)
                 self.trading_strategy.adapt_to_regime(market_regime, regime_reason)
+                
+                if self.swarm_enabled and self.swarm:
+                    self.swarm.set_regime_adjustments(
+                        rsi_oversold=self.trading_strategy.rsi_oversold,
+                        stoch_oversold=self.trading_strategy.stoch_oversold
+                    )
             
             swarm_vote = self.get_swarm_decision(symbol, indicators)
             

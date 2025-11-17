@@ -68,7 +68,10 @@
       "take_profit_multiplier": 0.8
     },
     "sideways_strategy": {
-      "description": "متوازن - استراتيجية BB",
+      "description": "متوازن - استراتيجية BB مخففة",
+      "rsi_oversold_adjustment": 5,
+      "stoch_oversold_adjustment": 5,
+      "bb_tolerance_adjustment": 2.0,
       "stop_loss_multiplier": 1.0,
       "take_profit_multiplier": 1.0
     }

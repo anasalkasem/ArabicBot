@@ -9,8 +9,9 @@ from collections import defaultdict
 logger = logging.getLogger('causal_inference')
 
 class CausalInferenceEngine:
-    def __init__(self, db_manager=None):
+    def __init__(self, db_manager=None, min_causal_strength=0.5):
         self.db = db_manager
+        self.min_causal_strength = min_causal_strength
         self.causal_graph = nx.DiGraph()
         self.causal_effects = {}
         self.variable_history = defaultdict(list)
@@ -22,7 +23,7 @@ class CausalInferenceEngine:
             'swarm_confidence', 'whale_activity'
         ]
         
-        logger.info("🧠 Causal Inference Engine initialized")
+        logger.info(f"🧠 Causal Inference Engine initialized (min_strength={min_causal_strength})")
         
         self._initialize_graph()
     
@@ -280,6 +281,21 @@ class CausalInferenceEngine:
         """
         فلترة الارتباطات الزائفة - الإشارات المبنية على ارتباط وليس سببية
         """
+        has_valid_edges = False
+        if self.causal_graph.number_of_edges() > 0:
+            for _, _, data in self.causal_graph.edges(data=True):
+                if data.get('weight', 0) >= self.min_causal_strength:
+                    has_valid_edges = True
+                    break
+        
+        if not has_valid_edges:
+            logger.info(f"⚠️ Causal graph not trained - bypassing spurious filter (allowing {len(signals)} signals)")
+            for signal in signals:
+                signal['is_spurious'] = False
+                signal['causal_strength'] = 0.5
+                signal['causal_confidence'] = 0.5
+            return signals
+        
         filtered_signals = []
         
         for signal in signals:
